@@ -16,16 +16,24 @@ const DEFAULT_PRICE = { min: '', max: '' };
 const API_PARAMS = { page: 1, limit: 1000 };
 
 // Search: menu links send phrases like "Tablet Press Machines" or "Dryers & Sifters".
-// Ignore words that only say what *kind* of thing it is, match singular/plural,
-// and look in the name, category and description.
+// Ignore words that only say what *kind* of thing it is (and one-letter words),
+// match singular/plural, and look in the name, category and description.
 const GENERIC_WORDS = new Set(['machine', 'machines', 'equipment', 'system', 'systems', 'line', 'lines', 'unit', 'units', 'and', 'the', 'for', 'of', 'with']);
 const stem = (w) => w.replace(/(ss|sh|ch|x)es$/, '$1').replace(/([^s])s$/, '$1');
 const searchWords = (term) => {
-  const words = term.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w && !GENERIC_WORDS.has(w)).map(stem);
-  return words.length ? words : [term.toLowerCase()];
+  const words = term.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length > 1 && !GENERIC_WORDS.has(w)).map(stem);
+  return words.length ? words : [term.toLowerCase().trim()];
 };
-const searchText = (p) =>
-  `${p.name || ''} ${String(p.category || '').replace(/-/g, ' ')} ${String(p.description || '').replace(/<[^>]+>/g, ' ')}`.toLowerCase();
+const tokens = (text) => String(text || '').replace(/<[^>]+>/g, ' ').replace(/-/g, ' ').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+// A search word matches the start of a word in the text: "press" finds "presses", not "spray"
+const countHits = (words, toks) => words.filter((w) => toks.some((t) => t.startsWith(w))).length;
+// Ranking: a match in the category counts most, then the name, then the description
+const scoreProduct = (p, words) => {
+  const name = tokens(p.name);
+  const category = tokens(p.category);
+  const any = countHits(words, [...name, ...category, ...tokens(p.description)]);
+  return { any, rank: countHits(words, category) * 3 + countHits(words, name) * 2 + any };
+};
 
 // embedded = shown inside the home page: the home page owns the title and the <h1>
 const ShopPage = ({ embedded = false }) => {
@@ -93,10 +101,11 @@ const ShopPage = ({ embedded = false }) => {
     });
     if (term) {
       const words = searchWords(term);
-      const hits = (p) => words.filter((w) => searchText(p).includes(w)).length;
-      const exact = list.filter((p) => hits(p) === words.length);
-      // Nothing matches every word: show the closest matches rather than an empty page
-      list = exact.length ? exact : list.filter((p) => hits(p) > 0).sort((a, b) => hits(b) - hits(a));
+      const scored = list.map((p) => ({ p, s: scoreProduct(p, words) })).filter((x) => x.s.any > 0);
+      const exact = scored.filter((x) => x.s.any === words.length);
+      // Nothing matches every word: show the closest matches rather than an empty page.
+      // Best matches first (the price/rating sort below still applies when chosen).
+      list = (exact.length ? exact : scored).sort((a, b) => b.s.rank - a.s.rank).map((x) => x.p);
     }
 
     return list
