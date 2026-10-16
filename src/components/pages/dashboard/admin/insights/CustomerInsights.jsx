@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Eye, Heart, ShoppingCart, UserCheck, X, Loader2, RefreshCw, Info } from 'lucide-react';
+import { Users, Eye, Heart, ShoppingCart, UserCheck, X, Loader2, RefreshCw, Info, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import getBaseURL from '../../../../../utlis/baseURL';
 
-const api = async (path) => {
+const api = async (path, method = 'GET') => {
   let token = null;
   try { token = localStorage.getItem('token'); } catch { /* storage blocked */ }
   const res = await fetch(`${getBaseURL()}/api/insights${path}`, {
+    method,
     credentials: 'include',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
@@ -29,6 +31,7 @@ const EVENT_LABEL = {
   product_like: 'liked ❤️',
   product_unlike: 'removed like from',
   add_to_cart: 'added to cart 🛒',
+  product_share: 'shared',
 };
 
 const Tile = ({ icon: Icon, label, value, tint }) => (
@@ -52,9 +55,47 @@ const ProductCell = ({ id, name, image }) => (
   </Link>
 );
 
-const CustomerDrawer = ({ userId, onClose }) => {
+// Deletes a customer's tracked activity (not their account or orders) after confirming
+const deleteCustomerData = async (userId, label) => {
+  const ok = window.confirm(
+    `Delete all tracked activity for ${label}?\n\n` +
+      'Pages and products they viewed, liked or added to cart will be removed from Customer Insights. ' +
+      'Their account and orders are not affected. This cannot be undone.'
+  );
+  if (!ok) return false;
+  try {
+    const r = await api(`/customer/${userId}`, 'DELETE');
+    toast.success(`Deleted ${r.deleted} activity record${r.deleted === 1 ? '' : 's'}`);
+    return true;
+  } catch (e) {
+    toast.error(e.message);
+    return false;
+  }
+};
+
+// Deletes an anonymous visitor's tracked activity after confirming
+const deleteVisitorData = async (visitorId, label) => {
+  if (!window.confirm(`Delete all tracked activity for ${label}? This cannot be undone.`)) return false;
+  try {
+    const r = await api(`/visitor/${encodeURIComponent(visitorId)}`, 'DELETE');
+    toast.success(`Deleted ${r.deleted} activity record${r.deleted === 1 ? '' : 's'}`);
+    return true;
+  } catch (e) {
+    toast.error(e.message);
+    return false;
+  }
+};
+
+const CustomerDrawer = ({ userId, onClose, onDeleted }) => {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const remove = async () => {
+    setDeleting(true);
+    const ok = await deleteCustomerData(userId, data?.customer?.name || data?.customer?.email || 'this customer');
+    setDeleting(false);
+    if (ok) onDeleted();
+  };
   useEffect(() => {
     api(`/customer/${userId}`).then(setData).catch((e) => setError(e.message));
   }, [userId]);
@@ -118,6 +159,19 @@ const CustomerDrawer = ({ userId, onClose }) => {
                 </li>
               ))}
             </ul>
+
+            <div className="mt-6 border-t border-gray-200 pt-4">
+              <button
+                type="button"
+                onClick={remove}
+                disabled={deleting}
+                className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 disabled:opacity-60"
+              >
+                {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                Delete this customer&apos;s tracking data
+              </button>
+              <p className="mt-1 text-xs text-gray-500">Removes their viewed, liked and cart activity. Their account and orders stay.</p>
+            </div>
           </>
         )}
       </aside>
@@ -234,6 +288,7 @@ const CustomerInsights = () => {
                         <th className="pb-2">Last seen</th>
                         <th className="pb-2 text-right">Products viewed</th>
                         <th className="pb-2 text-right">🛒</th>
+                        <th className="pb-2"><span className="sr-only">Delete</span></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -250,6 +305,20 @@ const CustomerInsights = () => {
                           <td className="whitespace-nowrap py-2 text-gray-600">{ago(c.lastSeen)}</td>
                           <td className="py-2 text-right">{c.productsViewed}</td>
                           <td className="py-2 text-right">{c.cartAdds}</td>
+                          <td className="py-2 pl-2 text-right">
+                            <button
+                              type="button"
+                              title="Delete this customer's tracking data"
+                              aria-label={`Delete tracking data for ${c.name || c.email}`}
+                              onClick={async (ev) => {
+                                ev.stopPropagation();
+                                if (await deleteCustomerData(c.userId, c.name || c.email || 'this customer')) load();
+                              }}
+                              className="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -272,7 +341,20 @@ const CustomerInsights = () => {
                       ) : <span className="text-gray-500">{e.who}</span>}{' '}
                       {EVENT_LABEL[e.type]} <span className="font-medium">{e.productName || e.path}</span>
                     </span>
-                    <span className="shrink-0 text-xs text-gray-400">{ago(e.at)}</span>
+                    <span className="flex shrink-0 items-center gap-1 text-xs text-gray-400">
+                      {ago(e.at)}
+                      {!e.userId && e.visitorId && (
+                        <button
+                          type="button"
+                          title="Delete this visitor's tracking data"
+                          aria-label={`Delete tracking data for ${e.who}`}
+                          onClick={async () => { if (await deleteVisitorData(e.visitorId, e.who)) load(); }}
+                          className="rounded p-1 text-gray-300 hover:bg-red-50 hover:text-red-600"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -281,7 +363,13 @@ const CustomerInsights = () => {
         </div>
       )}
 
-      {selected && <CustomerDrawer userId={selected} onClose={() => setSelected(null)} />}
+      {selected && (
+        <CustomerDrawer
+          userId={selected}
+          onClose={() => setSelected(null)}
+          onDeleted={() => { setSelected(null); load(); }}
+        />
+      )}
     </div>
   );
 };
