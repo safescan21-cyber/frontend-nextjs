@@ -54,7 +54,7 @@ const About = () => (
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
-              to="/quote"
+              to="/bulk-quote"
               className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-8 rounded-full transition shadow-lg"
             >
               Get a Quote
@@ -174,7 +174,7 @@ const About = () => (
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-4">
             <Link
-              to="/quote"
+              to="/bulk-quote"
               className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-8 rounded-full transition shadow-lg"
             >
               Get a Quote

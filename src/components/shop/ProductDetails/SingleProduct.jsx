@@ -160,6 +160,27 @@ const SingleProduct = () => {
     );
   }
 
+  // ── Facts for the Description / Specifications tabs (product data only) ──
+  const customSpecs = (Array.isArray(product.specifications) ? product.specifications : []).filter((sp) => sp?.key && sp?.value);
+  const hasCustomSpecs = customSpecs.length > 0;
+  const warrantyText = Number(product.warranty) > 0 ? `${product.warranty} months` : null;
+  const originText = product.origin ? String(product.origin).replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) : null;
+  const specRows = [
+    ['Product Name', product.name],
+    ['Category', String(product.category || '').replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())],
+    ...customSpecs.map((sp) => [sp.key, sp.value]),
+    ...(originText ? [['Origin', originText]] : []),
+    ...(warrantyText ? [['Warranty', warrantyText]] : []),
+    ['Price (INR)', `₹${Number(product.price || 0).toLocaleString('en-IN')}`],
+  ];
+  const atAGlance = [
+    ...customSpecs.slice(0, 4).map((sp) => `${sp.key}: ${sp.value}`),
+    warrantyText && `${warrantyText} warranty`,
+    product.readyToDispatch && 'Ready to dispatch',
+    Number(product.stock) > 0 ? 'In stock' : 'Currently out of stock — ask for lead time',
+    originText && `Origin: ${originText}`,
+  ].filter(Boolean);
+
   // ── Product videos (Cloudinary): play as MP4 everywhere, JPG frame as poster ──
   const videoUrls = (Array.isArray(product.videos) ? product.videos : []).filter((v) => typeof v === 'string' && v);
   const videoSrc = (url) => (url.includes('res.cloudinary.com') ? url.replace(/\.(webm|ogv|mov|mkv|avi)(\?.*)?$/i, '.mp4') : url);
@@ -698,60 +719,54 @@ const SingleProduct = () => {
                 <h3 className="text-lg font-bold text-gray-900">Product Overview</h3>
                 <p className="leading-relaxed whitespace-pre-line">
                   {product.description ||
-                    `The ${product.name} is a high-precision industrial instrument designed for demanding weighing and measurement applications.`}
+                    `${product.name} for pharma and food manufacturing. Contact us for full specifications and a quote.`}
                 </p>
-                <h4 className="text-base font-bold text-gray-900 mt-6">Key Features</h4>
-                <ul className="space-y-2">
-                  {[
-                    'High-precision measurement with ±0.01% accuracy',
-                    'Industrial-grade stainless steel construction',
-                    'IP67 rated for dust and water resistance',
-                    'RS-232/RS-485 communication interfaces',
-                    'Temperature compensated for stable readings',
-                    'Easy calibration with front-panel controls',
-                    'CE and RoHS certified',
-                  ].map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm">
-                      <svg className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
+                {/* Only facts from the product's own data (no template claims) */}
+                {atAGlance.length > 0 && (
+                  <>
+                    <h4 className="text-base font-bold text-gray-900 mt-6">At a Glance</h4>
+                    <ul className="space-y-2">
+                      {atAGlance.map((f) => (
+                        <li key={f} className="flex items-start gap-2 text-sm">
+                          <svg className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
               </div>
             )}
 
-            {/* Specs */}
+            {/* Specs: the specifications entered in admin for this product, plus its basic details */}
             {activeTab === 'specs' && (
               <div>
                 <h3 className="text-lg font-bold text-gray-900 mb-4">Technical Specifications</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm border-collapse">
                     <tbody>
-                      {[
-                        ['Product Name', product.name],
-                        ['Category', product.category?.replace(/-/g, ' ')],
-                        ['Color / Finish', product.color || 'N/A'],
-                        ['Price (INR)', `₹${product.price.toLocaleString('en-IN')}`],
-                        ['Rating', product.rating ? `${product.rating} / 5.0` : 'N/A'],
-                        ['Accuracy Class', 'OIML Class III'],
-                        ['Operating Temp', '-10°C to +60°C'],
-                        ['Protection Rating', 'IP67'],
-                        ['Power Supply', '110–240V AC / 12V DC'],
-                        ['Communication', 'RS-232 / RS-485 / USB'],
-                        ['Display', '6-digit LED / LCD'],
-                        ['Certification', 'CE, RoHS, ISO 9001'],
-                        ['Warranty', '12 Months'],
-                      ].map(([key, val], i) => (
-                        <tr key={key} className={i % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                      {specRows.map(([key, val], i) => (
+                        <tr key={`${key}-${i}`} className={i % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                           <td className="py-3 px-4 font-semibold text-gray-700 w-1/3 border border-gray-200">{key}</td>
-                          <td className="py-3 px-4 text-gray-600 border border-gray-200 capitalize">{val}</td>
+                          <td className="py-3 px-4 text-gray-600 border border-gray-200">{val}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
+                {!hasCustomSpecs && (
+                  <p className="mt-4 text-sm text-gray-600">
+                    Detailed technical specifications are available on request.{' '}
+                    <Link
+                      to={`/bulk-quote?product=${encodeURIComponent(product.name)}&id=${product._id}&source=product`}
+                      className="font-semibold text-blue-600 hover:underline"
+                    >
+                      Ask for the full spec sheet →
+                    </Link>
+                  </p>
+                )}
               </div>
             )}
 

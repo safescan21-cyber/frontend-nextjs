@@ -15,18 +15,37 @@ const DEFAULT_PRICE = { min: '', max: '' };
 // client-side so the category list never shrinks and filters always work.
 const API_PARAMS = { page: 1, limit: 1000 };
 
+// Search: menu links send phrases like "Tablet Press Machines" or "Dryers & Sifters".
+// Ignore words that only say what *kind* of thing it is, match singular/plural,
+// and look in the name, category and description.
+const GENERIC_WORDS = new Set(['machine', 'machines', 'equipment', 'system', 'systems', 'line', 'lines', 'unit', 'units', 'and', 'the', 'for', 'of', 'with']);
+const stem = (w) => w.replace(/(ss|sh|ch|x)es$/, '$1').replace(/([^s])s$/, '$1');
+const searchWords = (term) => {
+  const words = term.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w && !GENERIC_WORDS.has(w)).map(stem);
+  return words.length ? words : [term.toLowerCase()];
+};
+const searchText = (p) =>
+  `${p.name || ''} ${String(p.category || '').replace(/-/g, ' ')} ${String(p.description || '').replace(/<[^>]+>/g, ' ')}`.toLowerCase();
+
 // embedded = shown inside the home page: the home page owns the title and the <h1>
 const ShopPage = ({ embedded = false }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
 
-  const [filter, setFilter] = useState('all');
+  const [searchParams] = useSearchParams();
+  // ?category=tablet-press (menu/footer links) pre-selects that category
+  const urlCategory = searchParams.get('category') || 'all';
+  const [filter, setFilter] = useState(urlCategory);
+  const [prevUrlCategory, setPrevUrlCategory] = useState(urlCategory);
+  if (urlCategory !== prevUrlCategory) {
+    setPrevUrlCategory(urlCategory);
+    setFilter(urlCategory);
+  }
   const [sortBy, setSortBy] = useState('default');
   const [showFilters, setShowFilters] = useState(false); // phones/tablets: filter panel folds away
   const [priceRange, setPriceRange] = useState(DEFAULT_PRICE);
   // Read ?search= from the URL (e.g. from the navbar search) and keep it in sync
-  const [searchParams] = useSearchParams();
   const urlSearch = searchParams.get('search') || '';
   const [searchTerm, setSearchTerm] = useState(urlSearch);
   const [prevUrlSearch, setPrevUrlSearch] = useState(urlSearch);
@@ -63,17 +82,24 @@ const ShopPage = ({ embedded = false }) => {
 
   // Client-side category + price + search + sorting
   const filteredProducts = useMemo(() => {
-    const term = searchTerm.trim().toLowerCase();
+    const term = searchTerm.trim();
     const min = Number(priceRange.min) || 0;
     const max = priceRange.max === '' ? Infinity : Number(priceRange.max);
 
-    return products
-      .filter((product) => {
-        if (filter !== 'all' && product.category !== filter) return false;
-        if (product.price < min || product.price > max) return false;
-        if (term && !product.name?.toLowerCase().includes(term)) return false;
-        return true;
-      })
+    let list = products.filter((product) => {
+      if (filter !== 'all' && product.category !== filter) return false;
+      if (product.price < min || product.price > max) return false;
+      return true;
+    });
+    if (term) {
+      const words = searchWords(term);
+      const hits = (p) => words.filter((w) => searchText(p).includes(w)).length;
+      const exact = list.filter((p) => hits(p) === words.length);
+      // Nothing matches every word: show the closest matches rather than an empty page
+      list = exact.length ? exact : list.filter((p) => hits(p) > 0).sort((a, b) => hits(b) - hits(a));
+    }
+
+    return list
       .sort((a, b) => {
         if (sortBy === 'price-low') return a.price - b.price;
         if (sortBy === 'price-high') return b.price - a.price;
