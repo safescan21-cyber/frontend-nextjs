@@ -1,0 +1,11 @@
+node_modules/
+.next/
+out/
+# Secrets / local settings — never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+npm-debug.log*
+.DS_Store

@@ -1,0 +1,43 @@
+<svg viewBox="0 0 640 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="pmhGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22D3C4"/>
+      <stop offset="100%" stop-color="#0891B2"/>
+    </linearGradient>
+    <linearGradient id="pmhDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Icon -->
+  <g transform="translate(20,20)">
+    <!-- Hexagon body (hub) -->
+    <polygon points="80,4 148,42 148,118 80,156 12,118 12,42"
+             fill="url(#pmhDark)" stroke="url(#pmhGrad)" stroke-width="4"/>
+
+    <!-- Mechanical gear (engineering) -->
+    <path fill-rule="evenodd" fill="url(#pmhGrad)"
+      d="M 129.23,71.25 L 129.23,88.75 L 119.38,87.00 L 115.98,97.48 L 124.97,101.86 L 114.68,116.02 L 107.75,108.81 L 98.83,115.29 L 103.54,124.11 L 86.89,129.52 L 85.51,119.62 L 74.49,119.62 L 73.11,129.52 L 56.46,124.11 L 61.17,115.29 L 52.25,108.81 L 45.32,116.02 L 35.03,101.86 L 44.02,97.48 L 40.62,87.00 L 30.77,88.75 L 30.77,71.25 L 40.62,73.00 L 44.02,62.52 L 35.03,58.14 L 45.32,43.98 L 52.25,51.19 L 61.17,44.71 L 56.46,35.89 L 73.11,30.48 L 74.49,40.38 L 85.51,40.38 L 86.89,30.48 L 103.54,35.89 L 98.83,44.71 L 107.75,51.19 L 114.68,43.98 L 124.97,58.14 L 115.98,62.52 L 119.38,73.00 Z
+         M 80,60 A 20,20 0 1 1 79.99,60 Z"/>
+
+    <!-- Wrench accent crossing behind, engineering tool motif -->
+    <g transform="translate(80,80) rotate(25)" opacity="0.9">
+      <rect x="-58" y="-4" width="34" height="8" rx="4" fill="#F8FAFC"/>
+      <path d="M -58 -9 a 9 9 0 1 0 0 18 a 5 5 0 0 1 0 -18 Z" fill="#F8FAFC"/>
+    </g>
+
+    <!-- Capsule (pharma) centered on top -->
+    <g transform="translate(80,80) rotate(-40)">
+      <rect x="-30" y="-11" width="60" height="22" rx="11" fill="#F8FAFC"/>
+      <path d="M -30 -11 H 0 V 11 H -30 A 11 11 0 0 1 -30 -11 Z" fill="url(#pmhGrad)"/>
+      <line x1="0" y1="-11" x2="0" y2="11" stroke="#0F172A" stroke-width="1.3"/>
+    </g>
+  </g>
+
+  <!-- Wordmark -->
+  <g transform="translate(210,78)" font-family="Arial, Helvetica, sans-serif">
+    <text x="0" y="0" font-size="40" font-weight="700" fill="#F8FAFC">Pharma<tspan fill="url(#pmhGrad)">Machine</tspan>Hub</text>
+    <text x="2" y="30" font-size="15" letter-spacing="3" fill="#94A3B8">INDUSTRIAL PHARMA EQUIPMENT MARKETPLACE</text>
+  </g>
+</svg>
