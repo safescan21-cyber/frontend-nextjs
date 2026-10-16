@@ -165,6 +165,20 @@ export async function seoForPath(segments = []) {
     };
   }
 
-  // Everything else (login, cart, dashboard…): the site defaults, no canonical
-  return {};
+  // A solution page that doesn't exist
+  if (/^\/solutions\/[^/]+$/.test(path)) return { notFound: true };
+
+  // Other pages the app has (login, cart, dashboard…): the site defaults, no canonical
+  if (APP_ROUTES.some((re) => re.test(path))) return {};
+
+  // Anything else is a real 404 (not a "soft 404" page answering 200 OK)
+  return { notFound: true };
 }
+
+// Every route in src/App.jsx (keep in sync when adding pages)
+const APP_ROUTES = [
+  /^\/$/, /^\/about$/, /^\/contact$/, /^\/shop$/, /^\/products$/, /^\/products\/[^/]+$/, /^\/categories\/[^/]+$/,
+  /^\/press$/, /^\/projects$/, /^\/career$/, /^\/solutions$/, /^\/resources\/[^/]+$/, /^\/privacy$/, /^\/bulk-quote$/,
+  /^\/track-order$/, /^\/search$/, /^\/login$/, /^\/register$/, /^\/forgotpassword$/, /^\/resetpassword\/[^/]+$/,
+  /^\/cart$/, /^\/checkout$/, /^\/wishlist$/, /^\/dashboard(\/.*)?$/,
+];

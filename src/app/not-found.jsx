@@ -5,6 +5,9 @@ import ClientApp from './ClientApp';
 // (Next.js adds <meta name="robots" content="noindex"> to 404 responses itself)
 export const metadata = {
   title: { absolute: 'Page not found | Food Pharma Machinery' },
+  description: 'This page is no longer available. Browse pharma and food processing machinery at Food Pharma Machinery.',
+  openGraph: { title: 'Page not found | Food Pharma Machinery' },
+  twitter: { title: 'Page not found | Food Pharma Machinery' },
 };
 
 export default function NotFound() {

@@ -14,7 +14,7 @@ const getSeo = cache((slug) => seoForPath(slug || []));
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const seo = await getSeo(slug);
-  if (seo.notFound) return {};
+  if (seo.notFound) return {}; // the page itself calls notFound()
   if (!seo.title && !seo.canonical) return {}; // login, cart… keep the site defaults
 
   const image = seo.image || DEFAULT_IMAGE;
