@@ -5,7 +5,7 @@ import getBaseUrl from "../../utlis/baseURL";
 // ══════════════════════════════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════════════════════════════
-const WHATSAPP_NUMBER = "8700792607";
+const WHATSAPP_NUMBER = "918700792607"; // country code + number, as wa.me requires
 const WHATSAPP_MSG = "Hello, I would like to enquire about your machines.";
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MSG)}`;
 const PHONE_DISPLAY = "+91 8700792607";

@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import getBaseUrl from "../utlis/baseURL";
 
-const WHATSAPP_NUMBER = "8700792607";
+const WHATSAPP_NUMBER = "918700792607"; // country code + number, as wa.me requires
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=Hello%2C%20I%20would%20like%20to%20enquire%20about%20your%20machines.`;
 const PHONE_DISPLAY = "+91 8700792607";
 const PHONE_TEL = "tel:+918700792607";

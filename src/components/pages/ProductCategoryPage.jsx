@@ -149,7 +149,7 @@ const PRODUCT_DATA = {
 
 /* ─── Helper: WhatsApp link generator ───────────────────── */
 const getWhatsAppLink = (productName) => {
-  const phone = "12135550182";
+  const phone = "918700792607"; // +91 87007 92607
   const message = encodeURIComponent(`Hi PharmaMachine, I'm interested in the ${productName}. Please send more details.`);
   return `https://wa.me/${phone}?text=${message}`;
 };
