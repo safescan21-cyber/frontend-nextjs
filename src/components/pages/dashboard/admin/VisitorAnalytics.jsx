@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import getBaseURL from '../../../../utlis/baseURL';
 import toast from 'react-hot-toast';
@@ -65,6 +65,49 @@ const VisitorAnalytics = () => {
   useEffect(() => {
     fetchData(dateRange, who);
   }, [token, dateRange, who]);
+
+  // ── Selection for "Delete selected" ──
+  const [selected, setSelected] = useState(() => new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
+  const selectAllRef = useRef(null);
+  useEffect(() => { setSelected(new Set()); }, [visitors]); // new list → nothing selected
+  const allSelected = visitors.length > 0 && visitors.every((v) => selected.has(v._id));
+  const someSelected = selected.size > 0 && !allSelected;
+  useEffect(() => { if (selectAllRef.current) selectAllRef.current.indeterminate = someSelected; }, [someSelected]);
+  const toggleOne = (id) => setSelected((prev) => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
+  const toggleAll = () => setSelected(allSelected ? new Set() : new Set(visitors.map((v) => v._id)));
+
+  const deleteSelected = async () => {
+    const chosen = visitors.filter((v) => selected.has(v._id));
+    if (!chosen.length) return;
+    const users = chosen.filter((v) => v.user).length;
+    const msg =
+      `Delete all visit records of ${chosen.length} selected visitor${chosen.length === 1 ? '' : 's'}?` +
+      (users ? `\n\n${users} of them ${users === 1 ? 'is a logged-in customer' : 'are logged-in customers'}: every visit linked to their account will be removed too. Accounts and orders are not affected.` : '') +
+      '\n\nThis cannot be undone.';
+    if (!window.confirm(msg)) return;
+    setBulkDeleting(true);
+    try {
+      const res = await fetch(`${getBaseURL()}/api/admin/visitors/delete-many`, {
+        method: 'POST',
+        headers: { ...authHeaders(token), 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ visitorIds: chosen.map((v) => v._id), includeAccounts: true }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || `Delete failed (${res.status})`);
+      toast.success(`Deleted ${data.deleted} visit record${data.deleted === 1 ? '' : 's'} from ${chosen.length} visitor${chosen.length === 1 ? '' : 's'}`);
+      fetchData(dateRange, who);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setBulkDeleting(false);
+    }
+  };
 
   // Delete a visitor's records (for logged-in visitors: everything linked to their account)
   const [deletingId, setDeletingId] = useState(null);
@@ -379,11 +422,38 @@ const VisitorAnalytics = () => {
         <h3 className="text-slate-700 font-semibold mb-3 flex items-center gap-2">
           <Users className="w-4 h-4" /> Recent Visitors
         </h3>
+        {selected.size > 0 && (
+          <div className="mb-3 flex flex-wrap items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm">
+            <span className="font-semibold text-red-800">{selected.size} selected</span>
+            <button
+              type="button"
+              onClick={deleteSelected}
+              disabled={bulkDeleting}
+              className="inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 font-semibold text-white hover:bg-red-700 disabled:opacity-60"
+            >
+              <Trash2 className="h-4 w-4" /> {bulkDeleting ? 'Deleting…' : 'Delete selected'}
+            </button>
+            <button type="button" onClick={() => setSelected(new Set())} className="text-slate-600 hover:underline">
+              Clear
+            </button>
+          </div>
+        )}
         <div className="overflow-x-auto">
           {visitors.length > 0 ? (
             <table className="w-full text-sm text-left">
               <thead className="text-xs uppercase text-slate-500 border-b border-slate-200">
                 <tr>
+                  <th className="w-10 px-3 py-3">
+                    <input
+                      ref={selectAllRef}
+                      type="checkbox"
+                      checked={allSelected}
+                      onChange={toggleAll}
+                      aria-label={allSelected ? 'Unselect all visitors' : 'Select all visitors on this page'}
+                      title="Select all"
+                      className="h-4 w-4 cursor-pointer accent-red-600"
+                    />
+                  </th>
                   <th className="px-4 py-3">Visitor</th>
                   <th className="px-4 py-3">Device</th>
                   <th className="px-4 py-3">First Visit</th>
@@ -397,7 +467,16 @@ const VisitorAnalytics = () => {
                   const pages = (v.websitePages?.length ? v.websitePages : v.pages) || [];
                   const open = openRow === v._id;
                   return (
-                    <tr key={v._id} className="border-b border-slate-100 align-top hover:bg-slate-50 transition-colors">
+                    <tr key={v._id} className={`border-b border-slate-100 align-top transition-colors ${selected.has(v._id) ? 'bg-red-50/60' : 'hover:bg-slate-50'}`}>
+                      <td className="w-10 px-3 py-3">
+                        <input
+                          type="checkbox"
+                          checked={selected.has(v._id)}
+                          onChange={() => toggleOne(v._id)}
+                          aria-label={`Select ${v.user ? v.user.name || v.user.email : `guest ${v.ip}`}`}
+                          className="h-4 w-4 cursor-pointer accent-red-600"
+                        />
+                      </td>
                       <td className="px-4 py-3">
                         {v.user ? (
                           <div>
