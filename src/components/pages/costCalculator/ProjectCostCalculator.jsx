@@ -3,20 +3,27 @@ import { Link, useSearchParams } from 'react-router-dom';
 import {
   Calculator, Pill, Package, Droplets, Beaker, Syringe, Factory, ShieldCheck, Clock,
   Printer, MessageCircle, FileText, RotateCcw, ChevronDown, Info, Ruler, Wrench,
+  Egg, Box, TestTube, Snowflake, Eye, Droplet, Zap, Wind, Flame, Users, Thermometer,
 } from 'lucide-react';
-import { SECTIONS, TIERS, COMPLIANCE, calculate, formatLakh, formatRange, EFFICIENCY, HOURS_PER_SHIFT } from './costModel';
+import {
+  SECTIONS, SECTION_GROUPS, TIERS, COMPLIANCE, calculate, formatLakh, formatRange, formatRupees,
+  EFFICIENCY, HOURS_PER_SHIFT, DEFAULT_TARIFF,
+} from './costModel';
 
 // Public "Pharma Project Cost Calculator". Runs entirely in the browser:
 // the visitor's choices live in the page address (so a link can be shared)
 // and nothing is sent to our server.
 
-const ICONS = { tablets: Pill, capsules: Package, liquids: Droplets, ointments: Beaker, injectables: Syringe };
+const ICONS = {
+  tablets: Pill, capsules: Package, softgels: Egg, powders: Box, liquids: Droplets, ointments: Beaker,
+  injectables: Syringe, ampoules: TestTube, lyo: Snowflake, ophthalmic: Eye, lvp: Droplet,
+};
 const WHATSAPP = '918700792607';
 const GROUP_COLORS = {
   machinery: 'bg-blue-600', building: 'bg-amber-500', utilities: 'bg-teal-500', qc: 'bg-violet-500',
   project: 'bg-rose-500', contingency: 'bg-slate-400', land: 'bg-lime-600',
 };
-const DEFAULTS = { forms: 'tablets', tier: 'auto', comp: 'schedM', shifts: 1, coating: 1, land: 0 };
+const DEFAULTS = { forms: 'tablets', tier: 'auto', comp: 'schedM', shifts: 1, coating: 1, land: 0, tariff: DEFAULT_TARIFF };
 
 const readState = (params) => {
   const forms = (params.get('forms') ?? DEFAULTS.forms).split(',').filter((k) => SECTIONS[k]);
@@ -30,7 +37,9 @@ const readState = (params) => {
   const shifts = [1, 2, 3].includes(Number(params.get('shifts'))) ? Number(params.get('shifts')) : DEFAULTS.shifts;
   const coating = params.get('coating') !== '0';
   const landCost = Math.max(0, Math.min(100000, Number(params.get('land')) || 0));
-  return { sections, tier, compliance, shifts, coating, landCost };
+  const t = Number(params.get('tariff'));
+  const tariff = t > 0 && t <= 30 ? t : DEFAULTS.tariff;
+  return { sections, tier, compliance, shifts, coating, landCost, tariff };
 };
 
 const toParams = (s) => {
@@ -43,11 +52,106 @@ const toParams = (s) => {
   if (s.shifts !== DEFAULTS.shifts) p.set('shifts', String(s.shifts));
   if (!s.coating) p.set('coating', '0');
   if (s.landCost) p.set('land', String(s.landCost));
+  if (s.tariff !== DEFAULTS.tariff) p.set('tariff', String(s.tariff));
   return p;
 };
 
 const num = (n) => Number(n).toLocaleString('en-IN');
-const capText = (cap, unit) => (cap ? `${num(cap)} ${unit}/hr` : '');
+const capText = (cap, unit, perDay) => (cap ? `${num(cap)} ${unit}/${perDay ? 'day' : 'hr'}` : '');
+const kw = (n) => `${num(Math.round(n))} kW`;
+
+const Stat = ({ icon: Icon, label, value, sub }) => (
+  <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 print:break-inside-avoid">
+    <p className="flex items-center gap-1.5 text-xs font-medium text-slate-500"><Icon className="h-3.5 w-3.5" aria-hidden="true" />{label}</p>
+    <p className="mt-0.5 text-lg font-semibold text-slate-900">{value}</p>
+    {sub && <p className="text-xs text-slate-500">{sub}</p>}
+  </div>
+);
+
+// Power and utilities, per segment and for the whole plant
+const UtilitiesPanel = ({ result }) => {
+  const [showCommon, setShowCommon] = useState(false);
+  const { power, plant, segments, staff } = result;
+  return (
+    <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5 print:shadow-none">
+      <h2 className="flex items-center gap-2 font-semibold text-slate-800"><Zap className="h-5 w-5 text-amber-500" />Utilities &amp; power by segment</h2>
+      <p className="mt-1 text-xs text-slate-500">Electrical load, HVAC, steam, compressed air and water each product line needs, and what the whole plant needs.</p>
+
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+        <Stat icon={Zap} label="Connected load" value={kw(power.connectedKw)} sub={`Max demand ${kw(power.demandKw)} · ${num(power.demandKva)} kVA`} />
+        <Stat icon={Factory} label="Transformer" value={`${num(power.transformer)} kVA`} sub="sanctioned load to apply for" />
+        <Stat icon={Zap} label="DG set (backup)" value={`${num(power.dgSet)} kVA`} sub="keeps HVAC & production running" />
+        <Stat icon={Clock} label="Electricity per month" value={`${num(power.monthlyKwh)} units`} sub={`≈ ${formatRupees(power.monthlyBill)} bill @ ₹${result.tariff}/unit`} />
+        <Stat icon={Thermometer} label="HVAC" value={`${num(plant.tr)} TR`} sub="air-conditioning tonnage" />
+        <Stat icon={Flame} label="Steam" value={plant.steam ? `${num(plant.steam)} kg/hr` : 'Not needed'} sub={plant.steam ? 'boiler capacity' : 'no steam users'} />
+        <Stat icon={Wind} label="Compressed air" value={`${num(plant.air)} CFM`} sub="oil-free" />
+        <Stat icon={Droplets} label="Water" value={`${plant.water} KLD`} sub={`PW ${num(plant.pwLph)} L/hr${plant.wfiLph ? ` · WFI ${num(plant.wfiLph)} L/hr` : ''}`} />
+        <Stat icon={Users} label="Staff (approx.)" value={num(staff.total)} sub={`${num(staff.operators)} operators · ${num(staff.qa)} QA/QC`} />
+      </div>
+
+      <div className="mt-4 overflow-x-auto">
+        <table className="w-full min-w-[720px] text-sm">
+          <thead>
+            <tr className="border-b border-slate-200 text-left text-xs uppercase text-slate-500">
+              <th className="px-3 py-2 font-medium">Segment</th>
+              <th className="px-3 py-2 text-right font-medium">Machines</th>
+              <th className="px-3 py-2 text-right font-medium">HVAC</th>
+              <th className="px-3 py-2 text-right font-medium">Steam</th>
+              <th className="px-3 py-2 text-right font-medium">Air</th>
+              <th className="px-3 py-2 text-right font-medium">Water</th>
+              <th className="px-3 py-2 text-right font-medium">Units / month</th>
+            </tr>
+          </thead>
+          <tbody>
+            {segments.map((sg) => (
+              <tr key={sg.key} className="border-b border-slate-100">
+                <td className="px-3 py-2.5">
+                  <p className="font-medium text-slate-800">{sg.label}</p>
+                  <p className="text-xs text-slate-500">{num(sg.machineCount)} machines · {num(sg.area)} sq ft{sg.sterile ? ' sterile' : ''} · {kw(sg.connectedKw)} total</p>
+                </td>
+                <td className="whitespace-nowrap px-3 py-2.5 text-right text-slate-700">{kw(sg.machineKw)}</td>
+                <td className="whitespace-nowrap px-3 py-2.5 text-right text-slate-700">{num(sg.tr)} TR<span className="block text-xs text-slate-500">{kw(sg.hvacKw)}</span></td>
+                <td className="whitespace-nowrap px-3 py-2.5 text-right text-slate-700">{sg.steam ? `${num(sg.steam)} kg/hr` : '—'}</td>
+                <td className="whitespace-nowrap px-3 py-2.5 text-right text-slate-700">{num(sg.air)} CFM</td>
+                <td className="whitespace-nowrap px-3 py-2.5 text-right text-slate-700">{sg.water} KLD</td>
+                <td className="whitespace-nowrap px-3 py-2.5 text-right text-slate-700">{num(sg.monthlyKwh)}</td>
+              </tr>
+            ))}
+            <tr className="border-b border-slate-100">
+              <td className="px-3 py-2.5">
+                <button type="button" onClick={() => setShowCommon(!showCommon)} aria-expanded={showCommon} className="flex items-center gap-1 text-left font-medium text-slate-800">
+                  Common plant utilities
+                  <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform print:hidden ${showCommon ? 'rotate-180' : ''}`} />
+                </button>
+                <p className="text-xs text-slate-500">water systems, compressors, boiler, QC lab, stores, offices, lighting</p>
+              </td>
+              <td className="whitespace-nowrap px-3 py-2.5 text-right text-slate-700" colSpan={6}>{kw(power.commonKw)}</td>
+            </tr>
+            {power.commonLoads.map((l) => (
+              <tr key={l.name} className={`${showCommon ? '' : 'hidden'} border-b border-slate-50 text-xs print:table-row`}>
+                <td className="py-1.5 pl-6 pr-3 text-slate-600">{l.name}</td>
+                <td className="px-3 py-1.5 text-right text-slate-600" colSpan={6}>{kw(l.kw)}</td>
+              </tr>
+            ))}
+            <tr className="bg-slate-50 font-semibold text-slate-900">
+              <td className="px-3 py-2.5">Whole plant</td>
+              <td className="whitespace-nowrap px-3 py-2.5 text-right">{kw(power.connectedKw)}<span className="block text-xs font-normal text-slate-500">connected</span></td>
+              <td className="whitespace-nowrap px-3 py-2.5 text-right">{num(plant.tr)} TR</td>
+              <td className="whitespace-nowrap px-3 py-2.5 text-right">{plant.steam ? `${num(plant.steam)} kg/hr` : '—'}</td>
+              <td className="whitespace-nowrap px-3 py-2.5 text-right">{num(plant.air)} CFM</td>
+              <td className="whitespace-nowrap px-3 py-2.5 text-right">{plant.water} KLD</td>
+              <td className="whitespace-nowrap px-3 py-2.5 text-right">{num(power.monthlyKwh)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-3 text-xs text-slate-500">
+        Whole-plant steam includes WFI and pure steam; air includes 20% for leaks; water includes staff use ({plant.domesticKld} KLD) and cooling tower make-up ({plant.coolingKld} KLD).
+        HVAC runs 24 hours; machines run {result.shifts} shift{result.shifts > 1 ? 's' : ''} a day, 26 days a month.
+      </p>
+    </section>
+  );
+};
 
 const Card = ({ title, step, children }) => (
   <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
@@ -130,6 +234,7 @@ const ProjectCostCalculator = () => {
       `Automation: ${TIERS[result.tier].label} | ${result.compliance.short} | ${result.shifts} shift(s)`,
       `Estimated project cost: ${formatRange(result.total)} (incl. GST)`,
       `Machinery: ${formatRange(result.groups[0].total)}`,
+      `Power: ${num(result.power.connectedKw)} kW connected, ${num(result.power.transformer)} kVA transformer, DG ${num(result.power.dgSet)} kVA`,
       '',
       'Please send me a detailed quotation.',
       typeof window !== 'undefined' ? window.location.href : '',
@@ -176,7 +281,8 @@ const ProjectCostCalculator = () => {
           </p>
           <h1 className="text-2xl font-bold sm:text-3xl lg:text-4xl">Pharma Project Cost Calculator</h1>
           <p className="mt-2 max-w-3xl text-sm text-blue-100 sm:text-base">
-            Estimate the cost of a new pharma plant: machines, building and cleanrooms, HVAC, water systems, QC lab,
+            Estimate any pharma project — tablets, capsules, softgels, powders, liquids, ointments, vials, ampoules,
+            lyophilized products, eye drops and IV fluids: machines, power load, utilities, building and cleanrooms, HVAC, water systems, QC lab,
             validation and GST. Choose your products and capacity; the estimate updates instantly.
           </p>
         </div>
@@ -186,8 +292,12 @@ const ProjectCostCalculator = () => {
         {/* ── Inputs ── */}
         <div className="space-y-4 print:hidden">
           <Card step={1} title="What will you make?">
-            <div className="space-y-2">
-              {Object.entries(SECTIONS).map(([k, sec]) => {
+            <div className="space-y-4">
+              {SECTION_GROUPS.map((g) => (
+              <div key={g.key}>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">{g.label}</p>
+              <div className="space-y-2">
+              {Object.entries(SECTIONS).filter(([, sec]) => sec.group === g.key).map(([k, sec]) => {
                 const Icon = ICONS[k];
                 const s = state.sections[k];
                 return (
@@ -234,6 +344,9 @@ const ProjectCostCalculator = () => {
                   </div>
                 );
               })}
+              </div>
+              </div>
+              ))}
             </div>
           </Card>
 
@@ -262,7 +375,7 @@ const ProjectCostCalculator = () => {
             </div>
           </Card>
 
-          <Card step={4} title="Working shifts & land">
+          <Card step={4} title="Shifts, land & electricity">
             <div className="flex gap-2" role="radiogroup" aria-label="Shifts per day">
               {[1, 2, 3].map((n) => (
                 <button
@@ -289,6 +402,20 @@ const ProjectCostCalculator = () => {
               onChange={(e) => set({ landCost: Math.max(0, Math.min(100000, Number(e.target.value) || 0)) })}
               className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
             />
+            <label htmlFor="tariff" className="mt-4 block text-sm font-medium text-slate-700">Electricity rate (₹ per unit)</label>
+            <input
+              id="tariff"
+              type="number"
+              inputMode="decimal"
+              min={1}
+              max={30}
+              step={0.1}
+              value={state.tariff}
+              onChange={(e) => set({ tariff: Math.max(0, Math.min(30, Number(e.target.value) || 0)) })}
+              onBlur={() => !(state.tariff > 0) && set({ tariff: DEFAULT_TARIFF })}
+              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            />
+            <p className="mt-1 text-xs text-slate-500">Industrial rate in your state; ₹{DEFAULT_TARIFF} is a typical average.</p>
           </Card>
 
           <button type="button" onClick={reset} className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800">
@@ -378,11 +505,12 @@ const ProjectCostCalculator = () => {
                         </span>
                       </button>
                       <div className={`${open ? 'block' : 'hidden'} overflow-x-auto print:block`}>
-                        <table className="w-full min-w-[600px] text-sm">
+                        <table className="w-full min-w-[660px] text-sm">
                           <thead>
                             <tr className="text-left text-xs uppercase text-slate-500">
                               <th className="px-4 py-2 font-medium">Machine</th>
                               <th className="px-4 py-2 text-center font-medium">Qty</th>
+                              <th className="px-4 py-2 text-right font-medium">Power</th>
                               <th className="px-4 py-2 text-right font-medium">Price each</th>
                               <th className="px-4 py-2 text-right font-medium">Total</th>
                             </tr>
@@ -392,9 +520,10 @@ const ProjectCostCalculator = () => {
                               <tr key={i} className="border-t border-slate-50">
                                 <td className="px-4 py-2.5">
                                   <p className="font-medium text-slate-800">{l.name}</p>
-                                  <p className="text-xs text-slate-500">{l.model}{l.cap ? ` · ${capText(l.cap, s.unit)}` : ''}</p>
+                                  <p className="text-xs text-slate-500">{l.model}{l.cap ? ` · ${capText(l.cap, s.unit, l.perDay)}` : ''}</p>
                                 </td>
                                 <td className="px-4 py-2.5 text-center text-slate-700">{l.qty}</td>
+                                <td className="whitespace-nowrap px-4 py-2.5 text-right text-slate-600">{kw(l.kw)}</td>
                                 <td className="whitespace-nowrap px-4 py-2.5 text-right text-slate-600">{formatRange(l.unit)}</td>
                                 <td className="whitespace-nowrap px-4 py-2.5 text-right font-medium text-slate-800">{formatRange(l.total)}</td>
                               </tr>
@@ -407,8 +536,10 @@ const ProjectCostCalculator = () => {
                 })}
               </section>
 
+              <UtilitiesPanel result={result} />
+
               <CostTable title="Building, cleanrooms & HVAC" icon={Factory} rows={result.building} total={result.groups[1].total} />
-              <CostTable title="Utilities" icon={Droplets} rows={result.utilities} total={result.groups[2].total} />
+              <CostTable title="Utilities & power equipment" icon={Zap} rows={result.utilities} total={result.groups[2].total} />
               <CostTable title="QC & micro labs" icon={Beaker} rows={result.qc} total={result.groups[3].total} />
               <CostTable title="Installation, validation & pre-operative" icon={ShieldCheck} rows={result.project} total={result.groups[4].total} />
 
@@ -435,6 +566,7 @@ const ProjectCostCalculator = () => {
                 <ul className="mt-2 list-disc space-y-1 pl-5">
                   <li>Indicative 2026 Indian prices for new GMP-grade equipment and construction. Actual quotes depend on make, specifications, location and timing.</li>
                   <li>Machine numbers assume {HOURS_PER_SHIFT}-hour shifts at about {Math.round(EFFICIENCY * 100)}% of rated speed; tablet capacity assumes a 300 mg average tablet.</li>
+                  <li>Power, HVAC, steam, air and water are planning estimates to size the transformer, DG set, boiler and water systems; your consultant will finalise them.</li>
                   <li>Not included: land (unless entered), working capital, raw materials, salaries and product registration fees.</li>
                   <li>Nothing you enter here is sent to us. Use &quot;Get exact quotation&quot; or WhatsApp for a detailed project report.</li>
                 </ul>

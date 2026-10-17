@@ -131,7 +131,7 @@ export const seoPages = {
     path: '/project-cost-calculator',
     title: 'Pharma Project Cost Calculator – Plant & Machine Cost Estimate',
     description:
-      'Free pharma plant cost calculator: estimate machinery, building, cleanroom, HVAC, water system, QC lab and validation costs for tablet, capsule, liquid, ointment and injectable projects.',
+      'Free pharma plant cost calculator for tablets, capsules, softgels, liquids, ointments, vials, ampoules, lyophilized products, eye drops and IV fluids: machine cost, power load, transformer & DG size, utilities, HVAC and total project cost.',
   },
   privacy: {
     path: '/privacy',
