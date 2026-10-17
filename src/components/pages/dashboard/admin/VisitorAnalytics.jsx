@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import getBaseURL from '../../../../utlis/baseURL';
 import {
   Users, Eye, Calendar, TrendingUp,
   Globe, Clock, BarChart3, Activity,
@@ -11,6 +12,13 @@ import {
   Tooltip, Legend, ResponsiveContainer, PieChart,
   Pie, Cell, BarChart, Bar
 } from 'recharts';
+
+// Admin API calls: the login token is saved in localStorage at sign-in
+const authHeaders = (reduxToken) => {
+  let token = reduxToken;
+  try { token = token || localStorage.getItem('token'); } catch { /* storage blocked */ }
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
 const VisitorAnalytics = () => {
   const [stats, setStats] = useState(null);
@@ -24,11 +32,11 @@ const VisitorAnalytics = () => {
     setLoading(true);
     try {
       const [statsRes, visitorsRes] = await Promise.all([
-        fetch(`/api/admin/visitor-stats?range=${range}`, {
-          headers: { Authorization: `Bearer ${token}` },
+        fetch(`${getBaseURL()}/api/admin/visitor-stats?range=${range}`, {
+          headers: authHeaders(token), credentials: 'include',
         }),
-        fetch(`/api/admin/visitors?page=1&limit=20&range=${range}`, {
-          headers: { Authorization: `Bearer ${token}` },
+        fetch(`${getBaseURL()}/api/admin/visitors?page=1&limit=20&range=${range}`, {
+          headers: authHeaders(token), credentials: 'include',
         })
       ]);
 
