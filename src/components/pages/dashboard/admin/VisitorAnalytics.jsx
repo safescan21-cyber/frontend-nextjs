@@ -26,16 +26,19 @@ const VisitorAnalytics = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dateRange, setDateRange] = useState('7d'); // '7d', '30d', '90d'
+  const [who, setWho] = useState(''); // '' everyone, 'users' logged-in, 'guests'
+  const [visitorTotal, setVisitorTotal] = useState(0);
+  const [openRow, setOpenRow] = useState(null); // visitor whose pages are expanded
   const { token } = useSelector((state) => state.auth);
 
-  const fetchData = async (range) => {
+  const fetchData = async (range, whoFilter = '') => {
     setLoading(true);
     try {
       const [statsRes, visitorsRes] = await Promise.all([
         fetch(`${getBaseURL()}/api/admin/visitor-stats?range=${range}`, {
           headers: authHeaders(token), credentials: 'include',
         }),
-        fetch(`${getBaseURL()}/api/admin/visitors?page=1&limit=20&range=${range}`, {
+        fetch(`${getBaseURL()}/api/admin/visitors?page=1&limit=50&range=${range}${whoFilter ? `&who=${whoFilter}` : ''}`, {
           headers: authHeaders(token), credentials: 'include',
         })
       ]);
@@ -49,6 +52,7 @@ const VisitorAnalytics = () => {
 
       setStats(statsData);
       setVisitors(visitorsData.visitors || []);
+      setVisitorTotal(visitorsData.total || 0);
     } catch (err) {
       console.error('Analytics fetch error:', err);
       setError(err.message);
@@ -58,8 +62,8 @@ const VisitorAnalytics = () => {
   };
 
   useEffect(() => {
-    fetchData(dateRange);
-  }, [token, dateRange]);
+    fetchData(dateRange, who);
+  }, [token, dateRange, who]);
 
   // Helper to format numbers with commas
   const formatNumber = (num) => num?.toLocaleString() ?? 0;
@@ -109,6 +113,16 @@ const VisitorAnalytics = () => {
             <option value="7d">Last 7 days</option>
             <option value="30d">Last 30 days</option>
             <option value="90d">Last 90 days</option>
+          </select>
+          <select
+            value={who}
+            onChange={(e) => setWho(e.target.value)}
+            aria-label="Which visitors"
+            className="border border-slate-300 rounded-lg px-3 py-1.5 text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Everyone</option>
+            <option value="users">Logged-in users</option>
+            <option value="guests">Guests</option>
           </select>
           <span className="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
             Updated: {new Date().toLocaleString()}
@@ -343,27 +357,58 @@ const VisitorAnalytics = () => {
             <table className="w-full text-sm text-left">
               <thead className="text-xs uppercase text-slate-500 border-b border-slate-200">
                 <tr>
-                  <th className="px-4 py-3">IP</th>
+                  <th className="px-4 py-3">Visitor</th>
                   <th className="px-4 py-3">Device</th>
-                  <th className="px-4 py-3">Country</th>
                   <th className="px-4 py-3">First Visit</th>
                   <th className="px-4 py-3">Last Visit</th>
-                  <th className="px-4 py-3">Pages</th>
+                  <th className="px-4 py-3">Pages visited</th>
                 </tr>
               </thead>
               <tbody>
-                {visitors.map((v) => (
-                  <tr key={v._id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                    <td className="px-4 py-3 font-mono text-xs">{v.ip}</td>
-                    <td className="px-4 py-3 text-xs text-slate-600">
-                      {v.deviceType || '—'} / {v.os || '—'}
-                    </td>
-                    <td className="px-4 py-3 text-xs">{v.country || '—'}</td>
-                    <td className="px-4 py-3">{new Date(v.firstVisit).toLocaleDateString()}</td>
-                    <td className="px-4 py-3">{new Date(v.lastVisit).toLocaleDateString()}</td>
-                    <td className="px-4 py-3 font-semibold">{v.pageCount}</td>
-                  </tr>
-                ))}
+                {visitors.map((v) => {
+                  const pages = (v.websitePages?.length ? v.websitePages : v.pages) || [];
+                  const open = openRow === v._id;
+                  return (
+                    <tr key={v._id} className="border-b border-slate-100 align-top hover:bg-slate-50 transition-colors">
+                      <td className="px-4 py-3">
+                        {v.user ? (
+                          <div>
+                            <p className="font-semibold text-slate-800">{v.user.name || 'Customer'}</p>
+                            <a href={`mailto:${v.user.email}`} className="text-xs text-blue-600 hover:underline">{v.user.email}</a>
+                          </div>
+                        ) : (
+                          <p className="text-slate-500">Guest</p>
+                        )}
+                        <p className="font-mono text-[11px] text-slate-400">{v.ip}</p>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">
+                        {v.device || '—'}<br />
+                        <span className="text-slate-400">{[v.os, v.browser].filter(Boolean).join(' · ')}</span>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">{new Date(v.firstVisit).toLocaleString()}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">{new Date(v.lastVisit).toLocaleString()}</td>
+                      <td className="px-4 py-3 text-xs">
+                        {pages.length ? (
+                          <>
+                            <ul className="space-y-0.5">
+                              {(open ? pages : pages.slice(0, 3)).map((pg) => (
+                                <li key={pg} className="truncate max-w-[260px]" title={pg}>{pg}</li>
+                              ))}
+                            </ul>
+                            {pages.length > 3 && (
+                              <button type="button" onClick={() => setOpenRow(open ? null : v._id)} className="mt-1 text-blue-600 hover:underline">
+                                {open ? 'Show less' : `+${pages.length - 3} more`}
+                              </button>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-slate-400">—</span>
+                        )}
+                        <p className="mt-1 text-[11px] text-slate-400">{v.pageCount} requests</p>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           ) : (
@@ -372,7 +417,7 @@ const VisitorAnalytics = () => {
         </div>
         {/* Pagination placeholder – implement if needed */}
         <div className="flex justify-end mt-3 text-sm text-slate-500">
-          Showing 20 of {stats?.totalVisitors ?? 0}
+          Showing {visitors.length} of {formatNumber(visitorTotal)} visitors
         </div>
       </div>
     </div>
