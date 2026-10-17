@@ -6,6 +6,7 @@ import { useFetchAllProductsQuery } from '../store/products/productsApi';
 import toast from 'react-hot-toast';
 import Seo from '../Seo';
 import ShareProduct from '../shop/ShareProduct';
+import CatalogSwitch from './pharmaApi/CatalogSwitch';
 
 
 // Empty boxes = no limit, so expensive machines are never hidden by default
@@ -277,6 +278,7 @@ const ShopPage = ({ embedded = false }) => {
         </div>
 
         <div className="container mx-auto px-4 py-5 md:py-12">
+          {!embedded && <CatalogSwitch active="machinery" className="mb-5 max-w-xl md:-mt-4" />}
           <div className="flex flex-col lg:flex-row gap-5 lg:gap-8">
             {/* Sidebar Filters */}
             <div className="lg:w-1/4">

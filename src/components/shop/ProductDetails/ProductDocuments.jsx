@@ -6,10 +6,10 @@ const ICON = { xls: FileSpreadsheet, xlsx: FileSpreadsheet, png: FileImage, jpg:
 
 // Technical documents attached by the admin: PDFs and images open in the
 // browser to read; everything can be downloaded.
-const ProductDocuments = ({ documents }) => (
+const ProductDocuments = ({ documents, subtitle = 'Datasheets, manuals, drawings and certificates for this machine.' }) => (
   <div>
     <h3 className="mb-1 text-lg font-bold text-gray-900">Technical Documents</h3>
-    <p className="mb-4 text-sm text-gray-600">Datasheets, manuals, drawings and certificates for this machine.</p>
+    <p className="mb-4 text-sm text-gray-600">{subtitle}</p>
     <ul className="divide-y divide-gray-100 rounded-xl border border-gray-200">
       {documents.map((d) => {
         const Icon = ICON[docType(d)] || FileText;

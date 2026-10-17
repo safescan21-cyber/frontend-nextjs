@@ -8,7 +8,7 @@ const PRIVATE = ['/login', '/register', '/forgotpassword', '/resetpassword', '/c
 
 // These pages render their own <Seo>, so the default here would only duplicate tags
 const OWN_SEO_EXACT = ['/', '/shop', '/about', '/track-order', '/products', '/solutions', '/privacy', '/bulk-quote'];
-const OWN_SEO_PREFIX = ['/products/', '/solutions/', '/resources/', '/shop/', '/press/'];
+const OWN_SEO_PREFIX = ['/products/', '/solutions/', '/resources/', '/shop/', '/press/', '/pharma-api/'];
 
 const titleCase = (slug) =>
   decodeURIComponent(slug).replace(/[-_]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()).trim();

@@ -127,6 +127,12 @@ export const seoPages = {
     description:
       'Request a bulk quote for pharma and food processing machinery, spares and load cells. Volume pricing, delivery across India and a reply within 1 business day.',
   },
+  pharmaApi: {
+    path: '/pharma-api',
+    title: 'Pharma APIs – Active Pharmaceutical Ingredients & Bulk Drugs',
+    description:
+      'Active pharmaceutical ingredients (APIs) and bulk drugs in IP, BP, USP and EP grades: chemical name, CAS number, composition, COA and MSDS. Send an enquiry for price and availability.',
+  },
   costCalculator: {
     path: '/project-cost-calculator',
     title: 'Pharma Project Cost Calculator – Plant & Machine Cost Estimate',

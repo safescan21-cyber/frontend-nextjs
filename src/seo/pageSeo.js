@@ -23,7 +23,7 @@ const clip = (s, n) => (s.length > n ? `${s.slice(0, n - 1).replace(/\s+\S*$/, '
 const isId = (id) => /^[a-f0-9]{24}$/i.test(id || '');
 
 // Public, indexable pages (same list scripts/prerender-meta.mjs used)
-const EXISTING_ROUTES = new Set(['/', '/shop', '/about', '/products', '/career', '/press', '/track-order', '/contact', '/projects', '/solutions', '/privacy', '/bulk-quote', '/project-cost-calculator']);
+const EXISTING_ROUTES = new Set(['/', '/shop', '/about', '/products', '/career', '/press', '/track-order', '/contact', '/projects', '/solutions', '/privacy', '/bulk-quote', '/project-cost-calculator', '/pharma-api']);
 export const STATIC_PAGES = (() => {
   const pages = Object.values(seoPages).filter((p) => EXISTING_ROUTES.has(p.path) || p.path.startsWith('/solutions/'));
   for (const s of SOLUTIONS) {
@@ -114,6 +114,55 @@ export async function seoForPath(segments = []) {
     };
   }
 
+  // ── Pharma API (active pharmaceutical ingredient) ──
+  const pharma = path.match(/^\/pharma-api\/([^/]+)$/);
+  if (pharma) {
+    if (!/^[a-z0-9-]{1,100}$/.test(pharma[1])) return { notFound: true };
+    const { data, notFound } = await getJson(`/api/pharma-apis/${pharma[1]}`);
+    const a = data?.item;
+    if (notFound || (data && !a)) return { notFound: true };
+    if (!a) return { canonical: path };
+    const url = `${SITE_URL}/pharma-api/${a.slug}`;
+    const crumbs = [['Home', '/'], ['Pharma APIs', '/pharma-api'], [a.name, null]];
+    const facts = [
+      a.chemicalName && `Chemical name: ${a.chemicalName}`,
+      a.casNumber && `CAS number: ${a.casNumber}`,
+      a.molecularFormula && `Molecular formula: ${a.molecularFormula}`,
+      a.molecularWeight && `Molecular weight: ${a.molecularWeight}`,
+      a.composition && `Composition: ${a.composition}`,
+      a.grades?.length && `Grades: ${a.grades.join(', ')}`,
+    ].filter(Boolean);
+    return {
+      title: fullTitle(`${a.name}${a.casNumber ? ` (CAS ${a.casNumber})` : ''} – API Supplier`),
+      description: clip([a.name, a.chemicalName && `(${a.chemicalName})`, a.casNumber && `CAS ${a.casNumber}`, a.grades?.length && `${a.grades.join(', ')} grade`, a.category].filter(Boolean).join(' · ') + '. Composition, specifications, COA/MSDS and price on request.', 158),
+      canonical: url,
+      image: a.images?.[0],
+      noindex: a.active === false,
+      jsonLd: [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: a.name,
+          url,
+          category: a.category,
+          ...(a.images?.length && { image: a.images.slice(0, 5) }),
+          description: clip(plain(a.description) || facts.join('. '), 500),
+          ...(a.casNumber && { additionalProperty: [{ '@type': 'PropertyValue', name: 'CAS number', value: a.casNumber }] }),
+          brand: { '@id': `${SITE_URL}/#organization` },
+        },
+        breadcrumbLd(crumbs),
+      ],
+      summary: {
+        crumbs,
+        heading: a.name,
+        image: a.images?.[0],
+        lines: [a.category, ...facts, plain(a.description)].filter(Boolean),
+        list: (a.specifications || []).filter((s) => s?.key && s?.value).map((s) => `${s.key}: ${s.value}`),
+        links: [[`/bulk-quote?product=${encodeURIComponent(a.name)}&source=pharma-api`, 'Request a quotation'], ['/pharma-api', 'All pharma APIs']],
+      },
+    };
+  }
+
   // ── Press article ──
   const press = path.match(/^\/press\/([^/]+)$/);
   if (press) {
@@ -179,6 +228,6 @@ export async function seoForPath(segments = []) {
 const APP_ROUTES = [
   /^\/$/, /^\/about$/, /^\/contact$/, /^\/shop$/, /^\/products$/, /^\/products\/[^/]+$/, /^\/categories\/[^/]+$/,
   /^\/press$/, /^\/projects$/, /^\/career$/, /^\/solutions$/, /^\/resources\/[^/]+$/, /^\/privacy$/, /^\/bulk-quote$/,
-  /^\/track-order$/, /^\/project-cost-calculator$/, /^\/search$/, /^\/login$/, /^\/register$/, /^\/forgotpassword$/, /^\/resetpassword\/[^/]+$/,
+  /^\/track-order$/, /^\/project-cost-calculator$/, /^\/pharma-api$/, /^\/search$/, /^\/login$/, /^\/register$/, /^\/forgotpassword$/, /^\/resetpassword\/[^/]+$/,
   /^\/cart$/, /^\/checkout$/, /^\/wishlist$/, /^\/dashboard(\/.*)?$/,
 ];

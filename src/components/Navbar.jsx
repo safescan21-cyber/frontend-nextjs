@@ -8,11 +8,12 @@ import {
   Wind, Gauge, HardHat, Award,
   Search, Heart, ShoppingCart, LogOut,
   LayoutDashboard, User, CreditCard, ShoppingBag, PlusCircle, MessageSquare,
-  TrendingUp, Image, Newspaper
+  TrendingUp, Image, Newspaper, FlaskConical
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import UserAvatar from "./UserAvatar";
 import ThemeToggle from "./ThemeToggle";
+import { API_CATEGORIES } from './pages/pharmaApi/pharmaApiShared';
 import { organizationNode, websiteNode } from './seo/organization';
 import PharmaLogoAsset from "../assets/pharmamachinehub-logo-v2_2.svg";
 // Next.js gives image imports as { src, width, height }
@@ -37,6 +38,7 @@ const adminDropDownMenus = [
   { label: "User Analytics", path: "/dashboard/visitors",      icon: TrendingUp },
   { label: "Customer Insights", path: "/dashboard/insights",  icon: BarChart3 },
   { label: "Market Trends", path: "/dashboard/market-trends", icon: TrendingUp },
+  { label: "Pharma APIs", path: "/dashboard/pharma-apis", icon: FlaskConical },
   { label: "Discount Offers", path: "/dashboard/offers",      icon: CreditCard },
   { label: "Reviews & Comments", path: "/dashboard/manage-reviews", icon: MessageSquare },
   { label: "Bulk Quotes", path: "/dashboard/bulk-quotes", icon: FileText },
@@ -177,6 +179,7 @@ const seoNavLinks = [
   { name: 'Pharma Solutions', path: '/solutions' },
   ...solutionsData.map((s) => ({ name: s.name, path: s.path })),
   { name: 'Products', path: '/products' },
+  { name: 'Pharma APIs', path: '/pharma-api' },
   { name: 'Track Order', path: '/track-order' },
   { name: 'Bulk Quote', path: '/bulk-quote' },
   { name: 'Pharma Project Cost Calculator', path: '/project-cost-calculator' },
@@ -248,6 +251,8 @@ const Navbar = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [productsDropdown, setProductsDropdown] = useState(false);
+  const [apiDropdown, setApiDropdown] = useState(false);
+  const [apiMobileOpen, setApiMobileOpen] = useState(false);
   const [solutionsDropdown, setSolutionsDropdown] = useState(false);
   const [resourcesDropdown, setResourcesDropdown] = useState(false);
   const [isUserDropOpen, setIsUserDropOpen] = useState(false);
@@ -257,6 +262,7 @@ const Navbar = () => {
   const [cartNotification, setCartNotification] = useState(false);
 
   const productsTimeoutRef = useRef(null);
+  const apiTimeoutRef = useRef(null);
   const solutionsTimeoutRef = useRef(null);
   const resourcesTimeoutRef = useRef(null);
   const userDropRef = useRef(null);
@@ -584,6 +590,38 @@ const Navbar = () => {
                         </div>
                       </>
                     )}
+                  </HoverDropdown>
+
+                  {/* Pharma APIs: active pharmaceutical ingredients catalogue */}
+                  <HoverDropdown
+                    label="Pharma API"
+                    open={apiDropdown}
+                    setOpen={setApiDropdown}
+                    timeoutRef={apiTimeoutRef}
+                    wide
+                    id="pharma-api"
+                  >
+                    <div className="px-4 pt-3 pb-1">
+                      <p className="flex items-center gap-2 text-sm font-semibold text-slate-200"><FlaskConical className="w-4 h-4 text-amber-400" aria-hidden="true" />Active Pharmaceutical Ingredients</p>
+                      <p className="mt-0.5 text-xs text-slate-400">Bulk drugs in IP, BP, USP and EP grades with COA and MSDS</p>
+                    </div>
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1 p-2 max-h-[360px] overflow-y-auto custom-scrollbar">
+                      {API_CATEGORIES.map((c) => (
+                        <li key={c}>
+                          <Link
+                            to={`/pharma-api?category=${encodeURIComponent(c)}`}
+                            onClick={handleLinkClick}
+                            className="block px-3 py-2 text-sm text-slate-300 hover:text-amber-400 hover:bg-slate-700/50 rounded-lg transition-colors truncate"
+                          >
+                            {c}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="border-t border-slate-700 mt-1 pt-3 px-4 flex justify-between items-center gap-2">
+                      <Link to="/bulk-quote?product=Pharma%20API&source=pharma-api" onClick={handleLinkClick} className="text-xs text-slate-400 hover:text-amber-400">Can't find an API? Send an enquiry</Link>
+                      <Link to="/pharma-api" onClick={handleLinkClick} className="text-xs text-amber-400 hover:text-amber-300">View all APIs →</Link>
+                    </div>
                   </HoverDropdown>
 
                   {/* Solutions Dropdown */}
@@ -1072,6 +1110,40 @@ const Navbar = () => {
                           </li>
                         </>
                       )}
+                    </ul>
+                  )}
+                </li>
+
+                {/* Mobile Pharma APIs */}
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setApiMobileOpen(!apiMobileOpen)}
+                    aria-expanded={apiMobileOpen}
+                    aria-controls="mobile-pharma-api"
+                    className="w-full flex items-center justify-between px-3 py-3 text-base font-medium text-slate-200 hover:text-amber-400 hover:bg-slate-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400/50"
+                  >
+                    <span className="flex items-center gap-2"><FlaskConical className="w-4 h-4 text-amber-400" aria-hidden="true" />Pharma API</span>
+                    <ChevronDown className={`w-5 h-5 transition-transform ${apiMobileOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+                  </button>
+                  {apiMobileOpen && (
+                    <ul id="mobile-pharma-api" className="pl-4 space-y-1 mt-1 mb-2">
+                      <li>
+                        <Link to="/pharma-api" onClick={handleLinkClick} className="block px-3 py-2 text-sm font-semibold text-amber-400 hover:bg-slate-700 rounded-lg">
+                          All APIs →
+                        </Link>
+                      </li>
+                      {API_CATEGORIES.map((c) => (
+                        <li key={c}>
+                          <Link
+                            to={`/pharma-api?category=${encodeURIComponent(c)}`}
+                            onClick={handleLinkClick}
+                            className="block px-3 py-2 text-sm text-slate-300 hover:text-amber-400 hover:bg-slate-700 rounded-lg transition-colors truncate"
+                          >
+                            {c}
+                          </Link>
+                        </li>
+                      ))}
                     </ul>
                   )}
                 </li>
