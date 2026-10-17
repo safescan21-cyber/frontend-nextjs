@@ -595,6 +595,20 @@ const SingleProduct = () => {
                 </div>
               )}
 
+              {product.sellOnline === false && (
+                <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+                  <p className="font-semibold text-amber-900">Available on enquiry</p>
+                  <p className="mt-1 text-sm text-amber-800">This machine is supplied against a quotation (configuration, installation and delivery are confirmed first).</p>
+                  <Link
+                    to={`/bulk-quote?product=${encodeURIComponent(product.name)}&id=${product._id}&source=product`}
+                    className="mt-3 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-semibold text-white shadow hover:bg-orange-600"
+                  >
+                    Request quotation →
+                  </Link>
+                </div>
+              )}
+
+              {product.sellOnline !== false && (<>
               {/* ── 🔐 Quantity Selector (Disabled for guests) ── */}
               <div className="flex items-center gap-4">
                 <span className="text-sm font-semibold text-gray-700">Quantity:</span>
@@ -678,6 +692,7 @@ const SingleProduct = () => {
               >
                 Need 5+ units or a custom spec? Request a bulk quote →
               </Link>
+              </>)}
 
               <div className="grid grid-cols-3 gap-2 pt-2 border-t border-gray-100">
                 {[

@@ -44,6 +44,7 @@ const UpdateProduct = () => {
 
     const [newImage, setNewImage] = useState(null)
     const [documents, setDocuments] = useState([])
+    const [flags, setFlags] = useState({ active: true, sellOnline: true })
     const [docsUploading, setDocsUploading] = useState(false)
 
     const {name, category, color, description, image: imageURL, price } = productData?.product || {};
@@ -61,6 +62,7 @@ const UpdateProduct = () => {
                 image: imageURL || ''
             })
             setDocuments(productData.product?.documents || [])
+            setFlags({ active: productData.product?.active !== false, sellOnline: productData.product?.sellOnline !== false })
         }
     }, [productData])
 
@@ -86,6 +88,7 @@ const UpdateProduct = () => {
             ...product,
             image: newImage ? newImage : product.image, 
             documents,
+            ...flags,
             author: user?._id
         };
 
@@ -151,6 +154,17 @@ const UpdateProduct = () => {
                 placeholder='Write a product description'
                 onChange={handleChange}
                 ></textarea>
+                </div>
+
+                <div className='flex flex-wrap gap-x-6 gap-y-2 rounded-lg border border-gray-200 p-3'>
+                    <label className='flex items-center gap-2 text-sm font-medium text-gray-700'>
+                        <input type='checkbox' checked={flags.active} onChange={(e) => setFlags((f) => ({ ...f, active: e.target.checked }))} className='h-4 w-4 accent-blue-600' />
+                        Show on website
+                    </label>
+                    <label className='flex items-center gap-2 text-sm font-medium text-gray-700'>
+                        <input type='checkbox' checked={flags.sellOnline} onChange={(e) => setFlags((f) => ({ ...f, sellOnline: e.target.checked }))} className='h-4 w-4 accent-blue-600' />
+                        Sell online (untick = enquiry only, no Add to cart)
+                    </label>
                 </div>
 
                 <DocumentUploader documents={documents} setDocuments={setDocuments} onBusyChange={setDocsUploading} />

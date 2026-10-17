@@ -1,147 +1,160 @@
-import React, { useState } from 'react'
-import { useDeleteProductMutation, useFetchAllProductsQuery } from '../../../../store/products/productsApi'
-import { formatDate } from '../../../../../utlis/formatDate';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import toast from 'react-hot-toast';
+import { Package, Plus, Pencil, Trash2, ExternalLink, Eye, EyeOff, ShoppingCart, MessageSquareQuote, Search, Loader2 } from 'lucide-react';
+import getBaseURL from '../../../../../utlis/baseURL';
+import productsApi from '../../../../store/products/productsApi';
 
+const authHeaders = () => {
+  let token = null;
+  try { token = localStorage.getItem('token'); } catch { /* storage blocked */ }
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+const call = async (path, options = {}) => {
+  const res = await fetch(`${getBaseURL()}/api/products${path}`, {
+    credentials: 'include',
+    ...options,
+    headers: { ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...authHeaders(), ...options.headers },
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.message || `Request failed (${res.status})`);
+  return data;
+};
+const inr = (n) => `₹${Number(n || 0).toLocaleString('en-IN')}`;
+
+// Admin: every machine incl. hidden ones — show/hide, sell online or enquiry only, edit, delete
 const ManageProduct = () => {
-    const [currentPage, setCurrentPage] = useState(1);
-    const [productsPerPage] = useState(12)
-    const { data: { products = [], totalPages, totalProducts } = {}, isLoading, error, refetch } = useFetchAllProductsQuery({
-        category: '',
-        color: '',
-        minPrice: '',
-        maxPrice: '',
-        page: currentPage,
-        limit: productsPerPage,
-    })
+  const dispatch = useDispatch();
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [q, setQ] = useState('');
+  const [busyId, setBusyId] = useState(null);
 
-    // pagination
-    const startProduct = (currentPage - 1) * productsPerPage + 1;
-    const endProduct = startProduct + products.length - 1;
-    const handlePageChange = (pageNumber) => {
-        if (pageNumber > 0 && pageNumber <= totalPages) {
-            setCurrentPage(pageNumber)
-        }
-    }
+  const load = () => {
+    setLoading(true);
+    call('/admin/all')
+      .then((d) => { setItems(d.products || []); setError(''); })
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  };
+  useEffect(load, []);
 
-    const [deleteProduct] = useDeleteProductMutation()
-    const handleDeleteProduct = async (id) => {
-        try {
-            const response = await deleteProduct(id).unwrap();
-            alert("Product deleted successfully")
-            await refetch()
+  const refreshShop = () => dispatch(productsApi.util.invalidateTags(['Products']));
+  const shown = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    return s ? items.filter((p) => [p.name, p.category].some((v) => String(v || '').toLowerCase().includes(s))) : items;
+  }, [items, q]);
 
-        } catch (error) {
-            console.error("Error deleting product", error)
-        }
-    }
+  const update = async (p, patch, message) => {
+    setBusyId(p._id);
+    try {
+      await call(`/update-product/${p._id}`, { method: 'PATCH', body: JSON.stringify(patch) });
+      setItems((list) => list.map((i) => (i._id === p._id ? { ...i, ...patch } : i)));
+      refreshShop();
+      toast.success(message);
+    } catch (e) { toast.error(e.message); } finally { setBusyId(null); }
+  };
+  const remove = async (p) => {
+    if (!window.confirm(`Delete "${p.name}"? This cannot be undone.\n\nTip: use Hide instead if you may sell it again.`)) return;
+    setBusyId(p._id);
+    try {
+      await call(`/${p._id}`, { method: 'DELETE' });
+      setItems((list) => list.filter((i) => i._id !== p._id));
+      refreshShop();
+      toast.success('Product deleted');
+    } catch (e) { toast.error(e.message); } finally { setBusyId(null); }
+  };
 
-    return (
-        <>
-            {
-                isLoading && <div>Loading...</div>
+  const visible = items.filter((p) => p.active !== false).length;
+  const enquiry = items.filter((p) => p.sellOnline === false).length;
 
-            }
-            {
-                error && <div>Error loading products.</div>
-            }
-            <section className="py-1 bg-blueGray-50">
-                <div className="w-full  mb-12 xl:mb-0 px-4 mx-auto">
-                    <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded ">
-                        <div className="rounded-t mb-0 px-4 py-3 border-0">
-                            <div className="flex flex-wrap items-center">
-                                <div className="relative w-full px-4 max-w-full flex-grow flex-1">
-                                    <h3 className="font-semibold text-base text-blueGray-700">All Products</h3>
-                                </div>
-                                <div className="relative w-full px-4 max-w-full flex-grow flex-1 text-right">
-                                    <button className="bg-indigo-500 text-white active:bg-indigo-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" type="button">See all</button>
-                                </div>
-                            </div>
-                            <h3 className='my-4  text-sm'>Showing {startProduct} to {endProduct} of {totalProducts} products</h3>
-                        </div>
+  return (
+    <div className="px-4 pb-6 pt-6 md:px-6">
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-800"><Package className="h-6 w-6 text-blue-600" />Manage products</h1>
+          <p className="text-sm text-gray-500">{items.length} machines · {visible} on the website · {enquiry} enquiry only</p>
+        </div>
+        <Link to="/dashboard/add-product" className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700"><Plus className="h-4 w-4" /> Add product</Link>
+      </div>
 
-                        <div className="block w-full overflow-x-auto">
-                            <table className="items-center bg-transparent w-full border-collapse ">
-                                <thead>
-                                    <tr>
-                                        <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                                            No.
-                                        </th>
-                                        <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                                            Product Name
-                                        </th>
-                                        <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                                            Publishing date
-                                        </th>
-                                        <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                                            Edit or manage
-                                        </th>
-                                        <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                                            Actions
-                                        </th>
-                                    </tr>
-                                </thead>
+      <div className="relative mb-4 max-w-md">
+        <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" aria-hidden="true" />
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name or category…" aria-label="Search the product list" className="w-full rounded-lg border border-gray-300 py-2 pl-9 pr-3 text-sm focus:border-blue-500 focus:outline-none" />
+      </div>
 
-                                <tbody>
-                                    {
-                                        products && products.map((product, index) => (
-                                            <tr key={index}>
-                                                <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-blueGray-700 ">
-                                                    {index + 1}
-                                                </th>
-                                                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ">
-                                                    {product?.name}
-                                                </td>
-                                                <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                                    {formatDate(product?.createdAt)}
-                                                </td>
-                                                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 cursor-pointer hover:text-primary">
-                                                    <Link to={`/dashboard/update-product/${product._id}`}> Edit</Link>
-                                                </td>
-                                                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                                    <button
-                                                        onClick={() => handleDeleteProduct(product._id)}
-                                                        className='bg-red-600 text-white px-2 py-1'>Delete</button>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    }
+      {loading ? (
+        <div className="flex h-40 items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-blue-600" /></div>
+      ) : error ? (
+        <p className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</p>
+      ) : (
+        <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+          <table className="w-full min-w-[820px] text-sm">
+            <thead>
+              <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs uppercase text-gray-500">
+                <th className="px-4 py-3 font-medium">Product</th>
+                <th className="px-4 py-3 font-medium">Category</th>
+                <th className="px-4 py-3 text-right font-medium">Price</th>
+                <th className="px-4 py-3 text-right font-medium">Stock</th>
+                <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3 text-right font-medium">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {shown.map((p) => {
+                const hidden = p.active === false;
+                const online = p.sellOnline !== false;
+                return (
+                  <tr key={p._id} className={`border-b border-gray-100 align-middle hover:bg-gray-50 ${hidden ? 'opacity-60' : ''}`}>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <img src={p.images?.[0] || ''} alt="" className="h-12 w-12 shrink-0 rounded-lg border border-gray-200 object-cover" onError={(e) => { e.currentTarget.style.visibility = 'hidden'; }} />
+                        <span className="font-semibold text-gray-900">{p.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 capitalize text-gray-700">{String(p.category || '').replace(/-/g, ' ')}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-right text-gray-900">{inr(p.price)}</td>
+                    <td className="px-4 py-3 text-right text-gray-700">{p.stock ?? '—'}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-1">
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${hidden ? 'bg-gray-100 text-gray-600' : 'bg-green-100 text-green-800'}`}>{hidden ? 'Hidden' : 'Visible'}</span>
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${online ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'}`}>{online ? 'Sell online' : 'Enquiry only'}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex justify-end gap-1">
+                        <a href={`/shop/${p._id}`} target="_blank" rel="noopener noreferrer" title="Open page" aria-label={`Open ${p.name}`} className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-blue-600"><ExternalLink className="h-4 w-4" /></a>
+                        <Link to={`/dashboard/update-product/${p._id}`} title="Edit" aria-label={`Edit ${p.name}`} className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-blue-600"><Pencil className="h-4 w-4" /></Link>
+                        <button type="button" disabled={busyId === p._id}
+                          onClick={() => update(p, { sellOnline: !online }, online ? 'Now enquiry only (no Add to cart)' : 'Now sold online')}
+                          title={online ? 'Make enquiry only' : 'Sell online'} aria-label={`${online ? 'Make enquiry only' : 'Sell online'}: ${p.name}`}
+                          className="rounded p-1.5 text-gray-500 hover:bg-gray-100 disabled:opacity-50">
+                          {online ? <MessageSquareQuote className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
+                        </button>
+                        <button type="button" disabled={busyId === p._id}
+                          onClick={() => update(p, { active: hidden }, hidden ? 'Now visible on the website' : 'Hidden from the website')}
+                          title={hidden ? 'Show' : 'Hide'} aria-label={`${hidden ? 'Show' : 'Hide'} ${p.name}`}
+                          className="rounded p-1.5 text-gray-500 hover:bg-gray-100 disabled:opacity-50">
+                          {hidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                        </button>
+                        <button type="button" disabled={busyId === p._id} onClick={() => remove(p)} title="Delete" aria-label={`Delete ${p.name}`} className="rounded p-1.5 text-gray-500 hover:bg-red-50 hover:text-red-600 disabled:opacity-50"><Trash2 className="h-4 w-4" /></button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+              {shown.length === 0 && <tr><td colSpan={6} className="px-4 py-6 text-center text-gray-500">{items.length ? `No products match “${q}”.` : 'No products yet.'}</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      )}
+      <p className="mt-3 text-xs text-gray-500">
+        <EyeOff className="inline h-3 w-3" /> Hide removes a product from the shop, search and Google without deleting it. <MessageSquareQuote className="inline h-3 w-3" /> Enquiry only keeps it visible but replaces Add to cart with a quotation request.
+      </p>
+    </div>
+  );
+};
 
-
-                                </tbody>
-
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                {/* pagination */}
-                <div className='mt-6 flex items-center justify-center'>
-                    <button disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)} className='px-4 py-2 bg-gray-300 text-gray-700 rounded-md mr-2'>Previous</button>
-                    {
-                        [...Array(totalPages)].map((_, index) => (
-                            <button 
-                            onClick={() => handlePageChange(index + 1)}
-                            className={`px-4 py-2 ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'} rounded-md mx-1`}>{index + 1}</button>
-                        ))
-                    }
-                    <button disabled={currentPage === totalPages} onClick={() => handlePageChange(currentPage + 1)} className='px-4 py-2 bg-gray-300 text-gray-700 rounded-md ml-2'>Next</button>
-                </div>
-
-                <footer className="relative pt-8 pb-6 mt-16">
-                    <div className="container mx-auto px-4">
-                        <div className="flex flex-wrap items-center md:justify-between justify-center">
-                            <div className="w-full md:w-6/12 px-4 mx-auto text-center">
-                                <div className="text-sm text-blueGray-500 font-semibold py-1">
-                                    Made with <a href="https://www.creative-tim.com/product/notus-js" className="text-blueGray-500 hover:text-gray-800" target="_blank">Notus JS</a> by <a href="https://www.creative-tim.com" className="text-blueGray-500 hover:text-blueGray-800" target="_blank"> Creative Tim</a>.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </footer>
-            </section>
-        </>
-    )
-}
-
-export default ManageProduct
+export default ManageProduct;

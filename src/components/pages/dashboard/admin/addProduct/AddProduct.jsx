@@ -446,6 +446,8 @@ const AddProduct = () => {
         stock: '',
         readyToDispatch: false,
         description: '',
+        active: true,
+        sellOnline: true,
       });
       setImages([]);
       setVideos([]);
@@ -621,6 +623,17 @@ const AddProduct = () => {
           />
           <label htmlFor="readyToDispatch" className="text-sm font-medium text-gray-700">
             Ready to Dispatch (available for immediate shipping)
+          </label>
+        </div>
+
+        <div className="flex flex-wrap gap-x-6 gap-y-2 rounded-lg border border-gray-200 p-3">
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <input type="checkbox" checked={product.active !== false} onChange={(e) => setProduct((p) => ({ ...p, active: e.target.checked }))} className="h-4 w-4 accent-blue-600" />
+            Show on website
+          </label>
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <input type="checkbox" checked={product.sellOnline !== false} onChange={(e) => setProduct((p) => ({ ...p, sellOnline: e.target.checked }))} className="h-4 w-4 accent-blue-600" />
+            Sell online (untick = enquiry only, no Add to cart)
           </label>
         </div>
 

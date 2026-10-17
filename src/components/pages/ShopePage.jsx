@@ -528,7 +528,14 @@ const ShopPage = ({ embedded = false }) => {
                           </div>
 
                           {/* ── 🛒 CART CONTROLS ── */}
-                          {!productInCart ? (
+                          {product.sellOnline === false ? (
+                            <Link
+                              to={`/bulk-quote?product=${encodeURIComponent(product.name)}&id=${product._id}&source=shop`}
+                              className="flex w-full items-center justify-center gap-2 rounded-md bg-orange-500 py-2 font-medium text-white transition-colors hover:bg-orange-600"
+                            >
+                              Request quotation
+                            </Link>
+                          ) : !productInCart ? (
                             <button
                               onClick={() => handleAddToCart(product)}
                               disabled={!isInStock}
@@ -587,7 +594,7 @@ const ShopPage = ({ embedded = false }) => {
                             </div>
                           )}
 
-                          {productInCart && (
+                          {productInCart && product.sellOnline !== false && (
                             <button
                               onClick={() => {
                                 if (!requireAuth('/cart')) return;
