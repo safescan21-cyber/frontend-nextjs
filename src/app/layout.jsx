@@ -13,15 +13,18 @@ export const metadata = {
     'food pharma machinery', 'pharma machinery India', 'tablet press', 'capsule filling machine', 'blister packaging machine',
     'liquid filling machine', 'tube filling machine', 'fluid bed dryer', 'sigma mixer', 'pharma spares', 'PureLine Machinery Haridwar',
   ],
+  // Logo icons under new file names: Google's search results still show the old
+  // Vite icon it cached long ago, and new URLs make it fetch the logo again.
+  // Google wants a square icon whose size is a multiple of 48px, listed first.
   icons: {
     icon: [
-      { url: '/favicon.svg?v=5', type: 'image/svg+xml' },
-      { url: '/favicon-16x16.png?v=5', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon-32x32.png?v=5', sizes: '32x32', type: 'image/png' },
-      { url: '/favicon-192.png?v=5', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-2026.ico', sizes: '48x48', type: 'image/x-icon' },
+      { url: '/icon-2026-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-2026.svg', type: 'image/svg+xml' },
+      { url: '/icon-2026-32.png', sizes: '32x32', type: 'image/png' },
     ],
-    shortcut: '/favicon.ico?v=5',
-    apple: [{ url: '/apple-touch-icon.png?v=5', sizes: '180x180' }],
+    shortcut: '/icon-2026.ico',
+    apple: [{ url: '/apple-touch-icon.png?v=6', sizes: '180x180' }],
   },
   manifest: '/site.webmanifest',
   openGraph: {
