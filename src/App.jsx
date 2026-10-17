@@ -57,6 +57,7 @@ import RouteSeo from './components/seo/RouteSeo';
 import NotFound from './components/seo/NotFound';
 const PrivacyPolicy = lazy(() => import('./components/seo/PrivacyPolicy'));
 const BulkQuote = lazy(() => import('./components/pages/BulkQuote'));
+const ProjectCostCalculator = lazy(() => import('./components/pages/costCalculator/ProjectCostCalculator'));
 const ManageBulkQuotes = lazy(() => import('./components/pages/dashboard/admin/quotes/ManageBulkQuotes'));
 import { SolutionsHub, SolutionPage, ResourcePage } from './components/seo/SolutionPages';
 
@@ -169,6 +170,7 @@ function App() {
 
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/bulk-quote" element={<BulkQuote />} />
+          <Route path="/project-cost-calculator" element={<ProjectCostCalculator />} />
 
           {/* Anything else */}
           <Route path="*" element={<NotFound />} />

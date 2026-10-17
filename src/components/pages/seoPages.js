@@ -127,6 +127,12 @@ export const seoPages = {
     description:
       'Request a bulk quote for pharma and food processing machinery, spares and load cells. Volume pricing, delivery across India and a reply within 1 business day.',
   },
+  costCalculator: {
+    path: '/project-cost-calculator',
+    title: 'Pharma Project Cost Calculator – Plant & Machine Cost Estimate',
+    description:
+      'Free pharma plant cost calculator: estimate machinery, building, cleanroom, HVAC, water system, QC lab and validation costs for tablet, capsule, liquid, ointment and injectable projects.',
+  },
   privacy: {
     path: '/privacy',
     title: 'Privacy Policy',

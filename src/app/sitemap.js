@@ -3,7 +3,7 @@
 import { STATIC_PAGES } from '../seo/pageSeo';
 import { SITE_URL } from '../components/seo/organization';
 
-const priority = (p) => (p === '/' ? 1 : ['/shop', '/products', '/solutions'].includes(p) ? 0.9 : p.startsWith('/solutions/') ? 0.8 : 0.6);
+const priority = (p) => (p === '/' ? 1 : ['/shop', '/products', '/solutions'].includes(p) ? 0.9 : p.startsWith('/solutions/') || p === '/project-cost-calculator' ? 0.8 : 0.6);
 
 // No lastmod: these pages don't change on every request, and a date that always
 // says "now" teaches Google to ignore lastmod for the whole site.

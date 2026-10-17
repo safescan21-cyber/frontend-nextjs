@@ -160,6 +160,7 @@ const solutionsData = [
 ];
 
 const resourcesLinks = [
+  { name: 'Project Cost Calculator', path: '/project-cost-calculator', icon: Gauge, description: 'Estimate plant & machine cost' },
   { name: 'Technical Library', path: '/resources/technical',    icon: BookOpen,  description: 'Manuals and documentation' },
   { name: 'Product Catalogs',  path: '/resources/catalogs',     icon: FileText,  description: 'Download PDF catalogs' },
   { name: 'CAD Drawings',      path: '/resources/cad',          icon: Gauge,     description: '2D/3D models' },
@@ -177,6 +178,7 @@ const seoNavLinks = [
   { name: 'Products', path: '/products' },
   { name: 'Track Order', path: '/track-order' },
   { name: 'Bulk Quote', path: '/bulk-quote' },
+  { name: 'Pharma Project Cost Calculator', path: '/project-cost-calculator' },
   { name: 'Press & News', path: '/press' },
   { name: 'Careers', path: '/career' },
   { name: 'Projects', path: '/projects' },
@@ -465,6 +467,7 @@ const Navbar = () => {
                   <Link to="/track-order" onClick={handleLinkClick} className="inline-flex items-center gap-1 font-semibold text-amber-400 hover:text-amber-300 transition-colors"><Truck className="w-3 h-3" aria-hidden="true" />Track Order</Link>
                   <Link to="/bulk-quote" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">Bulk Orders</Link>
                   <Link to="/shop" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">Products</Link>
+                  <Link to="/project-cost-calculator" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">Cost Calculator</Link>
                   <Link to="/about" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">About Us</Link>
                   <Link to="/projects" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors 2xl:hidden">Projects</Link>
                   <Link to="/contact" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors 2xl:hidden">Contact</Link>

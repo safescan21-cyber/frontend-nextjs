@@ -71,6 +71,7 @@ const NAV_PRODUCTS_FALLBACK = [
 
 const NAV_SERVICES = [
   { label: "Turnkey Projects", to: "/solutions/turnkey" },
+  { label: "Project Cost Calculator", to: "/project-cost-calculator" },
   { label: "Custom Machine Design", to: "/contact" },
   { label: "Validation & Compliance", to: "/solutions/compliance" },
   { label: "Installation & Commissioning", to: "/solutions/turnkey" },

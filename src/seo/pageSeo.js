@@ -23,7 +23,7 @@ const clip = (s, n) => (s.length > n ? `${s.slice(0, n - 1).replace(/\s+\S*$/, '
 const isId = (id) => /^[a-f0-9]{24}$/i.test(id || '');
 
 // Public, indexable pages (same list scripts/prerender-meta.mjs used)
-const EXISTING_ROUTES = new Set(['/', '/shop', '/about', '/products', '/career', '/press', '/track-order', '/contact', '/projects', '/solutions', '/privacy', '/bulk-quote']);
+const EXISTING_ROUTES = new Set(['/', '/shop', '/about', '/products', '/career', '/press', '/track-order', '/contact', '/projects', '/solutions', '/privacy', '/bulk-quote', '/project-cost-calculator']);
 export const STATIC_PAGES = (() => {
   const pages = Object.values(seoPages).filter((p) => EXISTING_ROUTES.has(p.path) || p.path.startsWith('/solutions/'));
   for (const s of SOLUTIONS) {
@@ -179,6 +179,6 @@ export async function seoForPath(segments = []) {
 const APP_ROUTES = [
   /^\/$/, /^\/about$/, /^\/contact$/, /^\/shop$/, /^\/products$/, /^\/products\/[^/]+$/, /^\/categories\/[^/]+$/,
   /^\/press$/, /^\/projects$/, /^\/career$/, /^\/solutions$/, /^\/resources\/[^/]+$/, /^\/privacy$/, /^\/bulk-quote$/,
-  /^\/track-order$/, /^\/search$/, /^\/login$/, /^\/register$/, /^\/forgotpassword$/, /^\/resetpassword\/[^/]+$/,
+  /^\/track-order$/, /^\/project-cost-calculator$/, /^\/search$/, /^\/login$/, /^\/register$/, /^\/forgotpassword$/, /^\/resetpassword\/[^/]+$/,
   /^\/cart$/, /^\/checkout$/, /^\/wishlist$/, /^\/dashboard(\/.*)?$/,
 ];
