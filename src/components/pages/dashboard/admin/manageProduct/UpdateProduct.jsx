@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import TextInput from '../addProduct/TextInput';
 import SelectInput from '../addProduct/SelectInput';
 import UploadImage from '../addProduct/UploadImage';
+import DocumentUploader from '../addProduct/DocumentUploader';
 
 const categories = [
     { label: 'Select Category', value: '' },
@@ -42,6 +43,8 @@ const UpdateProduct = () => {
     const {data: productData, isLoading: isProductLoading, error: fetchError, refetch} = useFetchProductByIdQuery(id);
 
     const [newImage, setNewImage] = useState(null)
+    const [documents, setDocuments] = useState([])
+    const [docsUploading, setDocsUploading] = useState(false)
 
     const {name, category, color, description, image: imageURL, price } = productData?.product || {};
 
@@ -57,6 +60,7 @@ const UpdateProduct = () => {
                 description: description || '',
                 image: imageURL || ''
             })
+            setDocuments(productData.product?.documents || [])
         }
     }, [productData])
 
@@ -81,6 +85,7 @@ const UpdateProduct = () => {
         const updatedProduct = {
             ...product,
             image: newImage ? newImage : product.image, 
+            documents,
             author: user?._id
         };
 
@@ -148,11 +153,13 @@ const UpdateProduct = () => {
                 ></textarea>
                 </div>
 
+                <DocumentUploader documents={documents} setDocuments={setDocuments} onBusyChange={setDocsUploading} />
+
                 <div>
                     <button type='submit'
                     className='add-product-btn'
-                   
-                    >{isUpdating ? 'Updating...' : 'Update Product'}</button>
+                    disabled={isUpdating || docsUploading}
+                    >{isUpdating ? 'Updating...' : docsUploading ? 'Uploading documents...' : 'Update Product'}</button>
                 </div>
 
         </form>

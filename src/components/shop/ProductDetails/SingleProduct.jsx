@@ -11,6 +11,7 @@ import {
 } from '../../store/review/reviewApi';
 import ReviewActions from './ReviewActions';
 import ShareProduct from '../ShareProduct';
+import ProductDocuments from './ProductDocuments';
 import Seo from '../../Seo';
 import { track, getLikedProducts, setProductLiked } from '../../../utlis/track';
 import { addToCart, selectCartItems } from '../../store/cartSlice';
@@ -368,9 +369,11 @@ const SingleProduct = () => {
     { label: 'Stock', value: 'In Stock', icon: '✅' },
   ];
 
+  const documents = Array.isArray(product?.documents) ? product.documents.filter((d) => d && d.file) : [];
   const tabs = [
     { key: 'description', label: 'Description' },
     { key: 'specs', label: 'Specifications' },
+    ...(documents.length ? [{ key: 'documents', label: `Documents (${documents.length})` }] : []),
     { key: 'shipping', label: 'Shipping & Returns' },
     { key: 'reviews', label: `Reviews (${reviews.length})` },
   ];
@@ -756,6 +759,14 @@ const SingleProduct = () => {
                     </tbody>
                   </table>
                 </div>
+                {documents.length > 0 && (
+                  <p className="mt-4 text-sm text-gray-600">
+                    {documents.length} technical document{documents.length === 1 ? '' : 's'} available.{' '}
+                    <button type="button" onClick={() => setActiveTab('documents')} className="font-semibold text-blue-600 hover:underline">
+                      Read or download →
+                    </button>
+                  </p>
+                )}
                 {!hasCustomSpecs && (
                   <p className="mt-4 text-sm text-gray-600">
                     Detailed technical specifications are available on request.{' '}
@@ -769,6 +780,9 @@ const SingleProduct = () => {
                 )}
               </div>
             )}
+
+            {/* Technical documents uploaded by the admin */}
+            {activeTab === 'documents' && documents.length > 0 && <ProductDocuments documents={documents} />}
 
             {/* Shipping */}
             {activeTab === 'shipping' && (

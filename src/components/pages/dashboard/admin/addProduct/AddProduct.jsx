@@ -6,6 +6,7 @@ import { CheckCircle, AlertCircle, Plus, X } from 'lucide-react';
 import TextInput from './TextInput';
 import SelectInput from './SelectInput';
 import UploadImage from './UploadImage';
+import DocumentUploader from './DocumentUploader';
 import { useAddProductMutation } from '../../../../store/products/productsApi';
 import getBaseUrl from '../../../../../utlis/baseURL';
 
@@ -230,6 +231,8 @@ const AddProduct = () => {
   const [images, setImages] = useState([]);
   const [specifications, setSpecifications] = useState([]);
   const [videos, setVideos] = useState([]);
+  const [documents, setDocuments] = useState([]);
+  const [docsUploading, setDocsUploading] = useState(false);
   const [videoUploading, setVideoUploading] = useState(false);
   const [videoProgress, setVideoProgress] = useState(0);
   const [videoStatus, setVideoStatus] = useState('');
@@ -420,6 +423,7 @@ const AddProduct = () => {
         stock: product.stock ? Number(product.stock) : undefined,
         images,
         videos,
+        documents,
         author: user._id,
         specifications: cleanSpecs,
       };
@@ -445,6 +449,7 @@ const AddProduct = () => {
       });
       setImages([]);
       setVideos([]);
+      setDocuments([]);
       setSpecifications([]);
       setCustomCategory('');
       setShowCustomCategory(false);
@@ -669,6 +674,9 @@ const AddProduct = () => {
           </p>
         </div>
 
+        {/* ── Technical documents ── */}
+        <DocumentUploader documents={documents} setDocuments={setDocuments} onBusyChange={setDocsUploading} />
+
         <div>
           <label htmlFor="description" className="block text-sm font-medium text-gray-700">
             Description
@@ -732,8 +740,8 @@ const AddProduct = () => {
         </div>
 
         <div>
-          <button type="submit" className="add-product-btn" disabled={isLoading || videoUploading}>
-            {isLoading ? 'Adding...' : videoUploading ? 'Uploading video...' : 'Add Product'}
+          <button type="submit" className="add-product-btn" disabled={isLoading || videoUploading || docsUploading}>
+            {isLoading ? 'Adding...' : videoUploading ? 'Uploading video...' : docsUploading ? 'Uploading documents...' : 'Add Product'}
           </button>
         </div>
 
