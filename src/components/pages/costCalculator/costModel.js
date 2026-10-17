@@ -61,7 +61,7 @@ export const SECTIONS = {
   },
   capsules: {
     label: 'Hard gelatin capsules', group: 'osd', unit: 'capsules', defaultDaily: 500000, min: 20000, max: 10000000, step: 20000,
-    hint: 'e.g. 5 lakh capsules per day', sterile: false, wet: false, dust: true,
+    hint: 'e.g. 5 lakh capsules per day', sterile: false, wet: false, dust: true, lowRh: true,
     lineCap: { semi: 100000, auto: 200000, high: 400000 },
     water: ({ lines }) => 1.5 + lines * 2,
     machines: [
@@ -75,7 +75,7 @@ export const SECTIONS = {
   },
   softgels: {
     label: 'Soft gelatin capsules (softgels)', group: 'osd', unit: 'softgels', defaultDaily: 300000, min: 20000, max: 5000000, step: 10000,
-    hint: 'e.g. 3 lakh softgels per day', sterile: false, wet: true, dust: false,
+    hint: 'e.g. 3 lakh softgels per day', sterile: false, wet: true, dust: false, lowRh: true,
     lineCap: { semi: 8000, auto: 30000, high: 60000 },
     water: ({ lines }) => 3 + lines * 3,
     machines: [
@@ -90,7 +90,7 @@ export const SECTIONS = {
   },
   powders: {
     label: 'Dry syrup / powders (bottles or sachets)', group: 'osd', unit: 'packs', defaultDaily: 20000, min: 2000, max: 300000, step: 1000,
-    hint: 'bottles or sachets per day', sterile: false, wet: false, dust: true,
+    hint: 'bottles or sachets per day', sterile: false, wet: false, dust: true, lowRh: true,
     lineCap: { semi: 3000, auto: 6000, high: 12000 },
     water: ({ lines }) => 1.5 + lines * 1.5,
     machines: [
@@ -277,11 +277,13 @@ export function calculate(inputs) {
     const operators = Math.ceil(rows.reduce((a, r) => a + r.qty, 0) * TIERS[tierKey].operators * 0.6) * shifts;
     // HVAC: sterile rooms need far more air changes than oral solid rooms
     const tr = Math.round((area / (sec.sterile ? 45 : 85)) * comp.hvac);
+    // supply air: 10 ft rooms; ~20 air changes/hr for oral rooms (Grade D), ~50 for sterile suites (Grade B/C)
+    const cfm = Math.round((area * 10 * (sec.sterile ? 50 : 20) * comp.hvac) / 60 / 100) * 100;
     segments.push({
       key, label: sec.label, unit: sec.unit, daily, lines, sterile: sec.sterile, area,
       machineCount: rows.reduce((a, r) => a + r.qty, 0),
       machineKw: Math.round(machineKw),
-      tr, hvacKw: Math.round(tr * 1.1),
+      tr, hvacKw: Math.round(tr * 1.1), cfm, ahus: Math.max(1, Math.ceil(cfm / 10000)), lowRh: !!sec.lowRh,
       steam: Math.round(rows.reduce((a, r) => a + r.steam, 0)),
       air: Math.round(rows.reduce((a, r) => a + r.air, 0) * 1.2), // + leaks and future
       water: Math.round(sec.water({ daily, lines }) * comp.water * 10) / 10,
@@ -361,7 +363,41 @@ export function calculate(inputs) {
   const perSqft = (sqft, rate) => [(sqft * rate[0]) / 1e5, (sqft * rate[1]) / 1e5]; // ₹/sq ft → lakh
   const civil = perSqft(builtUp, [1500, 2200]);
   const cleanroom = add(perSqft(cleanArea, mul([1100, 1800], comp.area)), perSqft(sterileArea, mul([3000, 4800], comp.area)));
-  const hvac = add(perSqft(cleanArea, mul([900, 1500], comp.area)), perSqft(sterileArea, mul([2500, 4000], comp.area)));
+
+  // ── HVAC plant ──
+  const supportArea = qcArea + warehouse + support;
+  const supportCfm = Math.round((supportArea * 10 * 8) / 60 / 100) * 100; // stores, QC, offices: ~8 air changes
+  const supportAhus = Math.max(1, Math.ceil(supportCfm / 15000));
+  const cleanCfm = segments.reduce((a, sg) => a + sg.cfm, 0);
+  const totalCfm = cleanCfm + supportCfm;
+  const ahus = segments.reduce((a, sg) => a + sg.ahus, 0) + supportAhus;
+  const chillersWorking = Math.max(1, Math.ceil(totalTr / 250));
+  const chillerTr = Math.ceil(totalTr / chillersWorking / 10) * 10;
+  const sterileCfm = segments.filter((sg) => sg.sterile).reduce((a, sg) => a + sg.cfm, 0);
+  const hepaOral = Math.ceil((cleanCfm - sterileCfm) / 1000);
+  const hepaSterile = Math.ceil(sterileCfm / 800);
+  const lowRhSegs = segments.filter((sg) => sg.lowRh);
+  const bms = { schedM: [10, 20], who: [20, 35], eu: [40, 70] }[inputs.compliance] || [10, 20];
+  const lakhPer = (qty, rsLow, rsHigh) => [(qty * rsLow) / 1e5, (qty * rsHigh) / 1e5];
+  const hvacEquipment = [
+    { name: 'Air handling units (double-skin, pharma grade)', qty: ahus, basis: `${ahus} AHUs · ${totalCfm.toLocaleString('en-IN')} CFM supply air`, total: mul(lakhPer(totalCfm, 55, 90), comp.area > 1 ? 1.15 : 1) },
+    { name: 'Water-cooled screw chillers', qty: chillersWorking + 1, basis: `${chillersWorking} × ${chillerTr} TR working + 1 standby`, total: lakhPer(chillerTr * (chillersWorking + 1), 18000, 25000) },
+    { name: 'Cooling towers + chilled & condenser water pumps', qty: null, basis: `${totalTr.toLocaleString('en-IN')} TR, with standby pumps`, total: lakhPer(totalTr, 6000, 10000) },
+    { name: 'Chilled water piping, valves & insulation', qty: null, basis: `${totalTr.toLocaleString('en-IN')} TR`, total: lakhPer(totalTr, 4000, 7000) },
+    { name: 'Ducting, dampers, grilles & insulation', qty: null, basis: `${totalCfm.toLocaleString('en-IN')} CFM`, total: lakhPer(totalCfm, 30, 45) },
+    hepaOral && { name: 'Terminal HEPA filter boxes (H13, with DOP ports)', qty: hepaOral, basis: `${hepaOral} boxes · oral rooms`, total: lakhPer(hepaOral, 18000, 30000) },
+    hepaSterile && { name: 'Terminal HEPA filter boxes (H14, sterile suites)', qty: hepaSterile, basis: `${hepaSterile} boxes · Grade B/C rooms`, total: lakhPer(hepaSterile, 28000, 45000) },
+    lowRhSegs.length && { name: 'Dehumidifiers (low-humidity rooms)', qty: lowRhSegs.length, basis: lowRhSegs.map((sg) => sg.label.split(' (')[0]).join(', '), total: lowRhSegs.reduce((acc, sg) => add(acc, [Math.max(8, sg.cfm * 0.0012), Math.max(15, sg.cfm * 0.002)]), [0, 0]) },
+    { name: 'BMS / EMS: temperature, humidity & pressure monitoring', qty: null, basis: comp.short, total: bms },
+  ].filter(Boolean);
+  const hvacEquipTotal = sum(hvacEquipment, (h) => h.total);
+  const hvacPlant = [
+    ...hvacEquipment,
+    { name: 'HVAC installation, testing & air balancing', qty: null, basis: '10–15% of HVAC equipment', total: mul(hvacEquipTotal, [0.1, 0.15]) },
+    { name: 'HVAC qualification (HEPA integrity, particle counts, recovery, DP)', qty: null, basis: comp.short, total: mul([3, 6], comp.area) },
+  ];
+  const hvac = sum(hvacPlant, (h) => h.total);
+  for (const sg of segments) sg.hvacCost = mul(hvac, (sg.cfm + (supportCfm * sg.area) / production) / totalCfm);
 
   // ── Utility equipment, sized from the loads above ──
   const scale = (base, size, ref) => mul(base, Math.max(1, (size / ref) ** 0.6));
@@ -386,7 +422,7 @@ export function calculate(inputs) {
   const qcTotal = sum(qc, (u) => u.total);
 
   const installation = mul(machinery, [0.04, 0.07]);
-  const validation = mul(add(add(machinery, utilitiesTotal), hvac), comp.validation);
+  const validation = mul(add(machinery, utilitiesTotal), comp.validation);
   const project = [
     { name: 'Installation & commissioning', basis: '4–7% of machinery', total: installation },
     { name: 'Qualification & validation (DQ/IQ/OQ/PQ, documents)', basis: `${Math.round(comp.validation[0] * 100)}–${Math.round(comp.validation[1] * 100)}% of equipment`, total: validation },
@@ -399,17 +435,34 @@ export function calculate(inputs) {
   const building = [
     { name: 'Civil construction (RCC building)', basis: `${builtUp.toLocaleString('en-IN')} sq ft built-up`, total: civil },
     { name: 'Cleanroom panels, epoxy floors & doors', basis: `${production.toLocaleString('en-IN')} sq ft clean area${sterileArea ? ` (${sterileArea.toLocaleString('en-IN')} sterile)` : ''}`, total: cleanroom },
-    { name: 'HVAC: AHUs, chillers, ducting, HEPA, BMS', basis: `${totalTr.toLocaleString('en-IN')} TR · ${comp.short}`, total: hvac },
   ];
-  const buildingTotal = add(add(civil, cleanroom), hvac);
+  const buildingTotal = add(civil, cleanroom);
 
-  const subtotal = [machinery, buildingTotal, utilitiesTotal, qcTotal, projectTotal].reduce(add, [0, 0]);
+  const subtotal = [machinery, buildingTotal, hvac, utilitiesTotal, qcTotal, projectTotal].reduce(add, [0, 0]);
   const contingency = mul(subtotal, [0.05, 0.08]);
   const gst = mul(add(subtotal, mul(comp.licence, -1)), 0.18); // licences & consultancy are not taxed the same way
   const land = Math.max(0, Number(inputs.landCost) || 0);
   const totalExGst = add(add(subtotal, contingency), [land, land]);
   const total = add(totalExGst, gst);
   const months = [comp.months[0] + (sterile ? 3 : 0), comp.months[1] + (sterile ? 3 : 0)];
+
+  // ── Plant cost by segment ──
+  // Direct: its machines + its share of building (floor area), HVAC (air volume)
+  // and utilities (power). Shared costs (QC, installation, validation, contingency,
+  // land, GST) follow the same proportion, so the segments add up to the total.
+  const segKw = segments.reduce((a, sg) => a + sg.connectedKw, 0);
+  for (const sg of segments) {
+    sg.buildingCost = mul(buildingTotal, sg.area / production);
+    sg.utilitiesCost = mul(utilitiesTotal, sg.connectedKw / segKw);
+    sg.directCost = [sg.cost, sg.buildingCost, sg.hvacCost, sg.utilitiesCost].reduce(add, [0, 0]);
+  }
+  const directAll = segments.reduce((a, sg) => add(a, sg.directCost), [0, 0]);
+  const sharedAll = add(add(add(qcTotal, projectTotal), add(contingency, [land, land])), gst);
+  for (const sg of segments) {
+    sg.sharedCost = [sharedAll[0] * (sg.directCost[0] / directAll[0]), sharedAll[1] * (sg.directCost[1] / directAll[1])];
+    sg.plantCost = add(sg.directCost, sg.sharedCost);
+    sg.perUnitDay = [(sg.plantCost[0] * 1e5) / sg.daily, (sg.plantCost[1] * 1e5) / sg.daily]; // ₹ per unit/day of capacity
+  }
 
   return {
     tier: tierKey,
@@ -421,14 +474,16 @@ export function calculate(inputs) {
     machineCount: machines.reduce((n, l) => n + l.qty, 0),
     groups: [
       { key: 'machinery', label: 'Process & packing machinery', total: machinery },
-      { key: 'building', label: 'Building, cleanrooms & HVAC', total: buildingTotal },
+      { key: 'building', label: 'Building & cleanrooms', total: buildingTotal },
+      { key: 'hvac', label: 'HVAC plant', total: hvac },
       { key: 'utilities', label: 'Utilities & power', total: utilitiesTotal },
       { key: 'qc', label: 'QC & micro labs', total: qcTotal },
       { key: 'project', label: 'Installation, validation & pre-operative', total: projectTotal },
       { key: 'contingency', label: 'Contingency (5–8%)', total: contingency },
       ...(land ? [{ key: 'land', label: 'Land', total: [land, land] }] : []),
     ],
-    building, utilities, qc, project,
+    building, hvacPlant, utilities, qc, project,
+    hvacSummary: { cfm: totalCfm, cleanCfm, supportCfm, ahus, tr: totalTr, chillers: `${chillersWorking} + 1`, chillerTr, hepa: hepaOral + hepaSterile },
     area: { production, sterile: sterileArea, qc: qcArea, warehouse, support, builtUp, plot: Math.round(builtUp / 0.45) },
     power: {
       machineKw: Math.round(machineKw), hvacKw: Math.round(hvacKw), commonKw: Math.round(commonKw), commonLoads,

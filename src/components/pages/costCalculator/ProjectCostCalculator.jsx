@@ -21,7 +21,7 @@ const ICONS = {
 const WHATSAPP = '918700792607';
 const GROUP_COLORS = {
   machinery: 'bg-blue-600', building: 'bg-amber-500', utilities: 'bg-teal-500', qc: 'bg-violet-500',
-  project: 'bg-rose-500', contingency: 'bg-slate-400', land: 'bg-lime-600',
+  project: 'bg-rose-500', contingency: 'bg-slate-400', land: 'bg-lime-600', hvac: 'bg-cyan-500',
 };
 const DEFAULTS = { forms: 'tablets', tier: 'auto', comp: 'schedM', shifts: 1, coating: 1, land: 0, tariff: DEFAULT_TARIFF };
 
@@ -163,12 +163,15 @@ const Card = ({ title, step, children }) => (
   </section>
 );
 
-const CostTable = ({ title, icon: Icon, rows, total, open: startOpen = false }) => {
+const CostTable = ({ title, icon: Icon, rows, total, summary, open: startOpen = false }) => {
   const [open, setOpen] = useState(startOpen);
   return (
     <section className="rounded-xl border border-slate-200 bg-white shadow-sm print:break-inside-avoid print:border-slate-300 print:shadow-none">
       <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="flex w-full items-center justify-between gap-3 p-4 text-left">
-        <span className="flex items-center gap-2 font-semibold text-slate-800"><Icon className="h-5 w-5 text-blue-600" />{title}</span>
+        <span>
+          <span className="flex items-center gap-2 font-semibold text-slate-800"><Icon className="h-5 w-5 text-blue-600" />{title}</span>
+          {summary && <span className="mt-0.5 block pl-7 text-xs font-normal text-slate-500">{summary}</span>}
+        </span>
         <span className="flex items-center gap-2 text-sm font-semibold text-slate-700">
           {formatRange(total)}
           <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform print:hidden ${open ? 'rotate-180' : ''}`} />
@@ -193,6 +196,55 @@ const CostTable = ({ title, icon: Icon, rows, total, open: startOpen = false }) 
   );
 };
 
+// What each product block costs, with its share of the common plant
+const SegmentCosts = ({ result }) => (
+  <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5 print:break-inside-avoid print:shadow-none">
+    <h2 className="flex items-center gap-2 font-semibold text-slate-800"><Factory className="h-5 w-5 text-blue-600" />Plant cost by segment</h2>
+    <p className="mt-1 text-xs text-slate-500">
+      Each block&apos;s machines plus its share of the building (by floor area), HVAC (by air volume) and utilities (by power).
+      QC lab, installation, validation, contingency, land and GST are shared in the same proportion, so the rows add up to the total.
+    </p>
+    <div className="mt-4 overflow-x-auto">
+      <table className="w-full min-w-[760px] text-sm">
+        <thead>
+          <tr className="border-b border-slate-200 text-left text-xs uppercase text-slate-500">
+            <th className="px-3 py-2 font-medium">Segment</th>
+            <th className="px-3 py-2 text-right font-medium">Machines</th>
+            <th className="px-3 py-2 text-right font-medium">Building</th>
+            <th className="px-3 py-2 text-right font-medium">HVAC</th>
+            <th className="px-3 py-2 text-right font-medium">Utilities</th>
+            <th className="px-3 py-2 text-right font-medium">Shared + GST</th>
+            <th className="px-3 py-2 text-right font-medium">Plant cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          {result.segments.map((sg) => (
+            <tr key={sg.key} className="border-b border-slate-100 align-top">
+              <td className="px-3 py-2.5">
+                <p className="font-medium text-slate-800">{sg.label}</p>
+                <p className="text-xs text-slate-500">
+                  {num(sg.daily)} {sg.unit}/day · ₹{num(Math.round(sg.perUnitDay[0]))}–{num(Math.round(sg.perUnitDay[1]))} per {sg.unit.replace(/s$/, '')}/day of capacity
+                </p>
+              </td>
+              <td className="whitespace-nowrap px-3 py-2.5 text-right text-slate-700">{formatRange(sg.cost)}</td>
+              <td className="whitespace-nowrap px-3 py-2.5 text-right text-slate-700">{formatRange(sg.buildingCost)}</td>
+              <td className="whitespace-nowrap px-3 py-2.5 text-right text-slate-700">{formatRange(sg.hvacCost)}</td>
+              <td className="whitespace-nowrap px-3 py-2.5 text-right text-slate-700">{formatRange(sg.utilitiesCost)}</td>
+              <td className="whitespace-nowrap px-3 py-2.5 text-right text-slate-700">{formatRange(sg.sharedCost)}</td>
+              <td className="whitespace-nowrap px-3 py-2.5 text-right font-semibold text-slate-900">{formatRange(sg.plantCost)}</td>
+            </tr>
+          ))}
+          <tr className="bg-slate-50 font-semibold text-slate-900">
+            <td className="px-3 py-2.5">Whole project (incl. GST)</td>
+            <td className="px-3 py-2.5" colSpan={5} />
+            <td className="whitespace-nowrap px-3 py-2.5 text-right">{formatRange(result.total)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+);
+
 const ProjectCostCalculator = () => {
   const [params, setParams] = useSearchParams();
   const [state, setState] = useState(() => readState(params));
@@ -216,6 +268,7 @@ const ProjectCostCalculator = () => {
   }, [state]);
 
   const result = useMemo(() => calculate(state), [state]);
+  const groupTotal = (key) => result?.groups.find((g) => g.key === key)?.total || [0, 0];
   const set = (patch) => setState((s) => ({ ...s, ...patch }));
   const setSection = (k, patch) => setState((s) => ({ ...s, sections: { ...s.sections, [k]: { ...s.sections[k], ...patch } } }));
   const reset = () => setState(readState(new URLSearchParams()));
@@ -233,7 +286,7 @@ const ProjectCostCalculator = () => {
       forms,
       `Automation: ${TIERS[result.tier].label} | ${result.compliance.short} | ${result.shifts} shift(s)`,
       `Estimated project cost: ${formatRange(result.total)} (incl. GST)`,
-      `Machinery: ${formatRange(result.groups[0].total)}`,
+      `Machinery: ${formatRange(groupTotal('machinery'))} | HVAC plant: ${formatRange(groupTotal('hvac'))}`,
       `Power: ${num(result.power.connectedKw)} kW connected, ${num(result.power.transformer)} kVA transformer, DG ${num(result.power.dgSet)} kVA`,
       '',
       'Please send me a detailed quotation.',
@@ -486,7 +539,7 @@ const ProjectCostCalculator = () => {
               <section className="rounded-xl border border-slate-200 bg-white shadow-sm print:shadow-none">
                 <div className="flex flex-wrap items-center justify-between gap-2 p-4">
                   <h2 className="flex items-center gap-2 font-semibold text-slate-800"><Wrench className="h-5 w-5 text-blue-600" />Machine list &amp; cost</h2>
-                  <span className="text-sm font-semibold text-slate-700">{formatRange(result.groups[0].total)}</span>
+                  <span className="text-sm font-semibold text-slate-700">{formatRange(groupTotal('machinery'))}</span>
                 </div>
                 {machinesBySection.map((s) => {
                   const open = openSection === null ? machinesBySection.length === 1 || s.key === machinesBySection[0].key : openSection === s.key;
@@ -536,12 +589,21 @@ const ProjectCostCalculator = () => {
                 })}
               </section>
 
+              <SegmentCosts result={result} />
+
               <UtilitiesPanel result={result} />
 
-              <CostTable title="Building, cleanrooms & HVAC" icon={Factory} rows={result.building} total={result.groups[1].total} />
-              <CostTable title="Utilities & power equipment" icon={Zap} rows={result.utilities} total={result.groups[2].total} />
-              <CostTable title="QC & micro labs" icon={Beaker} rows={result.qc} total={result.groups[3].total} />
-              <CostTable title="Installation, validation & pre-operative" icon={ShieldCheck} rows={result.project} total={result.groups[4].total} />
+              <CostTable title="Building & cleanrooms" icon={Factory} rows={result.building} total={groupTotal('building')} />
+              <CostTable
+                title="HVAC plant"
+                icon={Thermometer}
+                rows={result.hvacPlant}
+                total={groupTotal('hvac')}
+                summary={`${num(result.hvacSummary.cfm)} CFM · ${result.hvacSummary.ahus} AHUs · ${num(result.hvacSummary.tr)} TR · chillers ${result.hvacSummary.chillers} × ${result.hvacSummary.chillerTr} TR · ${result.hvacSummary.hepa} HEPA filters`}
+              />
+              <CostTable title="Utilities & power equipment" icon={Zap} rows={result.utilities} total={groupTotal('utilities')} />
+              <CostTable title="QC & micro labs" icon={Beaker} rows={result.qc} total={groupTotal('qc')} />
+              <CostTable title="Installation, validation & pre-operative" icon={ShieldCheck} rows={result.project} total={groupTotal('project')} />
 
               {/* Actions */}
               <div className="flex flex-wrap gap-2 print:hidden">
