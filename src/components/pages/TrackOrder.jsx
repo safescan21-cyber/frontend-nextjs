@@ -185,7 +185,7 @@ const TrackOrder = () => {
                       </span>
                     )}
                     <span className="flex-1 text-slate-700">{item.name}</span>
-                    <span className="text-slate-500 text-sm">× {item.quantity}</span>
+                    <span className="text-slate-500 text-sm">× {item.quantity}{item.unit ? ` ${item.unit}` : ''}</span>
                   </li>
                 ))}
               </ul>

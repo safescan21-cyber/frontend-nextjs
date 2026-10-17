@@ -76,6 +76,8 @@ const CheckoutPage = () => {
   const location = useLocation();
 
   const cartItems = useSelector(selectCartItems);
+  // Pharma APIs are sold to licensed buyers: their drug licence number is required
+  const hasApi = (cartItems || []).some((i) => i.kind === 'api');
   const subtotal = useSelector(selectCartTotalPrice);
 
   // ── 🔐 Login guard: same source of truth as the rest of the app (Redux auth.user) ──
@@ -100,7 +102,7 @@ const CheckoutPage = () => {
     firstName: '', lastName: '', email: '', phone: '',
     addressLine1: '', addressLine2: '',
     city: '', state: '', pincode: '', country: 'India',
-    deliveryInstructions: '', saveAddress: false,
+    deliveryInstructions: '', saveAddress: false, drugLicence: '',
   });
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
@@ -127,6 +129,7 @@ const CheckoutPage = () => {
   // Order lines sent to the server (it prices the order from these)
   const orderItems = useMemo(() => (cartItems || []).map(item => ({
     productId: item._id,
+    kind: item.kind === 'api' ? 'api' : 'product',
     name: item.name,
     price: item.price,
     quantity: item.quantity,
@@ -217,6 +220,7 @@ const CheckoutPage = () => {
     city: v => !v.trim() ? 'City is required' : '',
     state: v => !v.trim() ? 'State is required' : '',
     pincode: v => !v.trim() ? 'Pincode is required' : !/^\d{6}$/.test(v) ? 'Must be 6 digits' : '',
+    drugLicence: v => (hasApi && String(v || '').trim().length < 3 ? 'Drug licence number is required to buy pharma APIs' : ''),
   };
 
   const validateField = (name, val = formData[name]) => {
@@ -379,6 +383,7 @@ const CheckoutPage = () => {
         deliveryInstructions: formData.deliveryInstructions,
       },
       items: orderItems,
+      ...(hasApi && { drugLicence: formData.drugLicence.trim() }),
       paymentMethod: paymentMethod === 'stripe' ? 'card' : paymentMethod,
       paymentIntentId: paymentDetails?.id || null,
       couponCode: appliedCoupon?.code || '',
@@ -637,6 +642,14 @@ const CheckoutPage = () => {
                     <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} onBlur={handleBlur} className={inputCls('phone')} placeholder="10-digit mobile number" maxLength={10} />
                     {errors.phone && touched.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                   </div>
+                  {hasApi && (
+                    <div className="md:col-span-2 rounded-lg border border-blue-200 bg-blue-50 p-3">
+                      <label htmlFor="drugLicence" className="block text-sm font-medium text-gray-700 mb-1.5">Drug licence number <span className="text-red-500">*</span></label>
+                      <input id="drugLicence" name="drugLicence" value={formData.drugLicence} onChange={handleInputChange} onBlur={handleBlur} className={inputCls('drugLicence')} placeholder="e.g. Form 20B / 21B / 25 licence no." maxLength={60} />
+                      {errors.drugLicence && touched.drugLicence && <p className="text-red-500 text-xs mt-1">{errors.drugLicence}</p>}
+                      <p className="mt-1 text-xs text-gray-600">Your cart has pharma APIs (bulk drugs). We supply them only to licensed manufacturers, wholesalers and labs; we may ask for a copy of the licence before dispatch.</p>
+                    </div>
+                  )}
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">Address Line 1 <span className="text-red-500">*</span></label>
                     <input name="addressLine1" value={formData.addressLine1} onChange={handleInputChange} onBlur={handleBlur} className={inputCls('addressLine1')} placeholder="House number, building, street" />
@@ -801,7 +814,7 @@ const CheckoutPage = () => {
                     <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
                     <div className="flex-1">
                       <p className="font-medium text-gray-800">{item.name}</p>
-                      <p className="text-gray-500 text-xs">Qty: {item.quantity}</p>
+                      <p className="text-gray-500 text-xs">Qty: {item.quantity}{item.kind === 'api' ? ` ${item.unit} × ₹${item.price.toLocaleString('en-IN')}/${item.unit}` : ''}</p>
                     </div>
                     <p className="font-semibold text-gray-800">₹{item.price * item.quantity}</p>
                   </div>

@@ -121,10 +121,16 @@ const PharmaApiList = () => {
                     {a.moq && <><dt className="text-slate-500">MOQ</dt><dd className="font-medium text-slate-800">{a.moq}</dd></>}
                   </dl>
                   {a.composition && <p className="mt-2 line-clamp-2 text-xs text-slate-500"><span className="font-semibold text-slate-600">Composition:</span> {a.composition}</p>}
+                  {a.sellOnline && a.unitPrice > 0 && (
+                    <p className="mt-3 flex items-center justify-between rounded-lg bg-green-50 px-3 py-2 text-sm">
+                      <span className="font-bold text-slate-900">₹{Number(a.unitPrice).toLocaleString('en-IN')} <span className="font-normal text-slate-600">/ {a.unit}</span></span>
+                      <span className="text-xs font-semibold text-green-800">Buy online · min {a.minOrderQty} {a.unit}</span>
+                    </p>
+                  )}
                   <div className="mt-auto flex gap-2 pt-4">
                     <a href={`/pharma-api/${a.slug}`} target="_blank" rel="noopener"
                       className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700">
-                      <ExternalLink className="h-4 w-4" aria-hidden="true" /> View details
+                      <ExternalLink className="h-4 w-4" aria-hidden="true" /> {a.sellOnline && a.unitPrice > 0 ? 'View & buy' : 'View details'}
                     </a>
                     <Link to={`/bulk-quote?product=${encodeURIComponent(a.name)}&source=pharma-api`}
                       className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">

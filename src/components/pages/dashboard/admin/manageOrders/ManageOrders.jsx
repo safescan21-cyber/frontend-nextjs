@@ -65,6 +65,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
     doc.text(`Email: ${customerInfo?.email}`, margin, y);
     y += 6;
     doc.text(`Phone: ${customerInfo?.phone}`, margin, y);
+    if (customerInfo?.drugLicence) { y += 6; doc.text(`Drug licence: ${customerInfo.drugLicence}`, margin, y); }
     y += 8;
 
     doc.setFontSize(14);
@@ -120,7 +121,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
         productName = productName.substring(0, 22) + '...';
       }
       doc.text(productName, col1, y, { maxWidth: 78 });
-      doc.text(String(item.quantity), col2 + 5, y, { align: 'right', maxWidth: 18 });
+      doc.text(`${item.quantity}${item.unit ? ` ${item.unit}` : ''}`, col2 + 5, y, { align: 'right', maxWidth: 18 });
       doc.text(`₹${item.price}`, col3 + 5, y, { align: 'right', maxWidth: 28 });
       doc.text(`₹${item.price * item.quantity}`, col4 + 5, y, { align: 'right', maxWidth: 28 });
       y += 6;
@@ -152,6 +153,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
               <p className="text-sm"><span className="font-medium">Name:</span> {customerInfo?.firstName} {customerInfo?.lastName}</p>
               <p className="text-sm"><span className="font-medium">Email:</span> {customerInfo?.email}</p>
               <p className="text-sm"><span className="font-medium">Phone:</span> {customerInfo?.phone}</p>
+              {customerInfo?.drugLicence && <p className="text-sm"><span className="font-medium">Drug licence:</span> {customerInfo.drugLicence}</p>}
             </div>
             <div className="bg-gray-50 p-4 rounded-lg">
               <h3 className="font-semibold text-gray-700 mb-2">Order</h3>
@@ -193,8 +195,8 @@ const OrderDetailsModal = ({ order, onClose }) => {
                 <tbody>
                   {items?.map((item, idx) => (
                     <tr key={idx} className="border-t">
-                      <td className="py-2 px-3 whitespace-nowrap">{item.name}</td>
-                      <td className="py-2 px-3 text-right whitespace-nowrap">{item.quantity}</td>
+                      <td className="py-2 px-3 whitespace-nowrap">{item.name}{item.kind === 'api' && <span className="ml-1 rounded bg-blue-50 px-1 text-xs text-blue-700">API</span>}</td>
+                      <td className="py-2 px-3 text-right whitespace-nowrap">{item.quantity}{item.unit ? ` ${item.unit}` : ''}</td>
                       <td className="py-2 px-3 text-right whitespace-nowrap">₹{item.price}</td>
                       <td className="py-2 px-3 text-right whitespace-nowrap">₹{item.price * item.quantity}</td>
                     </tr>

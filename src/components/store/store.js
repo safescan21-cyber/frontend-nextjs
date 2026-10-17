@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import cartReducer from './cartSlice';
+import cartReducer, { replaceCart } from './cartSlice';
 import authReducer from './authSlice';
 import authApi from './authApi';
 import productsApi from './products/productsApi';
@@ -20,7 +20,23 @@ const trackCartMiddleware = () => (next) => (action) => {
   return next(action);
 };
 
+// The cart is kept on this device so it survives reloads and is shared with
+// other open windows (pharma API pages open in a new window). Prices in it are
+// only for display: the server prices every order from the database.
+const CART_KEY = 'cart_v1';
+const readSavedCart = (raw) => {
+  try {
+    const list = JSON.parse(raw ?? (typeof window !== 'undefined' ? localStorage.getItem(CART_KEY) : null) ?? '[]');
+    return Array.isArray(list)
+      ? list.filter((i) => i && typeof i._id === 'string' && Number(i.price) >= 0 && Number(i.quantity) >= 1).slice(0, 50)
+      : [];
+  } catch {
+    return [];
+  }
+};
+
 export const store = configureStore({
+  preloadedState: { cart: { products: readSavedCart() } },
   reducer: {
     cart: cartReducer,
     auth: authReducer,
@@ -49,5 +65,18 @@ export const store = configureStore({
     ),
   devTools: process.env.NODE_ENV !== 'production',
 });
+
+if (typeof window !== 'undefined') {
+  let savedCart = store.getState().cart.products;
+  store.subscribe(() => {
+    const products = store.getState().cart.products;
+    if (products === savedCart) return;
+    savedCart = products;
+    try { localStorage.setItem(CART_KEY, JSON.stringify(products)); } catch { /* storage full or blocked */ }
+  });
+  window.addEventListener('storage', (e) => {
+    if (e.key === CART_KEY) store.dispatch(replaceCart(readSavedCart(e.newValue ?? '[]')));
+  });
+}
 
 export default store;

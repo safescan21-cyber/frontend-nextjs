@@ -192,7 +192,7 @@ const CartPage = () => {
                           </div>
                           <div className="flex-1">
                             <Link
-                              to={`/shop/${item._id}`}
+                              to={item.kind === 'api' ? `/pharma-api/${item.slug}` : `/shop/${item._id}`}
                               className="text-base md:text-lg font-semibold text-gray-800 hover:text-blue-600 transition-colors line-clamp-2"
                             >
                               {item.name}
@@ -200,6 +200,11 @@ const CartPage = () => {
                             <p className="text-sm text-gray-500 mt-1 capitalize">
                               {item.category?.replace('-', ' ')}
                             </p>
+                            {item.kind === 'api' && (
+                              <p className="mt-1 text-xs font-medium text-blue-700">
+                                Pharma API · ₹{item.price.toLocaleString('en-IN')} per {item.unit} · minimum {item.minQty} {item.unit}
+                              </p>
+                            )}
                             {item.color && (
                               <div className="flex items-center gap-2 mt-2">
                                 <span className="text-xs text-gray-500">Color:</span>
@@ -253,9 +258,11 @@ const CartPage = () => {
                               value={item.quantity}
                               onChange={(e) => handleQuantityChange(item._id, e.target.value)}
                               className="w-12 md:w-16 text-center py-1 border-x border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                              min="1"
-                              max="99"
+                              min={item.minQty || 1}
+                              max={item.kind === 'api' ? 100000 : 99}
+                              aria-label={item.kind === 'api' ? `Quantity in ${item.unit}` : 'Quantity'}
                             />
+                            {item.kind === 'api' && <span className="px-1.5 text-xs text-gray-500">{item.unit}</span>}
                             <button
                               onClick={() => handleIncreaseQuantity(item._id)}
                               className="px-2 md:px-3 py-1 hover:bg-gray-100 transition-colors"

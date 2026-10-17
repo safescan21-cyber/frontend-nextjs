@@ -11,6 +11,7 @@ const EMPTY = {
   name: '', category: '', chemicalName: '', casNumber: '', molecularFormula: '', molecularWeight: '', composition: '',
   form: '', appearance: '', solubility: '', storage: '', shelfLife: '', packaging: '', moq: '', price: '', description: '',
   grades: [], images: [], specifications: [], documents: [], active: true,
+  sellOnline: false, unitPrice: '', unit: 'kg', minOrderQty: 1,
 };
 
 const Field = ({ label, hint, children }) => (
@@ -71,9 +72,15 @@ const PharmaApiForm = () => {
     setError('');
     if (!api.name.trim() || !api.category.trim()) { setError('Please enter the API name and category.'); return; }
     if (api.casNumber && !/^\d{2,7}-\d{2}-\d$/.test(api.casNumber.trim())) { setError('CAS number format looks wrong — it should look like 103-90-2.'); return; }
+    if (api.sellOnline && !(Number(api.unitPrice) > 0)) { setError('Enter the price per unit to sell this API online.'); return; }
     setSaving(true);
     try {
-      const body = { ...api, specifications: api.specifications.filter((s) => s.key.trim() && s.value.trim()) };
+      const body = {
+        ...api,
+        unitPrice: Number(api.unitPrice) || 0,
+        minOrderQty: Math.max(1, parseInt(api.minOrderQty, 10) || 1),
+        specifications: api.specifications.filter((s) => s.key.trim() && s.value.trim()),
+      };
       for (const k of ['_id', 'slug', 'author', 'createdAt', 'updatedAt', '__v']) delete body[k];
       const { item } = await fetchJson(editing ? `${apiBase()}/${id}` : apiBase(), { method: editing ? 'PATCH' : 'POST', body: JSON.stringify(body) });
       toast.success(editing ? 'API updated' : 'API added');
@@ -140,6 +147,29 @@ const PharmaApiForm = () => {
           <Field label="Solubility"><input name="solubility" value={api.solubility} onChange={onText} maxLength={300} className={input} /></Field>
           <Field label="Storage"><input name="storage" value={api.storage} onChange={onText} maxLength={200} className={input} /></Field>
           <Field label="Shelf life / retest period"><input name="shelfLife" value={api.shelfLife} onChange={onText} maxLength={60} className={input} /></Field>
+        </section>
+
+        <section className={`rounded-xl border p-4 ${api.sellOnline ? 'border-green-300 bg-green-50/60' : 'border-gray-200 bg-white'}`}>
+          <label className="flex items-center gap-2 font-semibold text-gray-800">
+            <input type="checkbox" checked={api.sellOnline} onChange={(e) => set({ sellOnline: e.target.checked })} className="h-4 w-4 accent-green-600" />
+            Sell online (Add to cart, checkout &amp; payment like machines)
+          </label>
+          <p className="mt-1 pl-6 text-xs text-gray-500">Off = enquiry only. Buyers must enter their drug licence number at checkout.</p>
+          {api.sellOnline && (
+            <div className="mt-3 grid gap-4 pl-6 sm:grid-cols-3">
+              <Field label="Price per unit (₹) *" hint="Charged at checkout; GST as for machines">
+                <input type="number" inputMode="decimal" min="0" step="0.01" name="unitPrice" value={api.unitPrice} onChange={onText} className={input} />
+              </Field>
+              <Field label="Unit">
+                <select name="unit" value={api.unit} onChange={onText} className={input}>
+                  <option value="kg">kg</option><option value="g">g</option><option value="L">litre</option>
+                </select>
+              </Field>
+              <Field label="Minimum order quantity" hint={`in ${api.unit}`}>
+                <input type="number" inputMode="numeric" min="1" step="1" name="minOrderQty" value={api.minOrderQty} onChange={onText} className={input} />
+              </Field>
+            </div>
+          )}
         </section>
 
         <section className="grid gap-4 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-3">
