@@ -8,7 +8,7 @@ import Seo from '../Seo';
 const NotFound = () => (
   <>
     <Seo title="Page not found" description="The page you're looking for doesn't exist." noindex />
-    <div className="flex min-h-[70vh] items-center justify-center bg-gray-50 px-4 pb-24 pt-28 xl:pt-36">
+    <div className="flex min-h-[70vh] items-center justify-center bg-gray-50 px-4 pb-24 pt-8">
       <div className="max-w-lg text-center">
         <p className="text-6xl font-black text-amber-500">404</p>
         <h1 className="mt-3 text-2xl font-bold text-slate-800 md:text-3xl">We couldn't find that page</h1>

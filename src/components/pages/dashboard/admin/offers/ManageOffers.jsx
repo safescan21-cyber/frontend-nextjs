@@ -155,7 +155,7 @@ const ManageOffers = () => {
 
   if (form) {
     return (
-      <div className="px-4 pb-6 pt-24 md:px-6 xl:pt-32">
+      <div className="px-4 pb-6 pt-6 md:px-6">
         <h1 className="mb-1 text-2xl font-bold text-gray-800">{editingId ? 'Edit offer' : 'New offer'}</h1>
         <p className="mb-5 text-sm text-gray-500">The preview updates as you type.</p>
 
@@ -268,7 +268,7 @@ const ManageOffers = () => {
   }
 
   return (
-    <div className="px-4 pb-6 pt-24 md:px-6 xl:pt-32">
+    <div className="px-4 pb-6 pt-6 md:px-6">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Discount offers</h1>

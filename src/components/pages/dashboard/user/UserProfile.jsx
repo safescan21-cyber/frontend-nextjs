@@ -269,7 +269,7 @@ const UserProfile = () => {
 
   if (profileError) {
     return (
-      <div className="px-4 pt-28 text-center text-red-500 xl:pt-36">
+      <div className="px-4 pt-8 text-center text-red-500">
         Failed to load profile. Please try logging in again.
       </div>
     );
@@ -282,7 +282,7 @@ const UserProfile = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 pb-24 pt-24 xl:pt-32">
+    <div className="min-h-screen bg-gray-50 px-4 pb-24 pt-6">
       <div className="mx-auto max-w-3xl overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
         {/* Banner */}
         <div className="relative h-32 overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-amber-700 sm:h-40">

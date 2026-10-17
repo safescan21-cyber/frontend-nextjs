@@ -178,7 +178,7 @@ const ManageBulkQuotes = () => {
   }));
 
   return (
-    <div className="px-4 pb-6 pt-24 md:px-6 xl:pt-32">
+    <div className="px-4 pb-6 pt-6 md:px-6">
       <h1 className="text-2xl font-bold text-gray-800">Bulk quote requests</h1>
       <p className="mb-5 text-sm text-gray-500">Requests from the “Bulk Quote” button. You also get each one by email.</p>
 

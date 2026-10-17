@@ -92,7 +92,7 @@ const BulkQuote = () => {
   return (
     <>
       <Seo {...seoPages.bulkQuote} />
-      <div className="min-h-screen bg-gray-50 px-4 pb-28 pt-24 xl:pt-32">
+      <div className="min-h-screen bg-gray-50 px-4 pb-28 pt-6">
         <div className="mx-auto max-w-5xl">
           {done ? (
             <div className="mx-auto max-w-xl rounded-2xl border border-green-200 bg-white p-6 text-center md:p-10" role="status">

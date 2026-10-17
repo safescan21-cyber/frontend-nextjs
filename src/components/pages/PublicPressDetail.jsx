@@ -31,10 +31,10 @@ const PublicPressDetail = () => {
     load();
   }, [id]);
 
-  if (loading) return <div className="p-6 pt-28 text-center xl:pt-36">Loading...</div>;
+  if (loading) return <div className="p-6 pt-8 text-center">Loading...</div>;
   if (!press) {
     return (
-      <div className="p-6 pt-28 text-center text-red-500 xl:pt-36">
+      <div className="p-6 pt-8 text-center text-red-500">
         <Seo title="Press release not found" noindex />
         Press release not found
       </div>
@@ -64,7 +64,7 @@ const PublicPressDetail = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 pt-28 xl:pt-36">
+    <div className="max-w-4xl mx-auto p-6 pt-8">
       <Seo
         title={press.title}
         description={plain.slice(0, 160)}

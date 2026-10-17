@@ -54,7 +54,7 @@ const QuoteBox = ({ topic }) => (
   </div>
 );
 
-const pageWrap = 'min-h-screen bg-gray-50 px-4 pb-24 pt-24 xl:pt-32';
+const pageWrap = 'min-h-screen bg-gray-50 px-4 pb-24 pt-6';
 
 // /solutions — overview of all solution areas
 export const SolutionsHub = () => {

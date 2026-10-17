@@ -127,7 +127,7 @@ const MarketTrends = () => {
   const openUrl = `https://trends.google.com/trends/explore?date=${encodeURIComponent(time)}${geo ? `&geo=${geo}` : ''}&q=${keywords.map(encodeURIComponent).join(',')}`;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 pb-6 pt-6 md:px-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-2xl font-bold text-slate-800">

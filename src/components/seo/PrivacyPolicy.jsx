@@ -20,7 +20,7 @@ const PrivacyPolicy = () => (
       description="How Food Pharma Machinery collects, uses and protects your personal data when you use our website, place orders or contact us."
       path="/privacy"
     />
-    <div className="min-h-screen bg-gray-50 px-4 pb-24 pt-24 xl:pt-32">
+    <div className="min-h-screen bg-gray-50 px-4 pb-24 pt-6">
       <article className="mx-auto max-w-3xl rounded-2xl border border-gray-200 bg-white p-6 md:p-10">
         <h1 className="text-3xl font-bold text-slate-800">Privacy Policy</h1>
         <p className="mt-2 text-sm text-slate-500">Last updated: {UPDATED}</p>

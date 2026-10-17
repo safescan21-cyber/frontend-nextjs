@@ -70,7 +70,7 @@ const TrackOrder = () => {
         description="Track your Food Pharma Machinery order with your order ID. See order status, dispatch details and courier tracking link."
         path="/track-order"
       />
-      <div className="bg-gray-50 min-h-screen pt-24 xl:pt-32 pb-28 px-4">
+      <div className="bg-gray-50 min-h-screen pt-6 pb-28 px-4">
         <div className="max-w-2xl mx-auto">
           <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">Track your order</h1>
           <p className="text-slate-600 mb-6">

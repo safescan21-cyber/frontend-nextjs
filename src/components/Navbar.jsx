@@ -260,6 +260,26 @@ const Navbar = () => {
   const searchInputRef = useRef(null);
   const mobileMenuRef = useRef(null);
 
+  // The header is fixed, so a spacer below it keeps pages from sliding under it.
+  // Its height follows the header's real height (it differs per screen size).
+  // While the phone menu is open the header is taller; the page stays put.
+  const headerRef = useRef(null);
+  const menuOpenRef = useRef(false);
+  const [headerHeight, setHeaderHeight] = useState(null);
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return undefined;
+    const update = () => { if (!menuOpenRef.current) setHeaderHeight(el.offsetHeight); };
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    update();
+    return () => ro.disconnect();
+  }, []);
+  menuOpenRef.current = isOpen; // set during render, before the resize observer fires
+  useEffect(() => {
+    if (!isOpen && headerRef.current) setHeaderHeight(headerRef.current.offsetHeight);
+  }, [isOpen]);
+
   // ── 🔎 Structured data: Organization + WebSite (sitelinks search box) + site navigation ──
   const structuredData = useMemo(
     () => ({
@@ -408,6 +428,7 @@ const Navbar = () => {
       />
 
       <header
+        ref={headerRef}
         className={`fixed w-full top-0 z-50 transition-all duration-500 ${
           scrolled
             ? 'bg-gradient-to-r from-slate-900 to-slate-800 shadow-2xl'
@@ -1207,8 +1228,12 @@ const Navbar = () => {
         )}
       </header>
 
-      {/* Spacer - increased to match taller navbar */}
-      <div className="h-20 sm:h-24 md:h-28 xl:h-48" aria-hidden="true" />
+      {/* Spacer: same height as the fixed header (classes = first paint, then measured) */}
+      <div
+        className="h-20 sm:h-24 md:h-28 xl:h-[290px]"
+        style={headerHeight ? { height: headerHeight } : undefined}
+        aria-hidden="true"
+      />
 
       <style>{`
         @keyframes pulseCart {

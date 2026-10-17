@@ -203,7 +203,7 @@ const CustomerInsights = () => {
   const t = data?.totals || {};
 
   return (
-    <div className="px-4 pb-6 pt-24 md:px-6 xl:pt-32">
+    <div className="px-4 pb-6 pt-6 md:px-6">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Customer insights</h1>

@@ -57,7 +57,7 @@ const ManageReviews = () => {
   };
 
   return (
-    <div className="px-4 pb-6 pt-24 md:px-6 xl:pt-32">
+    <div className="px-4 pb-6 pt-6 md:px-6">
       <div className="mb-5">
         <h1 className="text-2xl font-bold text-gray-800">Reviews & comments</h1>
         <p className="text-sm text-gray-500">
