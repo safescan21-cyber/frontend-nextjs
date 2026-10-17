@@ -5,11 +5,11 @@ import { SITE_URL } from '../components/seo/organization';
 
 const priority = (p) => (p === '/' ? 1 : ['/shop', '/products', '/solutions'].includes(p) ? 0.9 : p.startsWith('/solutions/') ? 0.8 : 0.6);
 
+// No lastmod: these pages don't change on every request, and a date that always
+// says "now" teaches Google to ignore lastmod for the whole site.
 export default function sitemap() {
-  const now = new Date();
   return STATIC_PAGES.map((p) => ({
     url: `${SITE_URL}${p.path === '/' ? '/' : p.path}`,
-    lastModified: now,
     priority: priority(p.path),
   }));
 }
