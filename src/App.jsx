@@ -42,6 +42,7 @@ import ProductCategoryPage from "./components/pages/ProductCategoryPage";
 
 const VisitorAnalytics = lazy(() => import('./components/pages/dashboard/admin/VisitorAnalytics'));
 const CustomerInsights = lazy(() => import('./components/pages/dashboard/admin/insights/CustomerInsights'));
+const MarketTrends = lazy(() => import('./components/pages/dashboard/admin/MarketTrends'));
 const ManageOffers = lazy(() => import('./components/pages/dashboard/admin/offers/ManageOffers'));
 const ManageReviews = lazy(() => import('./components/pages/dashboard/admin/reviews/ManageReviews'));
 const AdminHeroSlides = lazy(() => import('../src/components/pages/dashboard/admin/AdminHeroSlides'));
@@ -157,6 +158,7 @@ function App() {
               <Route path="manage-jobs" element={<ManageJobs />} />
               <Route path="visitors" element={<VisitorAnalytics />} />
               <Route path="insights" element={<CustomerInsights />} />
+              <Route path="market-trends" element={<MarketTrends />} />
               <Route path="offers" element={<ManageOffers />} />
               <Route path="manage-reviews" element={<ManageReviews />} />
               <Route path="bulk-quotes" element={<ManageBulkQuotes />} />

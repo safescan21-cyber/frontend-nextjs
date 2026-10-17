@@ -35,6 +35,7 @@ const adminDropDownMenus = [
   { label: "Users",        path: "/dashboard/users",           icon: Users },
   { label: "User Analytics", path: "/dashboard/visitors",      icon: TrendingUp },
   { label: "Customer Insights", path: "/dashboard/insights",  icon: BarChart3 },
+  { label: "Market Trends", path: "/dashboard/market-trends", icon: TrendingUp },
   { label: "Discount Offers", path: "/dashboard/offers",      icon: CreditCard },
   { label: "Reviews & Comments", path: "/dashboard/manage-reviews", icon: MessageSquare },
   { label: "Bulk Quotes", path: "/dashboard/bulk-quotes", icon: FileText },
