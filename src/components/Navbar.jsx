@@ -442,7 +442,7 @@ const Navbar = () => {
                 <nav aria-label="Company links" className="flex items-center space-x-3 text-slate-300">
                   <Link to="/track-order" onClick={handleLinkClick} className="inline-flex items-center gap-1 font-semibold text-amber-400 hover:text-amber-300 transition-colors"><Truck className="w-3 h-3" aria-hidden="true" />Track Order</Link>
                   <Link to="/bulk-quote" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">Bulk Orders</Link>
-                  <Link to="/products" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">Products</Link>
+                  <Link to="/shop" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">Products</Link>
                   <Link to="/about" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">About Us</Link>
                   <Link to="/projects" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors 2xl:hidden">Projects</Link>
                   <Link to="/contact" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors 2xl:hidden">Contact</Link>
