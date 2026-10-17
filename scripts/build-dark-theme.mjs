@@ -1,0 +1,107 @@
+// Generates src/dark-theme.css: the site's dark mode.
+//
+// The pages use fixed light Tailwind colours (bg-white cards, gray text, light
+// borders), so instead of adding dark: classes everywhere, this maps those light
+// colours to dark ones while <html> has the "dark" class (set by ThemeToggle).
+// Dark backgrounds (header, footer, heroes) and white text on coloured buttons
+// are left alone, so they look the same in both themes. Printing stays light.
+//
+// Run after changing the mapping:  node scripts/build-dark-theme.mjs
+import { writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+const NEUTRALS = ['slate', 'gray', 'zinc', 'neutral', 'stone'];
+// Tailwind's 300 (light text) and 500 (tint base) shades for each colour
+const COLORS = {
+  blue: ['#93c5fd', '59 130 246'], red: ['#fca5a5', '239 68 68'], green: ['#86efac', '34 197 94'],
+  amber: ['#fcd34d', '245 158 11'], orange: ['#fdba74', '249 115 22'], yellow: ['#fde047', '234 179 8'],
+  emerald: ['#6ee7b7', '16 185 129'], teal: ['#5eead4', '20 184 166'], indigo: ['#a5b4fc', '99 102 241'],
+  purple: ['#d8b4fe', '168 85 247'], violet: ['#c4b5fd', '139 92 246'], pink: ['#f9a8d4', '236 72 153'],
+  rose: ['#fda4af', '244 63 94'], sky: ['#7dd3fc', '14 165 233'], cyan: ['#67e8f9', '6 182 212'], lime: ['#bef264', '132 204 22'],
+};
+
+// Dark palette
+const PAGE = '#020617';   // page background (light grey pages)
+const CARD = '#0f172a';   // white cards, panels, dropdowns
+const RAISED = '#1e293b'; // light grey boxes, hover rows
+const RAISED2 = '#334155';
+const TEXT = '#f1f5f9';
+const TEXT2 = '#e2e8f0';
+const TEXT3 = '#cbd5e1';
+const MUTED = '#94a3b8';
+const LINE = '#1e293b';
+const LINE2 = '#334155';
+const LINE3 = '#475569';
+
+const esc = (cls) => cls.replace(/([:/.[\]#%])/g, '\\$1');
+const rules = [];
+const rule = (classes, decl, pseudo = '') => {
+  // :where() keeps specificity at one class, so Tailwind's own hover/focus colours still win
+  const list = (Array.isArray(classes) ? classes : [classes]).map((c) => `:where(.dark) .${esc(c)}${pseudo}`);
+  rules.push(`${list.join(',\n')} { ${decl} }`);
+};
+const grad = (dir, color) => `--tw-gradient-${dir}: ${color};`;
+
+// ── Neutral backgrounds ──
+rule(['bg-white', ...NEUTRALS.map((p) => `bg-${p}-50/50`)], `background-color: ${CARD};`);
+for (const a of [50, 60, 70, 75, 80, 90, 95]) rule(`bg-white/${a}`, `background-color: rgb(15 23 42 / ${a}%);`);
+rule(NEUTRALS.map((p) => `bg-${p}-50`), `background-color: ${PAGE};`);
+rule(NEUTRALS.map((p) => `bg-${p}-100`), `background-color: ${RAISED};`);
+rule(NEUTRALS.map((p) => `bg-${p}-200`), `background-color: ${RAISED2};`);
+rule(['hover:bg-white', ...NEUTRALS.flatMap((p) => [`hover:bg-${p}-50`, `hover:bg-${p}-100`])], `background-color: ${RAISED};`, ':hover');
+rule(NEUTRALS.map((p) => `hover:bg-${p}-200`), `background-color: ${RAISED2};`, ':hover');
+
+// gradients that start/pass/end on white or light grey
+for (const dir of ['from', 'via', 'to']) {
+  rule([`${dir}-white`, ...NEUTRALS.map((p) => `${dir}-${p}-50`)], grad(dir, CARD));
+  rule(NEUTRALS.map((p) => `${dir}-${p}-100`), grad(dir, RAISED));
+  for (const [c, [, rgb]] of Object.entries(COLORS)) rule([`${dir}-${c}-50`, `${dir}-${c}-100`], grad(dir, `rgb(${rgb} / 12%)`));
+}
+
+// ── Neutral text ──
+rule(['text-black', ...NEUTRALS.flatMap((p) => [`text-${p}-900`, `text-${p}-800`])], `color: ${TEXT};`);
+rule(NEUTRALS.map((p) => `text-${p}-700`), `color: ${TEXT2};`);
+rule(NEUTRALS.map((p) => `text-${p}-600`), `color: ${TEXT3};`);
+rule(NEUTRALS.map((p) => `text-${p}-500`), `color: ${MUTED};`);
+rule(NEUTRALS.flatMap((p) => [`hover:text-${p}-900`, `hover:text-${p}-800`, `hover:text-${p}-700`]), `color: #ffffff;`, ':hover');
+
+// ── Neutral borders, dividers, rings ──
+rule(NEUTRALS.flatMap((p) => [`border-${p}-50`, `border-${p}-100`, 'border-white']), `border-color: ${LINE};`);
+rule(NEUTRALS.map((p) => `border-${p}-200`), `border-color: ${LINE2};`);
+rule(NEUTRALS.map((p) => `border-${p}-300`), `border-color: ${LINE3};`);
+rule(NEUTRALS.flatMap((p) => [`divide-${p}-100`, `divide-${p}-200`]), `border-color: ${LINE};`, ' > :not(:last-child)');
+rule(NEUTRALS.flatMap((p) => [`ring-${p}-100`, `ring-${p}-200`]), `--tw-ring-color: ${LINE2};`);
+
+// ── Coloured tints (badges, alerts, selected cards) ──
+for (const [c, [light, rgb]] of Object.entries(COLORS)) {
+  rule([`bg-${c}-50`, `bg-${c}-50/50`, `bg-${c}-50/60`, `bg-${c}-50/80`], `background-color: rgb(${rgb} / 12%);`);
+  rule(`bg-${c}-100`, `background-color: rgb(${rgb} / 20%);`);
+  rule([`hover:bg-${c}-50`, `hover:bg-${c}-100`], `background-color: rgb(${rgb} / 22%);`, ':hover');
+  rule([`text-${c}-700`, `text-${c}-800`, `text-${c}-900`], `color: ${light};`);
+  rule([`hover:text-${c}-700`, `hover:text-${c}-800`], `color: ${light};`, ':hover');
+  rule([`border-${c}-100`, `border-${c}-200`, `border-${c}-300`], `border-color: rgb(${rgb} / 40%);`);
+}
+
+// Imported from index.css right after Tailwind, inside Tailwind's own layers.
+const css = `/* GENERATED by scripts/build-dark-theme.mjs — edit the script, not this file. */
+@layer base {
+  @media screen {
+    html.dark { color-scheme: dark; }
+    :where(.dark) body { background-color: ${PAGE}; color: ${TEXT2}; }
+    :where(.dark) :where(input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea) {
+      background-color: ${CARD}; color: ${TEXT}; border-color: ${LINE2};
+    }
+    :where(.dark) ::placeholder { color: #64748b; }
+    :where(.dark) img:not([src$=".svg"]) { filter: brightness(0.92); }
+  }
+}
+@layer utilities {
+  @media screen {
+${rules.map((r) => `    ${r.replace(/\n/g, '\n    ')}`).join('\n')}
+  }
+}
+`;
+
+const out = fileURLToPath(new URL('../src/dark-theme.css', import.meta.url));
+writeFileSync(out, css);
+console.log(`wrote ${out} (${rules.length} rules, ${(css.length / 1024).toFixed(1)} KB)`);

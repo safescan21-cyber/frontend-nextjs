@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tailwindcss";
+/* Tailwind itself is loaded once in index.css; this only makes @apply work here */
+@reference "tailwindcss";
 
 
 

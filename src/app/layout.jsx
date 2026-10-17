@@ -44,9 +44,15 @@ export const viewport = {
   themeColor: '#0F172A',
 };
 
+// Applies the visitor's saved theme before first paint (see components/ThemeToggle.jsx)
+const THEME_SCRIPT = "try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}";
+
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body>{children}</body>
     </html>
   );

@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* Dark mode follows the site's theme switch (class "dark" on <html>), not the OS setting */
+@custom-variant dark (&:where(.dark, .dark *));
+@import "./dark-theme.css";
 @keyframes fadeIn {
   from {
     opacity: 0;

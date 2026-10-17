@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import UserAvatar from "./UserAvatar";
+import ThemeToggle from "./ThemeToggle";
 import { organizationNode, websiteNode } from './seo/organization';
 import PharmaLogoAsset from "../assets/pharmamachinehub-logo-v2_2.svg";
 // Next.js gives image imports as { src, width, height }
@@ -706,6 +707,7 @@ const Navbar = () => {
                   <FileText className="w-4 h-4" aria-hidden="true" />
                   Bulk Quote
                 </Link>
+                <ThemeToggle className="p-2 text-slate-300 hover:text-amber-400 hover:bg-slate-700/50 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-amber-400/50" />
                 <Link
                   to="/wishlist"
                   onClick={handleLinkClick}
@@ -835,6 +837,7 @@ const Navbar = () => {
 
               {/* Mobile actions */}
               <div className="xl:hidden flex shrink-0 items-center space-x-1 sm:space-x-2">
+                <ThemeToggle className="p-2 text-slate-200 hover:text-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/50 rounded-lg" />
                 <button
                   type="button"
                   onClick={() => { navigate('/search'); setIsOpen(false); }}
