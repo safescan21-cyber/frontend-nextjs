@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import getBaseURL from '../../../../utlis/baseURL';
+import toast from 'react-hot-toast';
 import {
   Users, Eye, Calendar, TrendingUp,
   Globe, Clock, BarChart3, Activity,
   Smartphone, Monitor, Link, MapPin,
-  ArrowUpRight, ArrowDownRight, Filter
+  ArrowUpRight, ArrowDownRight, Filter, Trash2
 } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid,
@@ -64,6 +65,32 @@ const VisitorAnalytics = () => {
   useEffect(() => {
     fetchData(dateRange, who);
   }, [token, dateRange, who]);
+
+  // Delete a visitor's records (for logged-in visitors: everything linked to their account)
+  const [deletingId, setDeletingId] = useState(null);
+  const deleteVisitor = async (v) => {
+    const label = v.user ? `${v.user.name || 'this customer'} (${v.user.email})` : `this guest (${v.ip})`;
+    const msg = v.user
+      ? `Delete all visit records of ${label}?\n\nThis removes their visits from every browser they used. Their account and orders are not affected. This cannot be undone.`
+      : `Delete all visit records of ${label}? This cannot be undone.`;
+    if (!window.confirm(msg)) return;
+    setDeletingId(v._id);
+    try {
+      const res = await fetch(`${getBaseURL()}/api/admin/visitors/${encodeURIComponent(v._id)}${v.user ? '?account=1' : ''}`, {
+        method: 'DELETE',
+        headers: authHeaders(token),
+        credentials: 'include',
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || `Delete failed (${res.status})`);
+      toast.success(`Deleted ${data.deleted} visit record${data.deleted === 1 ? '' : 's'}`);
+      fetchData(dateRange, who);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   // Helper to format numbers with commas
   const formatNumber = (num) => num?.toLocaleString() ?? 0;
@@ -362,6 +389,7 @@ const VisitorAnalytics = () => {
                   <th className="px-4 py-3">First Visit</th>
                   <th className="px-4 py-3">Last Visit</th>
                   <th className="px-4 py-3">Pages visited</th>
+                  <th className="px-4 py-3"><span className="sr-only">Delete</span></th>
                 </tr>
               </thead>
               <tbody>
@@ -405,6 +433,18 @@ const VisitorAnalytics = () => {
                           <span className="text-slate-400">—</span>
                         )}
                         <p className="mt-1 text-[11px] text-slate-400">{v.pageCount} requests</p>
+                      </td>
+                      <td className="px-2 py-3 text-right">
+                        <button
+                          type="button"
+                          onClick={() => deleteVisitor(v)}
+                          disabled={deletingId === v._id}
+                          title={v.user ? "Delete this customer's visit records" : "Delete this guest's visit records"}
+                          aria-label={`Delete visit records of ${v.user ? v.user.name || v.user.email : `guest ${v.ip}`}`}
+                          className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                       </td>
                     </tr>
                   );
