@@ -5,7 +5,9 @@ import { splitLocale, localeInfo } from './i18n/locales';
 
 export function proxy(request) {
   const headers = new Headers(request.headers);
-  headers.set('x-site-lang', localeInfo(splitLocale(request.nextUrl.pathname).locale).lang);
+  const info = localeInfo(splitLocale(request.nextUrl.pathname).locale);
+  headers.set('x-site-lang', info.lang);
+  headers.set('x-site-dir', info.dir || 'ltr');
   return NextResponse.next({ request: { headers } });
 }
 

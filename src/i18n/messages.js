@@ -4,6 +4,7 @@
 
 import { PRODUCT_DATA } from '../components/pages/productCategoryData';
 import { SEO_TEXT } from './seoText';
+import { UR } from './messagesUr';
 
 const ROWS = {
   // ── Navigation, top bar, search ──
@@ -395,6 +396,60 @@ const ROWS = {
   'Vitamins & Nutraceuticals': ['Vitamines et nutraceutiques', 'ビタミン・栄養補助成分', '비타민 및 건강기능원료'],
   'Excipients': ['Excipients', '添加剤', '부형제'],
   'Others': ['Autres', 'その他', '기타'],
+  // Slide categories, phone action bar
+  'Capsule Filling': ['Remplissage de gélules', 'カプセル充填', '캡슐 충전'],
+  'Packaging': ['Conditionnement', '包装', '포장'],
+  'Mixing': ['Mélange', '混合', '혼합'],
+  'Sterile': ['Stérile', '無菌', '무균'],
+  'Food Processing': ['Agroalimentaire', '食品加工', '식품 가공'],
+  'Lab Equipment': ['Équipement de laboratoire', '試験機器', '실험 장비'],
+  'Spares': ['Pièces détachées', 'スペアパーツ', '예비 부품'],
+  'Professional': ['Professionnel', 'プロフェッショナル', '전문가용'],
+  'Bulk Order': ['Commande en volume', '大口注文', '대량 주문'],
+  'Account': ['Compte', 'アカウント', '계정'],
+  'WhatsApp': ['WhatsApp', 'WhatsApp', 'WhatsApp'],
+  // Shop cards: stock, warranty, product categories
+  'In Stock ({n})': ['En stock ({n})', '在庫あり（{n}）', '재고 있음 ({n})'],
+  '{n} mo warranty': ['Garantie {n} mois', '保証{n}か月', '보증 {n}개월'],
+  'All Products': ['Tous les produits', 'すべての製品', '전체 제품'],
+  'Blister Packaging': ['Blistérisation', 'ブリスター包装', '블리스터 포장'],
+  'Coating': ['Pelliculage', 'コーティング', '코팅'],
+  'Fluid Bed Dryer': ['Sécheur à lit fluidisé', '流動層乾燥機', '유동층 건조기'],
+  'Granulation': ['Granulation', '造粒', '과립'],
+  'Hvac': ['CVC', '空調（HVAC）', '공조(HVAC)'],
+  'Inspection': ['Inspection', '検査', '검사'],
+  'Liquid Filling': ['Remplissage de liquides', '液体充填', '액체 충전'],
+  'Milling': ['Broyage', '粉砕', '분쇄'],
+  'Packaging Accessories': ['Accessoires de conditionnement', '包装関連機器', '포장 부속품'],
+  'Powder Filling': ['Remplissage de poudre', '粉末充填', '분말 충전'],
+  'Strip Packaging': ['Conditionnement en bande', 'ストリップ包装', '스트립 포장'],
+  'Tablet Press': ['Presse à comprimés', '打錠機', '타정기'],
+  'Tooling': ['Outillage', '金型・ツーリング', '금형'],
+  // Buttons with two states
+  'Add to Cart': ['Ajouter au panier', 'カートに入れる', '장바구니 담기'],
+  'Login to Add to Cart': ['Connectez-vous pour ajouter au panier', 'ログインしてカートに入れる', '로그인 후 장바구니 담기'],
+  'Remove like': ['Retirer des favoris', 'お気に入りから外す', '좋아요 취소'],
+  'Like this product': ['Ajouter aux favoris', 'お気に入りに追加', '이 제품 좋아요'],
+  'Submit Review': ['Publier l’avis', 'レビューを投稿', '리뷰 등록'],
+  'Logging out…': ['Déconnexion…', 'ログアウト中…', '로그아웃 중…'],
+  'Logout': ['Déconnexion', 'ログアウト', '로그아웃'],
+  'Close menu': ['Fermer le menu', 'メニューを閉じる', '메뉴 닫기'],
+  'Open menu': ['Ouvrir le menu', 'メニューを開く', '메뉴 열기'],
+  'Joining…': ['Inscription…', '登録中…', '가입 중…'],
+  'Subscribe': ['S’abonner', '登録する', '구독하기'],
+  'No APIs match your search.': ['Aucun API ne correspond à votre recherche.', '検索条件に合う原薬はありません。', '검색과 일치하는 API가 없습니다.'],
+  'API listings are coming soon.': ['La liste des API arrive bientôt.', '原薬の掲載は近日公開予定です。', 'API 목록이 곧 공개됩니다.'],
+  'View & buy': ['Voir et acheter', '詳細・購入', '보기 및 구매'],
+  'View details': ['Voir les détails', '詳細を見る', '상세 보기'],
+  // Product page details
+  'Color': ['Couleur', '色', '색상'],
+  'Rating': ['Note', '評価', '평점'],
+  'Stock': ['Stock', '在庫', '재고'],
+  'In Stock': ['En stock', '在庫あり', '재고 있음'],
+  'Description': ['Description', '説明', '설명'],
+  'Documents': ['Documents', '資料', '문서'],
+  'Login to select quantity': ['Connectez-vous pour choisir la quantité', 'ログインして数量を選択', '로그인 후 수량 선택'],
+  'Login to Buy': ['Connectez-vous pour acheter', 'ログインして購入', '로그인 후 구매'],
   // ── Testimonials, cookies ──
   'What our customers say': ['Ce que disent nos clients', 'お客様の声', '고객 후기'],
   'Customer testimonials': ['Témoignages clients', 'お客様の声', '고객 후기'],
@@ -441,4 +496,17 @@ const build = (col) => {
   return out;
 };
 
-export const MESSAGES = { fr: build(0), ja: build(1), ko: build(2) };
+// Urdu has its own file (messagesUr.js), keyed the same way
+const buildUr = () => {
+  const out = { ...UR };
+  for (const [slug, c] of Object.entries(PRODUCT_DATA)) {
+    const row = SEO_TEXT.ur?.[`/products/${slug}`];
+    if (row) {
+      out[c.title] ??= row[0];
+      out[c.description] ??= row[1];
+    }
+  }
+  return out;
+};
+
+export const MESSAGES = { fr: build(0), ja: build(1), ko: build(2), ur: buildUr() };

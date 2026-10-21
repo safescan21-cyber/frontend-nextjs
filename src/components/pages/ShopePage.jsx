@@ -42,6 +42,12 @@ const scoreProduct = (p, words) => {
 // embedded = shown inside the home page: the home page owns the title and the <h1>
 const ShopPage = ({ embedded = false }) => {
   const { t } = useLocale();
+  // 'lab-equipment' -> 'Lab Equipment', translated on the country versions
+  const categoryName = (slug) => {
+    if (!slug) return '';
+    const name = slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    return t(name);
+  };
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
@@ -341,7 +347,7 @@ const ShopPage = ({ embedded = false }) => {
                           className="text-blue-600 focus:ring-blue-500"
                         />
                         <span className="text-gray-700 capitalize flex-1">
-                          {cat === 'all' ? 'All Products' : cat.replace(/-/g, ' ')}
+                          {cat === 'all' ? t('All Products') : categoryName(cat)}
                         </span>
                         <span className="text-xs text-gray-400">({categoryCounts[cat] || 0})</span>
                       </label>
@@ -492,7 +498,7 @@ const ShopPage = ({ embedded = false }) => {
                           ) : null}
 
                           <p className="text-sm text-gray-500 mb-2 capitalize">
-                            {product.category?.replace(/-/g, ' ')}
+                            {categoryName(product.category)}
                           </p>
 
                           {/* Badges */}
@@ -500,7 +506,7 @@ const ShopPage = ({ embedded = false }) => {
                             {isInStock ? (
                               <span className="inline-flex items-center gap-1 text-xs font-medium text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
                                 <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-                                In Stock ({stockCount})
+                                {t('In Stock ({n})', { n: stockCount })}
                               </span>
                             ) : (
                               <span className="inline-flex items-center gap-1 text-xs font-medium text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
@@ -523,7 +529,7 @@ const ShopPage = ({ embedded = false }) => {
                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                {warrantyMonths} mo warranty
+                                {t('{n} mo warranty', { n: warrantyMonths })}
                               </span>
                             )}
                           </div>
@@ -557,7 +563,7 @@ const ShopPage = ({ embedded = false }) => {
                               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6M17 13l1.5 6M9 21h6M12 15v6" />
                               </svg>
-                              {!isInStock ? 'Out of Stock' : 'Add to Cart'}
+                              {!isInStock ? t('Out of Stock') : t('Add to Cart')}
                             </button>
                           ) : (
                             <div className="flex items-center justify-between gap-2">

@@ -555,7 +555,7 @@ export default function PharmaMachineFooter() {
                         <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
                       </svg>
                     )}
-                    {subscribing ? "Joining…" : "Subscribe"}
+                    {subscribing ? t("Joining…") : t("Subscribe")}
                   </button>
                 </div>
                 {subscribeError ? (

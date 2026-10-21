@@ -40,6 +40,19 @@ const styles = `
 // ── Fallback image (high‑quality, free) ──
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1524514587686-e2909d726e9b?w=1200';
 
+// Slide category label (slides store a slug such as 'liquid-processing')
+const SLIDE_CATEGORY_NAMES = {
+  'solid-dosage': 'Solid Dosage',
+  'capsule-filling': 'Capsule Filling',
+  'packaging': 'Packaging',
+  'liquid-processing': 'Liquid Processing',
+  'mixing': 'Mixing',
+  'sterile': 'Sterile',
+  'food-processing': 'Food Processing',
+  'lab-equipment': 'Lab Equipment',
+  'spares': 'Spares',
+};
+
 // ── Running text marquee ──
 const RunningData = () => {
   const { t } = useLocale();
@@ -204,7 +217,7 @@ const Home = () => {
                 <div className="flex items-center justify-center mb-2 sm:mb-4 space-x-2">
                   {getCategoryIcon(image.category)}
                   <span className="text-xs sm:text-sm uppercase tracking-wider text-blue-300">
-                    {image.category || 'Professional'}
+                    {t(SLIDE_CATEGORY_NAMES[image.category] || image.category || 'Professional')}
                   </span>
                 </div>
                 {/* Slides use h2 — the page has a single h1 below */}

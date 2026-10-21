@@ -8,6 +8,8 @@ export const LOCALES = {
   fr: { lang: 'fr', hreflang: 'fr', label: 'France (Français)', short: 'FR', flag: '🇫🇷', currency: 'EUR', language: 'fr' },
   ja: { lang: 'ja', hreflang: 'ja', label: '日本 (日本語)', short: 'JP', flag: '🇯🇵', currency: 'JPY', language: 'ja' },
   ko: { lang: 'ko', hreflang: 'ko', label: '한국 (한국어)', short: 'KR', flag: '🇰🇷', currency: 'KRW', language: 'ko' },
+  // Urdu: a language version (no country), written right to left; prices stay in INR
+  ur: { lang: 'ur', hreflang: 'ur', label: 'اردو (Urdu)', short: 'اردو', flag: '🌐', currency: 'INR', language: 'ur', dir: 'rtl' },
 };
 
 // The default site (no folder)

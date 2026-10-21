@@ -49,9 +49,11 @@ export const viewport = {
 const THEME_SCRIPT = "try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}";
 
 export default async function RootLayout({ children }) {
-  const lang = (await headers()).get('x-site-lang') || 'en-IN'; // set by proxy.js
+  const h = await headers();
+  const lang = h.get('x-site-lang') || 'en-IN'; // set by proxy.js
+  const dir = h.get('x-site-dir') === 'rtl' ? 'rtl' : 'ltr'; // Urdu reads right to left
   return (
-    <html lang={lang} suppressHydrationWarning>
+    <html lang={lang} dir={dir} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>

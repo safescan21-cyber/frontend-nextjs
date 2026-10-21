@@ -851,7 +851,7 @@ const Navbar = () => {
                               className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-colors disabled:opacity-50 focus:outline-none focus:bg-red-900/20"
                             >
                               <LogOut className="w-4 h-4" aria-hidden="true" />
-                              {logoutLoading ? 'Logging out…' : 'Logout'}
+                              {logoutLoading ? t('Logging out…') : t('Logout')}
                             </button>
                           </div>
                         </div>
@@ -913,7 +913,7 @@ const Navbar = () => {
                   aria-expanded={isOpen}
                   aria-controls="mobile-menu"
                   className="p-2 rounded-lg text-slate-200 hover:text-amber-400 hover:bg-slate-700/50 transition-all focus:outline-none focus:ring-2 focus:ring-amber-400/50"
-                  aria-label={isOpen ? 'Close menu' : 'Open menu'}
+                  aria-label={isOpen ? t('Close menu') : t('Open menu')}
                 >
                   {isOpen ? <X className="h-6 w-6" aria-hidden="true" /> : <Menu className="h-6 w-6" aria-hidden="true" />}
                 </button>
@@ -1033,7 +1033,7 @@ const Navbar = () => {
                         className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-red-400 hover:bg-red-900/20 rounded-lg transition-colors border-t border-slate-600 mt-1 pt-3 disabled:opacity-50"
                       >
                         <LogOut className="w-4 h-4" aria-hidden="true" />
-                        {logoutLoading ? 'Logging out…' : 'Logout'}
+                        {logoutLoading ? t('Logging out…') : t('Logout')}
                       </button>
                     </li>
                   </ul>

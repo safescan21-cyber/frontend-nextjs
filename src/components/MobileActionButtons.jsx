@@ -1,3 +1,4 @@
+import { useLocale } from '../i18n/LocaleContext';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -9,6 +10,7 @@ import UserAvatar from './UserAvatar';
  * Uses React Router for internal navigation and regular links for external URLs.
  */
 const MobileActionButtons = () => {
+  const { t } = useLocale();
   const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
   const user = useSelector((state) => state.auth?.user);
 
@@ -130,7 +132,7 @@ const MobileActionButtons = () => {
                 className={`flex flex-col items-center justify-center min-w-0 flex-1 py-1.5 rounded-lg transition-all duration-200 ${button.bgColor} ${button.hoverBg} mx-0.5 sm:mx-1 text-white shadow-md active:scale-95`}
               >
                 {button.icon}
-                <span className="mt-0.5 whitespace-nowrap text-[11px] font-semibold leading-tight sm:text-xs">{button.label}</span>
+                <span className="mt-0.5 whitespace-nowrap text-[11px] font-semibold leading-tight sm:text-xs">{t(button.label)}</span>
               </Link>
             );
           }
@@ -145,7 +147,7 @@ const MobileActionButtons = () => {
               className={`flex flex-col items-center justify-center min-w-0 flex-1 py-1.5 rounded-lg transition-all duration-200 ${button.bgColor} ${button.hoverBg} mx-0.5 sm:mx-1 text-white shadow-md active:scale-95`}
             >
               {button.icon}
-              <span className="mt-0.5 whitespace-nowrap text-[11px] font-semibold leading-tight sm:text-xs">{button.label}</span>
+              <span className="mt-0.5 whitespace-nowrap text-[11px] font-semibold leading-tight sm:text-xs">{t(button.label)}</span>
             </a>
           );
         })}

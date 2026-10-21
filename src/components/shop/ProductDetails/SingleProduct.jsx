@@ -367,17 +367,17 @@ const SingleProduct = () => {
   });
 
   const specs = [
-    { label: 'Category', value: product.category?.replace(/-/g, ' ') || 'N/A', icon: '🏭' },
-    { label: 'Color', value: product.color || 'N/A', icon: '🎨' },
-    { label: 'Rating', value: product.rating ? `${product.rating}/5` : 'N/A', icon: '⭐' },
-    { label: 'Stock', value: 'In Stock', icon: '✅' },
+    { label: t('Category'), value: product.category ? t(product.category.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())) : 'N/A', icon: '🏭' },
+    { label: t('Color'), value: product.color || 'N/A', icon: '🎨' },
+    { label: t('Rating'), value: product.rating ? `${product.rating}/5` : 'N/A', icon: '⭐' },
+    { label: t('Stock'), value: t('In Stock'), icon: '✅' },
   ];
 
   const documents = Array.isArray(product?.documents) ? product.documents.filter((d) => d && d.file) : [];
   const tabs = [
-    { key: 'description', label: 'Description' },
-    { key: 'specs', label: 'Specifications' },
-    ...(documents.length ? [{ key: 'documents', label: `Documents (${documents.length})` }] : []),
+    { key: 'description', label: t('Description') },
+    { key: 'specs', label: t('Specifications') },
+    ...(documents.length ? [{ key: 'documents', label: `${t('Documents')} (${documents.length})` }] : []),
     { key: 'shipping', label: 'Shipping & Returns' },
     { key: 'reviews', label: `Reviews (${reviews.length})` },
   ];
@@ -479,7 +479,7 @@ const SingleProduct = () => {
                 <button
                   onClick={toggleLike}
                   aria-pressed={wishlist}
-                  aria-label={wishlist ? 'Remove like' : 'Like this product'}
+                  aria-label={wishlist ? t('Remove like') : t('Like this product')}
                   className={`absolute ${
                     selectedImage >= imageUrls.length
                       ? product.rating >= 4.5 ? 'top-14 right-4' : 'top-4 right-4' // keep clear of the video controls
@@ -651,7 +651,7 @@ const SingleProduct = () => {
                 <span className="text-xs text-gray-400">{t("Max 100 units")}</span>
                 {!isAuthenticated && (
                   <span className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-full font-medium">
-                    🔒 Login to select quantity
+                    🔒 {t('Login to select quantity')}
                   </span>
                 )}
               </div>
@@ -670,11 +670,11 @@ const SingleProduct = () => {
                   }`}
                 >
                   {!isAuthenticated ? (
-                    <>🔒 Login to Add to Cart</>
+                    <>🔒 {t('Login to Add to Cart')}</>
                   ) : addedToCart ? (
-                    <>✓ Added to Cart!</>
+                    <>✓ {t('Added to Cart!')}</>
                   ) : (
-                    <>🛒 Add to Cart</>
+                    <>🛒 {t('Add to Cart')}</>
                   )}
                 </button>
 
@@ -688,7 +688,7 @@ const SingleProduct = () => {
                       : 'border-2 border-gray-300 text-gray-400 cursor-not-allowed'
                   }`}
                 >
-                  {isAuthenticated ? '⚡ Buy Now' : '🔒 Login to Buy'}
+                  {isAuthenticated ? `⚡ ${t('Buy now')}` : `🔒 ${t('Login to Buy')}`}
                 </button>
               </div>
               <Link
@@ -935,7 +935,7 @@ const SingleProduct = () => {
                               <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                               {t("Submitting...")}
                             </>
-                          ) : 'Submit Review'}
+                          ) : t('Submit Review')}
                         </button>
                         <button
                           type="button"
