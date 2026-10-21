@@ -3,11 +3,31 @@
 // renders the real page. Step 2 of the migration turns individual pages into
 // full server components with their own folders under src/app.
 import { cache } from 'react';
+import { preload } from 'react-dom';
 import { notFound } from 'next/navigation';
 import ClientApp from '../ClientApp';
 import SeoSummary from '../SeoSummary';
 import { seoForPath, DEFAULT_IMAGE } from '../../seo/pageSeo';
 import { organizationNode, websiteNode } from '../../components/seo/organization';
+import { orderedSlides, slideSrcSet } from '../../components/heroSlidesData';
+
+const API = (process.env.NEXT_PUBLIC_BACKEND_URL || 'https://api.foodpharmamachinery.com').replace(/\/api\/?$/, '').replace(/\/$/, '');
+
+// Home page: start downloading the first hero slide with the HTML instead of after the
+// app's JavaScript has loaded (it is the largest thing on screen, Google's LCP).
+const preloadHeroImage = async () => {
+  let apiSlides = [];
+  try {
+    const res = await fetch(`${API}/api/hero-slides`, { next: { revalidate: 300 } });
+    if (res.ok) apiSlides = await res.json();
+  } catch {
+    /* API down: the defaults are shown, so preload those */
+  }
+  const first = orderedSlides(apiSlides)[0];
+  if (!first?.url) return;
+  const srcSet = slideSrcSet(first.url);
+  preload(first.url, { as: 'image', fetchPriority: 'high', ...(srcSet && { imageSrcSet: srcSet, imageSizes: '100vw' }) });
+};
 
 const getSeo = cache((slug) => seoForPath(slug || []));
 
@@ -51,6 +71,7 @@ export default async function Page({ params }) {
   const { slug } = await params;
   const seo = await getSeo(slug);
   if (seo.notFound) notFound();
+  if (!slug || slug.length === 0) await preloadHeroImage();
 
   return (
     <ClientApp>
