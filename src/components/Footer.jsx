@@ -2,6 +2,7 @@
 // Requirements: react-router-dom, tailwindcss, axios
 // Add to tailwind.config.js => fontFamily: { barlow: ['"Barlow"','sans-serif'], barlowC: ['"Barlow Condensed"','sans-serif'] }
 
+import { useLocale } from '../i18n/LocaleContext';
 import { formTool } from './webmcp/webmcpTools';
 import { Link } from "react-router-dom";
 import { useFetchAllProductsQuery } from "../components/store/products/productsApi"; // ✅ adjust path
@@ -141,6 +142,7 @@ const ContactRow = ({ icon: Icon, label, children }) => (
 
 /* ─── Main Footer ─────────────────────────────────────────── */
 export default function PharmaMachineFooter() {
+  const { t } = useLocale();
   // ── Product query ──
   const { data: apiData, isLoading: productsLoading } = useFetchAllProductsQuery({
     page: 1,
@@ -250,7 +252,7 @@ export default function PharmaMachineFooter() {
       itemScope
       itemType="https://schema.org/Organization"
       className="relative bg-[#080b11] text-slate-400 font-barlow w-full overflow-hidden"
-      aria-label="Site footer"
+      aria-label={t("Site footer")}
     >
       <meta itemProp="name" content="Food Pharma Machinery" />
       <meta itemProp="legalName" content="PureLine Machinery Pvt. Ltd." />
@@ -292,13 +294,13 @@ export default function PharmaMachineFooter() {
           <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="max-w-2xl">
               <p className="font-barlowC font-bold text-[12px] tracking-[0.25em] uppercase text-white/80 mb-2">
-                Pharmaceutical machinery solutions
+                {t("Pharmaceutical machinery solutions")}
               </p>
               <h2 className="font-barlowC font-bold text-3xl sm:text-4xl leading-tight text-white">
-                Looking for the right machine for your plant?
+                {t("Looking for the right machine for your plant?")}
               </h2>
               <p className="mt-2 text-[15px] text-white/90">
-                Tell us what you manufacture and our engineers will recommend the right equipment, with a quote within 24 hours.
+                {t("Tell us what you manufacture and our engineers will recommend the right equipment, with a quote within 24 hours.")}
               </p>
             </div>
             <div className="flex flex-wrap gap-3 shrink-0">
@@ -306,7 +308,7 @@ export default function PharmaMachineFooter() {
                 to="/contact"
                 className="inline-flex items-center gap-2 bg-[#080b11] hover:bg-black text-white font-barlowC font-bold text-[14px] tracking-widest uppercase px-6 py-3.5 rounded-xl transition-all hover:-translate-y-0.5 shadow-lg"
               >
-                Request a Quote
+                {t("Request a Quote")}
                 <IconArrow />
               </Link>
               <a
@@ -316,7 +318,7 @@ export default function PharmaMachineFooter() {
                 className="inline-flex items-center gap-2 bg-white hover:bg-orange-50 text-orange-700 font-barlowC font-bold text-[14px] tracking-widest uppercase px-6 py-3.5 rounded-xl transition-all hover:-translate-y-0.5 shadow-lg"
               >
                 <IconWhatsApp className="w-5 h-5" />
-                WhatsApp Us
+                {t("WhatsApp Us")}
               </a>
             </div>
           </div>
@@ -327,12 +329,12 @@ export default function PharmaMachineFooter() {
       <div className="relative max-w-7xl mx-auto px-5 sm:px-8 mt-10">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-px rounded-2xl overflow-hidden border border-slate-800 bg-slate-800">
           {STATS.map(({ value, label }) => (
-            <div key={label} className="bg-[#0b0f17] px-5 py-6 text-center group hover:bg-[#0e131d] transition-colors">
+            <div key={t(label)} className="bg-[#0b0f17] px-5 py-6 text-center group hover:bg-[#0e131d] transition-colors">
               <p className="font-barlowC font-bold text-3xl sm:text-4xl bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent group-hover:from-orange-400 group-hover:to-amber-300 transition-all">
                 {value}
               </p>
               <p className="mt-1 font-barlowC font-semibold text-[11px] tracking-[0.2em] uppercase text-slate-500">
-                {label}
+                {t(label)}
               </p>
             </div>
           ))}
@@ -343,7 +345,7 @@ export default function PharmaMachineFooter() {
       <div className="relative max-w-7xl mx-auto px-5 sm:px-8 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8">
         {/* Brand */}
         <div className="lg:col-span-3">
-          <Link to="/" aria-label="Food Pharma Machinery — Home" className="flex items-center gap-3 mb-4 group">
+          <Link to="/" aria-label={t("Food Pharma Machinery — Home")} className="flex items-center gap-3 mb-4 group">
             <span className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-orange-700 text-white flex items-center justify-center shadow-lg shadow-orange-900/40 group-hover:rotate-90 transition-transform duration-700">
               <IconGear />
             </span>
@@ -360,16 +362,16 @@ export default function PharmaMachineFooter() {
             Engineering high-precision pharmaceutical processing and packaging equipment for solid dose,
             liquid, and sterile applications — built to cGMP, delivered on time.
           </p>
-          <div className="flex flex-wrap gap-2" aria-label="Certifications">
+          <div className="flex flex-wrap gap-2" aria-label={t("Certifications")}>
             {CERTIFICATIONS.map((c) => (
               <span
-                key={c}
+                key={t(c)}
                 className="flex items-center gap-1.5 bg-slate-900/80 border border-slate-700/70 rounded-full pl-2 pr-3 py-1 text-[10.5px] font-barlowC font-bold tracking-wide uppercase text-slate-300"
               >
                 <span className="text-emerald-500">
                   <IconShield />
                 </span>
-                {c}
+                {t(c)}
               </span>
             ))}
           </div>
@@ -377,27 +379,27 @@ export default function PharmaMachineFooter() {
 
         {/* Products + Services */}
         <div className="lg:col-span-3 lg:pl-6">
-          <ColHeading>Products</ColHeading>
-          <nav aria-label="Product categories">
+          <ColHeading>{t("Products")}</ColHeading>
+          <nav aria-label={t("Product categories")}>
             {productsLoading ? (
-              <p className="text-[12px] text-slate-600">Loading…</p>
+              <p className="text-[12px] text-slate-600">{t("Loading…")}</p>
             ) : (
               <ul role="list">
                 {navProducts.map(({ label, to }) => (
-                  <li key={label}>
-                    <FooterLink to={to}>{label}</FooterLink>
+                  <li key={t(label)}>
+                    <FooterLink to={to}>{t(label)}</FooterLink>
                   </li>
                 ))}
               </ul>
             )}
           </nav>
           <div className="mt-8">
-            <ColHeading>Services</ColHeading>
-            <nav aria-label="Services">
+            <ColHeading>{t("Services")}</ColHeading>
+            <nav aria-label={t("Services")}>
               <ul role="list">
                 {NAV_SERVICES.map(({ label, to }) => (
-                  <li key={label}>
-                    <FooterLink to={to}>{label}</FooterLink>
+                  <li key={t(label)}>
+                    <FooterLink to={to}>{t(label)}</FooterLink>
                   </li>
                 ))}
               </ul>
@@ -407,30 +409,30 @@ export default function PharmaMachineFooter() {
 
         {/* Contact */}
         <div className="lg:col-span-3">
-          <ColHeading>Contact Us</ColHeading>
+          <ColHeading>{t("Contact Us")}</ColHeading>
           <address className="not-italic space-y-5">
-            <ContactRow icon={IconPin} label="Office Locations">
+            <ContactRow icon={IconPin} label={t("Office Locations")}>
               <div className="space-y-2">
                 <div>
-                  <span className="font-semibold text-white">Main Office:</span> Shivalik Nagar, Haridwar,
+                  <span className="font-semibold text-white">{t("Main Office:")}</span> Shivalik Nagar, Haridwar,
                   Uttarakhand 249403, India
                 </div>
                 <div>
-                  <span className="font-semibold text-white">East India:</span> Lokhra, Jyotikuchhi,
+                  <span className="font-semibold text-white">{t("East India:")}</span> Lokhra, Jyotikuchhi,
                   Guwahati, Assam, India
                 </div>
                 <div>
-                  <span className="font-semibold text-white">Mumbai:</span> Thane, Mumbai, Maharashtra, India
+                  <span className="font-semibold text-white">{t("Mumbai:")}</span> Thane, Mumbai, Maharashtra, India
                 </div>
               </div>
             </ContactRow>
 
-            <ContactRow icon={IconPhone} label="Sales Hotline">
+            <ContactRow icon={IconPhone} label={t("Sales Hotline")}>
               <a
                 href={PHONE_TEL}
                 itemProp="telephone"
                 className="text-[16px] font-semibold text-white hover:text-orange-400 transition-colors"
-                aria-label="Call our sales line"
+                aria-label={t("Call our sales line")}
               >
                 {PHONE_DISPLAY}
               </a>
@@ -447,7 +449,7 @@ export default function PharmaMachineFooter() {
               </a>
             </ContactRow>
 
-            <ContactRow icon={IconMail} label="Email">
+            <ContactRow icon={IconMail} label={t("Email")}>
               <a
                 href={`mailto:${EMAIL}`}
                 itemProp="email"
@@ -457,15 +459,15 @@ export default function PharmaMachineFooter() {
               </a>
             </ContactRow>
 
-            <ContactRow icon={IconClock} label="Business Hours">
+            <ContactRow icon={IconClock} label={t("Business Hours")}>
               <div
                 className="mt-1 bg-slate-900/70 border-l-2 border-orange-500 rounded-r-lg p-3 space-y-1.5 min-w-[210px]"
                 itemProp="openingHours"
               >
                 {HOURS.map(({ day, time, open }) => (
-                  <div key={day} className="flex justify-between gap-4 text-[12.5px]">
-                    <span className="text-slate-500">{day}</span>
-                    <span className={open ? "text-emerald-400 font-medium" : "text-slate-500"}>{time}</span>
+                  <div key={t(day)} className="flex justify-between gap-4 text-[12.5px]">
+                    <span className="text-slate-500">{t(day)}</span>
+                    <span className={open ? "text-emerald-400 font-medium" : "text-slate-500"}>{t(time)}</span>
                   </div>
                 ))}
               </div>
@@ -476,9 +478,9 @@ export default function PharmaMachineFooter() {
         {/* Newsletter + Company + Press */}
         <div className="lg:col-span-3">
           <div className="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900/80 to-slate-900/30 p-5 backdrop-blur">
-            <ColHeading>Newsletter</ColHeading>
+            <ColHeading>{t("Newsletter")}</ColHeading>
             <p className="text-[13.5px] text-slate-400 leading-relaxed mb-4 -mt-2">
-              Regulatory updates, new machines and pharma tech news — straight to your inbox.
+              {t("Regulatory updates, new machines and pharma tech news — straight to your inbox.")}
             </p>
 
             {subscribedAs ? (
@@ -505,7 +507,7 @@ export default function PharmaMachineFooter() {
                       onClick={resetSubscribe}
                       className="mt-2 text-[13px] text-orange-400 underline-offset-2 hover:underline"
                     >
-                      Use a different email
+                      {t("Use a different email")}
                     </button>
                   </div>
                 </div>
@@ -513,7 +515,7 @@ export default function PharmaMachineFooter() {
             ) : (
               <form {...formTool('newsletter')} onSubmit={handleSubscribe} noValidate>
                 <label htmlFor="footer-email" className="mb-1.5 block text-[13px] font-medium text-slate-300">
-                  Your email address
+                  {t("Your email address")}
                 </label>
                 <div
                   className={`flex rounded-xl overflow-hidden border bg-[#0b0f17] transition-all focus-within:ring-2 ${
@@ -562,7 +564,7 @@ export default function PharmaMachineFooter() {
                   </p>
                 ) : (
                   <p id="footer-email-hint" className="mt-2 text-[12px] text-slate-500">
-                    No spam. Unsubscribe with one click.
+                    {t("No spam. Unsubscribe with one click.")}
                   </p>
                 )}
               </form>
@@ -573,20 +575,20 @@ export default function PharmaMachineFooter() {
               target="_blank"
               rel="noopener noreferrer"
               className="mt-4 flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white transition-all hover:-translate-y-0.5 shadow-lg shadow-emerald-900/30 text-[13px] font-barlowC font-bold tracking-wider uppercase"
-              aria-label="Chat with us on WhatsApp"
+              aria-label={t("Chat with us on WhatsApp")}
             >
               <IconWhatsApp className="w-5 h-5" />
-              Chat on WhatsApp
+              {t("Chat on WhatsApp")}
             </a>
           </div>
 
           <div className="mt-8">
-            <ColHeading>Company</ColHeading>
-            <nav aria-label="Company pages">
+            <ColHeading>{t("Company")}</ColHeading>
+            <nav aria-label={t("Company pages")}>
               <ul role="list">
                 {NAV_COMPANY.map(({ label, to }) => (
-                  <li key={label}>
-                    <FooterLink to={to}>{label}</FooterLink>
+                  <li key={t(label)}>
+                    <FooterLink to={to}>{t(label)}</FooterLink>
                   </li>
                 ))}
               </ul>
@@ -596,7 +598,7 @@ export default function PharmaMachineFooter() {
             {!pressLoading && pressReleases.length > 0 && (
               <div className="mt-6">
                 <h3 className="font-barlowC font-bold text-[11px] tracking-[0.2em] uppercase text-orange-500 mb-3">
-                  Latest Press Releases
+                  {t("Latest Press Releases")}
                 </h3>
                 <ul className="space-y-3">
                   {pressReleases.map((item) => (
@@ -627,7 +629,7 @@ export default function PharmaMachineFooter() {
                   to="/press"
                   className="inline-block mt-3 text-[11px] font-barlowC font-bold tracking-widest uppercase text-orange-500 hover:text-orange-400 transition-colors"
                 >
-                  View all →
+                  {t("View all →")}
                 </Link>
               </div>
             )}
@@ -657,32 +659,32 @@ export default function PharmaMachineFooter() {
         <p className="text-[12.5px] text-slate-500 order-3 lg:order-1 text-center">
           &copy; {new Date().getFullYear()} Food Pharma Machinery (PureLine Machinery Pvt. Ltd.). All rights reserved.
         </p>
-        <nav aria-label="Legal links" className="order-2 flex flex-wrap justify-center gap-x-6 gap-y-1">
+        <nav aria-label={t("Legal links")} className="order-2 flex flex-wrap justify-center gap-x-6 gap-y-1">
           <Link to="/privacy" className="text-[12.5px] text-slate-500 hover:text-orange-400 transition-colors">
-            Privacy Policy
+            {t("Privacy Policy")}
           </Link>
           <button
             type="button"
             onClick={() => window.dispatchEvent(new Event('openCookieSettings'))}
             className="text-[12.5px] text-slate-500 hover:text-orange-400 transition-colors"
           >
-            Cookie Settings
+            {t("Cookie Settings")}
           </button>
           {/* Plain link: the sitemap is a file, not an app page */}
           <a href="/sitemap.xml" className="text-[12.5px] text-slate-500 hover:text-orange-400 transition-colors">
-            Sitemap
+            {t("Sitemap")}
           </a>
         </nav>
         <div
           className="order-1 lg:order-3 flex flex-wrap items-center justify-center gap-2"
-          aria-label="Accepted payment methods"
+          aria-label={t("Accepted payment methods")}
         >
           {["VISA", "Mastercard", "AMEX", "Cash on Delivery"].map((m) => (
             <span
-              key={m}
+              key={t(m)}
               className="bg-slate-900 border border-slate-700/80 rounded-md px-2.5 py-1 text-[10.5px] font-barlowC font-bold tracking-wide text-slate-400"
             >
-              {m}
+              {t(m)}
             </span>
           ))}
         </div>
@@ -695,7 +697,7 @@ export default function PharmaMachineFooter() {
           type="button"
           onClick={scrollToTop}
           className="w-11 h-11 rounded-full bg-slate-800/90 hover:bg-orange-600 text-white border border-slate-600 flex items-center justify-center shadow-lg backdrop-blur transition-colors"
-          aria-label="Back to top"
+          aria-label={t("Back to top")}
         >
           <IconUp />
         </button>
@@ -704,7 +706,7 @@ export default function PharmaMachineFooter() {
           target="_blank"
           rel="noopener noreferrer"
           className="relative hidden lg:flex w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white items-center justify-center shadow-xl shadow-emerald-900/40 transition-transform hover:scale-110"
-          aria-label="Chat with us on WhatsApp"
+          aria-label={t("Chat with us on WhatsApp")}
         >
           <span className="absolute inset-0 rounded-full bg-emerald-400/60 animate-ping" aria-hidden="true" />
           <IconWhatsApp className="relative w-7 h-7" />

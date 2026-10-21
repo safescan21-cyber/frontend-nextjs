@@ -1,3 +1,4 @@
+import { useLocale } from '../i18n/LocaleContext';
 import { sizedImage } from '../utlis/imageUrl';
 import { slideSrcSet, orderedSlides } from './heroSlidesData';
 import React, { useState, useRef, useEffect } from 'react';
@@ -41,6 +42,7 @@ const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1524514587686-e2909d72
 
 // ── Running text marquee ──
 const RunningData = () => {
+  const { t } = useLocale();
   const messages = [
     { icon: '🏭', text: 'GMP-Ready Machinery for Pharma & Food' },
     { icon: '⭐', text: 'Industry-Leading Quality Guaranteed' },
@@ -57,7 +59,7 @@ const RunningData = () => {
           {doubledMessages.map((msg, idx) => (
             <span key={idx} className="mx-6 flex items-center gap-2">
               <span className="text-xl">{msg.icon}</span>
-              <span>{msg.text}</span>
+              <span>{t(msg.text)}</span>
               <span className="mx-4 text-white/30">|</span>
             </span>
           ))}
@@ -68,6 +70,7 @@ const RunningData = () => {
 };
 
 const Home = () => {
+  const { t } = useLocale();
   const { data: heroSlidesData, isLoading: heroSlidesLoading, isError: heroSlidesError } = useGetHeroSlidesQuery();
 
   // ── Merge admin slides + default slides, sorted by order ──
@@ -154,7 +157,7 @@ const Home = () => {
     <>
       <Seo {...seoPages.home} />
       {/* The page's one h1 (the slider and sections below use h2) */}
-      <h1 className="sr-only">Food Pharma Machinery — pharma and food processing machinery, pharma APIs and spares from India</h1>
+      <h1 className="sr-only">{t("Food Pharma Machinery — pharma and food processing machinery, pharma APIs and spares from India")}</h1>
       <style>{styles}</style>
       <div className="relative h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] w-full overflow-hidden bg-black">
         {/* Background pattern */}
@@ -178,7 +181,7 @@ const Home = () => {
               src={image.url}
               srcSet={slideSrcSet(image.url)}
               sizes="100vw"
-              alt={image.title}
+              alt={t(image.title)}
               className="w-full h-full object-cover"
               onError={handleImageError}
               loading={index === 0 ? 'eager' : 'lazy'}
@@ -191,7 +194,7 @@ const Home = () => {
               <div className={`absolute top-4 sm:top-8 left-4 sm:left-8 z-20 ${getOfferBadgeColor(image.offer.type)} text-white px-3 sm:px-4 py-1 sm:py-2 rounded-full shadow-lg`}>
                 <div className="flex items-center space-x-2">
                   {getOfferIcon(image.offer.type)}
-                  <span className="font-bold text-xs sm:text-sm">{image.offer.value}</span>
+                  <span className="font-bold text-xs sm:text-sm">{t(image.offer.value)}</span>
                 </div>
               </div>
             )}
@@ -206,15 +209,15 @@ const Home = () => {
                 </div>
                 {/* Slides use h2 — the page has a single h1 below */}
                 <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-2 sm:mb-4 animate-fade-in drop-shadow-lg">
-                  {image.title}
+                  {t(image.title)}
                 </h2>
                 <p className="text-base sm:text-lg md:text-2xl lg:text-3xl mb-4 sm:mb-6 animate-fade-in-delay drop-shadow-md">
-                  {image.subtitle}
+                  {t(image.subtitle)}
                 </p>
                 {image.offer?.details && (
                   <div className="mb-4 sm:mb-6 animate-fade-in-delay-2">
                     <p className="text-xs sm:text-sm bg-black/30 backdrop-blur-sm inline-block px-3 sm:px-4 py-1 sm:py-2 rounded-full">
-                      {image.offer.details}
+                      {t(image.offer.details)}
                     </p>
                   </div>
                 )}
@@ -222,7 +225,7 @@ const Home = () => {
                   onClick={() => window.location.href = image.ctaLink || '#'}
                   className="bg-blue-600 text-white px-6 sm:px-8 md:px-10 py-2 sm:py-3 md:py-4 rounded-full font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 text-sm sm:text-base md:text-lg shadow-lg animate-fade-in-delay-2 flex items-center space-x-2 mx-auto"
                 >
-                  <span>{image.cta}</span>
+                  <span>{t(image.cta)}</span>
                 </button>
               </div>
             </div>
@@ -231,10 +234,10 @@ const Home = () => {
 
         {images.length > 1 && (
           <>
-            <button onClick={prevSlide} aria-label="Previous slide" className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-all">
+            <button onClick={prevSlide} aria-label={t("Previous slide")} className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-all">
               <ChevronLeft size={20} className="sm:w-6 sm:h-6" />
             </button>
-            <button onClick={nextSlide} aria-label="Next slide" className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-all">
+            <button onClick={nextSlide} aria-label={t("Next slide")} className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-all">
               <ChevronRight size={20} className="sm:w-6 sm:h-6" />
             </button>
           </>
@@ -261,7 +264,7 @@ const Home = () => {
         <div className="absolute top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-4 z-20 flex justify-between items-center">
           <div className="flex space-x-1 sm:space-x-2">
             {/* Slide grid and speed controls are desktop-only; on phones they crowd the offer badge */}
-            <button onClick={() => setShowThumbnails(!showThumbnails)} aria-label="Show all slides" className="hidden md:block bg-black/50 backdrop-blur-sm text-white px-2 sm:px-3 py-1 sm:py-2 rounded-lg">
+            <button onClick={() => setShowThumbnails(!showThumbnails)} aria-label={t("Show all slides")} className="hidden md:block bg-black/50 backdrop-blur-sm text-white px-2 sm:px-3 py-1 sm:py-2 rounded-lg">
               <Grid size={14} className="sm:w-4 sm:h-4" />
             </button>
           </div>
@@ -270,7 +273,7 @@ const Home = () => {
               <select
                 value={slideDuration}
                 onChange={(e) => setSlideDuration(parseInt(e.target.value))}
-                aria-label="Slide speed"
+                aria-label={t("Slide speed")}
                 className="hidden md:block bg-black/50 backdrop-blur-sm text-white px-2 sm:px-3 py-1 sm:py-2 rounded-lg text-xs sm:text-sm"
               >
                 {speedOptions.map(opt => (

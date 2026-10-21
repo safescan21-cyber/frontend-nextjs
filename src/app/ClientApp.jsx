@@ -11,7 +11,11 @@ import WebMcpTools from '../components/webmcp/WebMcpTools';
 // and crashes if it later tries to remove one that is gone.
 // (<title> is left alone: the app sets document.title itself, which always wins.)
 const headKey = (el) => {
-  if (el.tagName === 'LINK') return el.getAttribute('rel') === 'canonical' ? 'canonical' : null;
+  if (el.tagName === 'LINK') {
+    if (el.getAttribute('rel') === 'canonical') return 'canonical';
+    if (el.getAttribute('rel') === 'alternate' && el.getAttribute('hreflang')) return `alt:${el.getAttribute('hreflang')}`;
+    return null;
+  }
   if (el.tagName !== 'META') return null;
   const name = el.getAttribute('name') || el.getAttribute('property');
   return name && /^(description|robots|og:|twitter:)/.test(name) ? `meta:${name}` : null;
@@ -19,7 +23,7 @@ const headKey = (el) => {
 
 const neutralise = (el) => {
   if (el.tagName === 'LINK') {
-    el.setAttribute('rel', 'x-replaced-canonical');
+    el.setAttribute('rel', `x-replaced-${el.getAttribute('rel')}`);
   } else {
     const attr = el.hasAttribute('name') ? 'name' : 'property';
     el.setAttribute(`data-replaced-${attr}`, el.getAttribute(attr));

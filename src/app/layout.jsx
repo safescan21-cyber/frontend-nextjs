@@ -1,4 +1,5 @@
 // Root layout: replaces the Vite index.html (<head> tags, icons, global CSS).
+import { headers } from 'next/headers';
 import '../index.css';
 import { SITE_URL, SITE_NAME } from '../components/seo/organization';
 import { DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_IMAGE } from '../seo/pageSeo';
@@ -47,9 +48,10 @@ export const viewport = {
 // Applies the visitor's saved theme before first paint (see components/ThemeToggle.jsx)
 const THEME_SCRIPT = "try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}";
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const lang = (await headers()).get('x-site-lang') || 'en-IN'; // set by proxy.js
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={lang} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>

@@ -1,3 +1,5 @@
+import LocalPrice from '../../i18n/LocalPrice';
+import { useLocale } from '../../i18n/LocaleContext';
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
@@ -14,6 +16,7 @@ import {
 } from '../store/cartSlice';
 
 const CartPage = () => {
+  const { t } = useLocale();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const cartItems = useSelector(selectCartItems);
@@ -128,16 +131,16 @@ const CartPage = () => {
               />
             </svg>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
-              Your Cart is Empty
+              {t("Your Cart is Empty")}
             </h2>
             <p className="text-gray-600 mb-8">
-              Looks like you haven't added any items to your cart yet.
+              {t("Looks like you haven't added any items to your cart yet.")}
             </p>
             <Link
               to="/shop"
               className="inline-block bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors font-medium"
             >
-              Continue Shopping
+              {t("Continue Shopping")}
             </Link>
           </div>
         </div>
@@ -150,7 +153,7 @@ const CartPage = () => {
       <div className="container mx-auto px-4">
         <div className="mb-6">
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
-            Shopping Cart
+            {t("Shopping Cart")}
           </h1>
           <p className="text-gray-600">
             You have {totalQuantity} {totalQuantity === 1 ? 'item' : 'items'} in your cart
@@ -163,10 +166,10 @@ const CartPage = () => {
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               {/* Desktop Header */}
               <div className="hidden md:grid grid-cols-12 gap-4 bg-gray-100 px-6 py-3 text-sm font-semibold text-gray-700 border-b">
-                <div className="col-span-6">Product</div>
-                <div className="col-span-2 text-center">Price</div>
-                <div className="col-span-2 text-center">Quantity</div>
-                <div className="col-span-1 text-center">Total</div>
+                <div className="col-span-6">{t("Product")}</div>
+                <div className="col-span-2 text-center">{t("Price")}</div>
+                <div className="col-span-2 text-center">{t("Quantity")}</div>
+                <div className="col-span-1 text-center">{t("Total")}</div>
                 <div className="col-span-1"></div>
               </div>
 
@@ -207,7 +210,7 @@ const CartPage = () => {
                             )}
                             {item.color && (
                               <div className="flex items-center gap-2 mt-2">
-                                <span className="text-xs text-gray-500">Color:</span>
+                                <span className="text-xs text-gray-500">{t("Color:")}</span>
                                 <div
                                   className="w-4 h-4 rounded-full border border-gray-300"
                                   style={{ backgroundColor: item.color.toLowerCase() }}
@@ -218,13 +221,13 @@ const CartPage = () => {
                             <div className="md:hidden mt-3">
                               <div className="flex items-center justify-between">
                                 <div>
-                                  <span className="text-sm text-gray-500">Price: </span>
+                                  <span className="text-sm text-gray-500">{t("Price:")} </span>
                                   <span className="font-semibold text-blue-600">
                                     ₹{item.price.toLocaleString('en-IN')}
                                   </span>
                                 </div>
                                 <div>
-                                  <span className="text-sm text-gray-500">Total: </span>
+                                  <span className="text-sm text-gray-500">{t("Total:")} </span>
                                   <span className="font-semibold text-blue-600">
                                     ₹{(item.price * item.quantity).toLocaleString('en-IN')}
                                   </span>
@@ -247,7 +250,7 @@ const CartPage = () => {
                             <button
                               onClick={() => handleDecreaseQuantity(item._id)}
                               className="px-2 md:px-3 py-1 hover:bg-gray-100 transition-colors"
-                              aria-label="Decrease quantity"
+                              aria-label={t("Decrease quantity")}
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
@@ -266,7 +269,7 @@ const CartPage = () => {
                             <button
                               onClick={() => handleIncreaseQuantity(item._id)}
                               className="px-2 md:px-3 py-1 hover:bg-gray-100 transition-colors"
-                              aria-label="Increase quantity"
+                              aria-label={t("Increase quantity")}
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -278,7 +281,7 @@ const CartPage = () => {
                           <button
                             onClick={() => handleRemoveItem(item._id)}
                             className="md:hidden text-red-500 hover:text-red-700 transition-colors p-2"
-                            aria-label="Remove item"
+                            aria-label={t("Remove item")}
                           >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -298,7 +301,7 @@ const CartPage = () => {
                           <button
                             onClick={() => handleRemoveItem(item._id)}
                             className="text-red-500 hover:text-red-700 transition-colors"
-                            aria-label="Remove item"
+                            aria-label={t("Remove item")}
                           >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -321,7 +324,7 @@ const CartPage = () => {
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
-                    Continue Shopping
+                    {t("Continue Shopping")}
                   </Link>
                   <button
                     onClick={() => {
@@ -334,7 +337,7 @@ const CartPage = () => {
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
-                    Clear Cart
+                    {t("Clear Cart")}
                   </button>
                 </div>
               </div>
@@ -344,26 +347,26 @@ const CartPage = () => {
           {/* Order Summary Section */}
           <div className="lg:w-1/3">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Order Summary</h2>
+              <h2 className="text-xl font-bold text-gray-800 mb-4">{t("Order Summary")}</h2>
               
               {/* Coupon Section */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Coupon Code
+                  {t("Coupon Code")}
                 </label>
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
-                    placeholder="Enter coupon code"
+                    placeholder={t("Enter coupon code")}
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   <button
                     onClick={handleApplyCoupon}
                     className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900 transition-colors"
                   >
-                    Apply
+                    {t("Apply")}
                   </button>
                 </div>
                 {appliedCoupon && (
@@ -380,19 +383,20 @@ const CartPage = () => {
                   <span>₹{getSubtotal().toLocaleString('en-IN')}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
-                  <span>Shipping</span>
+                  <span>{t("Shipping")}</span>
                   <span>₹{shippingCost.toLocaleString('en-IN')}</span>
                 </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-green-600">
-                    <span>Discount</span>
+                    <span>{t("Discount")}</span>
                     <span>-₹{discount.toLocaleString('en-IN')}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-lg font-bold text-gray-800 pt-3 border-t border-gray-200">
-                  <span>Total</span>
+                  <span>{t("Total")}</span>
                   <span className="text-blue-600">₹{getTotal().toLocaleString('en-IN')}</span>
                 </div>
+                <div className="text-right"><LocalPrice inr={getTotal()} /></div>
               </div>
 
               {/* Checkout Button (already guarded in handleCheckout) */}
@@ -400,23 +404,23 @@ const CartPage = () => {
                 onClick={handleCheckout}
                 className="w-full mt-6 bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition-colors font-medium text-lg"
               >
-                Proceed to Checkout
+                {t("Proceed to Checkout")}
               </button>
               <Link
                 to="/bulk-quote?source=cart"
                 className="mt-3 block text-center text-sm font-medium text-amber-700 hover:underline"
               >
-                Ordering in bulk? Get a custom quote with volume pricing →
+                {t("Ordering in bulk? Get a custom quote with volume pricing →")}
               </Link>
 
               {/* Payment Methods */}
               <div className="mt-6 pt-6 border-t border-gray-200">
-                <p className="text-sm text-gray-600 text-center mb-3">Secure Payment Methods</p>
+                <p className="text-sm text-gray-600 text-center mb-3">{t("Secure Payment Methods")}</p>
                 <div className="flex justify-center gap-4">
-                  <span className="text-xs text-gray-500">Visa</span>
-                  <span className="text-xs text-gray-500">Mastercard</span>
-                  <span className="text-xs text-gray-500">Amex</span>
-                  <span className="text-xs text-gray-500">Cash on Delivery</span>
+                  <span className="text-xs text-gray-500">{t("Visa")}</span>
+                  <span className="text-xs text-gray-500">{t("Mastercard")}</span>
+                  <span className="text-xs text-gray-500">{t("Amex")}</span>
+                  <span className="text-xs text-gray-500">{t("Cash on Delivery")}</span>
                 </div>
               </div>
             </div>

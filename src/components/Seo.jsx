@@ -1,4 +1,7 @@
 import { Helmet } from 'react-helmet-async';
+import { useLocale } from '../i18n/LocaleContext';
+import { localePath, alternateUrls } from '../i18n/locales';
+import { seoText } from '../i18n/seoText';
 
 const SITE_URL = 'https://www.foodpharmamachinery.com';
 const SITE_NAME = 'Food Pharma Machinery';
@@ -49,6 +52,15 @@ const Seo = ({
   noindex = false,
   jsonLd,
 }) => {
+  // Country versions (/fr, /ja…): translated title/description when we have them,
+  // their own address as canonical, and links to every language version
+  const { locale, info } = useLocale();
+  const cleanPath = new URL(buildUrl(path)).pathname;
+  const translated = seoText(locale, cleanPath);
+  if (translated) {
+    title = translated.title;
+    description = translated.description;
+  }
   const cleanTitle = cleanText(title, 70);
   const fullTitle = !cleanTitle
     ? DEFAULT_TITLE
@@ -57,7 +69,8 @@ const Seo = ({
       : `${cleanTitle} | ${SITE_NAME}`;
 
   const metaDescription = cleanText(description || DEFAULT_DESCRIPTION, 160) || DEFAULT_DESCRIPTION;
-  const url = buildUrl(path);
+  const url = buildUrl(localePath(locale, cleanPath));
+  const languages = noindex ? null : alternateUrls(SITE_URL, cleanPath);
   const ogImage = absoluteImage(image);
 
   // Escape "<" so structured data can never break out of the <script> tag
@@ -68,10 +81,12 @@ const Seo = ({
       <title>{fullTitle}</title>
       <meta name="description" content={metaDescription} />
       {!noindex && <link rel="canonical" href={url} />}
+      {languages && Object.entries(languages).map(([lang, href]) => <link key={lang} rel="alternate" hrefLang={lang} href={href} />)}
       <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
 
       <meta property="og:type" content={type === 'product' ? 'product' : type === 'article' ? 'article' : 'website'} />
       <meta property="og:site_name" content={SITE_NAME} />
+      <meta property="og:locale" content={info.lang.replace('-', '_')} />
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={metaDescription} />
       <meta property="og:url" content={url} />

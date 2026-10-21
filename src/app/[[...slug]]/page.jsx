@@ -8,6 +8,8 @@ import { notFound } from 'next/navigation';
 import ClientApp from '../ClientApp';
 import SeoSummary from '../SeoSummary';
 import { seoForPath, DEFAULT_IMAGE } from '../../seo/pageSeo';
+import { localizeSeo } from '../../seo/localizeSeo';
+import { LOCALES, localeInfo } from '../../i18n/locales';
 import { organizationNode, websiteNode } from '../../components/seo/organization';
 import { orderedSlides, slideSrcSet } from '../../components/heroSlidesData';
 
@@ -29,7 +31,14 @@ const preloadHeroImage = async () => {
   preload(first.url, { as: 'image', fetchPriority: 'high', ...(srcSet && { imageSrcSet: srcSet, imageSizes: '100vw' }) });
 };
 
-const getSeo = cache((slug) => seoForPath(slug || []));
+// /fr/shop -> the /shop page in the French version (see i18n/locales.js)
+const getSeo = cache(async (slug) => {
+  const segments = slug || [];
+  const locale = segments[0] && LOCALES[segments[0]] ? segments[0] : '';
+  const rest = locale ? segments.slice(1) : segments;
+  const path = `/${rest.map(decodeURIComponent).join('/')}`.replace(/\/+$/, '') || '/';
+  return { ...localizeSeo(await seoForPath(rest), locale, path), locale, isHome: rest.length === 0 };
+});
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -41,10 +50,11 @@ export async function generateMetadata({ params }) {
   return {
     ...(seo.title && { title: { absolute: seo.title } }),
     ...(seo.description && { description: seo.description }),
-    ...(seo.canonical && { alternates: { canonical: seo.canonical } }),
+    ...(seo.canonical && { alternates: { canonical: seo.canonical, ...(seo.alternates && { languages: seo.alternates }) } }),
     ...(seo.noindex && { robots: { index: false, follow: true } }),
     openGraph: {
       type: seo.type === 'article' ? 'article' : 'website',
+      locale: localeInfo(seo.locale).lang.replace('-', '_'),
       url: seo.canonical,
       ...(seo.title && { title: seo.title }),
       ...(seo.description && { description: seo.description }),
@@ -71,7 +81,7 @@ export default async function Page({ params }) {
   const { slug } = await params;
   const seo = await getSeo(slug);
   if (seo.notFound) notFound();
-  if (!slug || slug.length === 0) await preloadHeroImage();
+  if (seo.isHome) await preloadHeroImage();
 
   return (
     <ClientApp>

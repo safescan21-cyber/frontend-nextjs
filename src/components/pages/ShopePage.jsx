@@ -1,3 +1,5 @@
+import LocalPrice from '../../i18n/LocalPrice';
+import { useLocale } from '../../i18n/LocaleContext';
 import { sizedImage } from '../../utlis/imageUrl';
 import React, { useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -39,6 +41,7 @@ const scoreProduct = (p, words) => {
 
 // embedded = shown inside the home page: the home page owns the title and the <h1>
 const ShopPage = ({ embedded = false }) => {
+  const { t } = useLocale();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
@@ -236,7 +239,7 @@ const ShopPage = ({ embedded = false }) => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 pt-20">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-500">Loading products...</p>
+          <p className="text-gray-500">{t("Loading products...")}</p>
         </div>
       </div>
     );
@@ -247,8 +250,8 @@ const ShopPage = ({ embedded = false }) => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 pt-20">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-red-500 mb-2">Failed to load products</h2>
-          <p className="text-gray-500">Please try again later.</p>
+          <h2 className="text-xl font-semibold text-red-500 mb-2">{t("Failed to load products")}</h2>
+          <p className="text-gray-500">{t("Please try again later.")}</p>
         </div>
       </div>
     );
@@ -258,7 +261,7 @@ const ShopPage = ({ embedded = false }) => {
     <>
       {!embedded && (
         <Seo
-          title="Shop Pharma & Food Processing Machinery"
+          title={t("Shop Pharma & Food Processing Machinery")}
           description="Buy tablet presses, capsule fillers, load cells, weighing scales and packaging machines. Built to cGMP standards, with genuine spares and support."
           path="/shop"
         />
@@ -268,12 +271,12 @@ const ShopPage = ({ embedded = false }) => {
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-8 md:py-16">
           <div className="container mx-auto px-4 text-center">
             {embedded ? (
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4">Pharma &amp; Food Processing Machinery</h2>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4">{t("Pharma & Food Processing Machinery")}</h2>
             ) : (
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4">Pharma &amp; Food Processing Machinery</h1>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4">{t("Pharma & Food Processing Machinery")}</h1>
             )}
             <p className="text-base md:text-xl text-blue-100 max-w-2xl mx-auto">
-              Tablet presses, capsule fillers, packaging lines and lab equipment for pharma and food manufacturers
+              {t("Tablet presses, capsule fillers, packaging lines and lab equipment for pharma and food manufacturers")}
             </p>
           </div>
         </div>
@@ -289,8 +292,8 @@ const ShopPage = ({ embedded = false }) => {
                   type="search"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search machines..."
-                  aria-label="Search machines in the shop"
+                  placeholder={t("Search machines...")}
+                  aria-label={t("Search machines in the shop")}
                   className="min-w-0 flex-1 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <button
@@ -303,7 +306,7 @@ const ShopPage = ({ embedded = false }) => {
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18l-7 8v6l-4 2v-8L3 4z" />
                   </svg>
-                  Filters
+                  {t("Filters")}
                   {activeFilterCount > 0 && (
                     <span className={`ml-0.5 rounded-full px-1.5 text-xs ${showFilters ? 'bg-white text-blue-600' : 'bg-blue-600 text-white'}`}>{activeFilterCount}</span>
                   )}
@@ -311,21 +314,21 @@ const ShopPage = ({ embedded = false }) => {
               </div>
 
               <div id="shop-filters" className={`${showFilters ? 'block mt-3' : 'hidden'} lg:block lg:mt-0 bg-white rounded-lg shadow-md p-5 lg:p-6 lg:sticky lg:top-24`}>
-                <h2 className="text-xl font-bold text-gray-800 mb-4 hidden lg:block">Filters</h2>
+                <h2 className="text-xl font-bold text-gray-800 mb-4 hidden lg:block">{t("Filters")}</h2>
 
                 <div className="mb-6 hidden lg:block">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t("Search")}</label>
                   <input
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search products..."
+                    placeholder={t("Search products...")}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t("Category")}</label>
                   <div className="space-y-2">
                     {categories.map((cat) => (
                       <label key={cat} className="flex items-center gap-2 cursor-pointer">
@@ -347,7 +350,7 @@ const ShopPage = ({ embedded = false }) => {
                 </div>
 
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Price Range (₹)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t("Price Range (₹)")}</label>
                   <div className="flex gap-2 items-center">
                     <input
                       type="number"
@@ -357,7 +360,7 @@ const ShopPage = ({ embedded = false }) => {
                         setPriceRange({ ...priceRange, min: e.target.value === '' ? '' : Number(e.target.value) })
                       }
                       className="w-1/2 px-2 py-1 border border-gray-300 rounded-md text-sm"
-                      placeholder="Min"
+                      placeholder={t("Min")}
                     />
                     <span>-</span>
                     <input
@@ -368,22 +371,22 @@ const ShopPage = ({ embedded = false }) => {
                         setPriceRange({ ...priceRange, max: e.target.value === '' ? '' : Number(e.target.value) })
                       }
                       className="w-1/2 px-2 py-1 border border-gray-300 rounded-md text-sm"
-                      placeholder="No limit"
+                      placeholder={t("No limit")}
                     />
                   </div>
                 </div>
 
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t("Sort By")}</label>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="default">Default</option>
-                    <option value="price-low">Price: Low to High</option>
-                    <option value="price-high">Price: High to Low</option>
-                    <option value="rating">Top Rated</option>
+                    <option value="default">{t("Default")}</option>
+                    <option value="price-low">{t("Price: Low to High")}</option>
+                    <option value="price-high">{t("Price: High to Low")}</option>
+                    <option value="rating">{t("Top Rated")}</option>
                   </select>
                 </div>
 
@@ -391,7 +394,7 @@ const ShopPage = ({ embedded = false }) => {
                   onClick={resetFilters}
                   className="w-full bg-gray-200 text-gray-700 py-2 rounded-md hover:bg-gray-300 transition-colors"
                 >
-                  Reset Filters
+                  {t("Reset Filters")}
                 </button>
               </div>
             </div>
@@ -409,13 +412,13 @@ const ShopPage = ({ embedded = false }) => {
                   <svg className="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">No products found</h3>
-                  <p className="text-gray-600 mb-4">Try adjusting your filters or search term</p>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">{t("No products found")}</h3>
+                  <p className="text-gray-600 mb-4">{t("Try adjusting your filters or search term")}</p>
                   <button
                     onClick={resetFilters}
                     className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                   >
-                    Clear all filters
+                    {t("Clear all filters")}
                   </button>
                 </div>
               ) : (
@@ -461,14 +464,14 @@ const ShopPage = ({ embedded = false }) => {
                             {!isInStock && (
                               <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                                 <span className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-sm">
-                                  Out of Stock
+                                  {t("Out of Stock")}
                                 </span>
                               </div>
                             )}
                             {addedProductId === product._id && (
                               <div className="absolute inset-0 bg-green-500 bg-opacity-20 flex items-center justify-center animate-pulse">
                                 <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                  Added to Cart!
+                                  {t("Added to Cart!")}
                                 </span>
                               </div>
                             )}
@@ -502,7 +505,7 @@ const ShopPage = ({ embedded = false }) => {
                             ) : (
                               <span className="inline-flex items-center gap-1 text-xs font-medium text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
                                 <span className="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
-                                Out of Stock
+                                {t("Out of Stock")}
                               </span>
                             )}
 
@@ -511,7 +514,7 @@ const ShopPage = ({ embedded = false }) => {
                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
-                                Ready to Ship
+                                {t("Ready to Ship")}
                               </span>
                             )}
 
@@ -527,6 +530,7 @@ const ShopPage = ({ embedded = false }) => {
 
                           <div className="flex items-center gap-2 mb-4">
                             <span className="text-xl font-bold text-blue-600">{formatPrice(product.price)}</span>
+                            <LocalPrice inr={product.price} />
                             {product.oldPrice && (
                               <span className="text-sm text-gray-500 line-through">{formatPrice(product.oldPrice)}</span>
                             )}
@@ -538,7 +542,7 @@ const ShopPage = ({ embedded = false }) => {
                               to={`/bulk-quote?product=${encodeURIComponent(product.name)}&id=${product._id}&source=shop`}
                               className="flex w-full items-center justify-center gap-2 rounded-md bg-orange-500 py-2 font-medium text-white transition-colors hover:bg-orange-600"
                             >
-                              Request quotation
+                              {t("Request quotation")}
                             </Link>
                           ) : !productInCart ? (
                             <button
@@ -560,7 +564,7 @@ const ShopPage = ({ embedded = false }) => {
                               <button
                                 onClick={() => handleDecreaseQuantity(product)}
                                 className="w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-700 font-bold transition-colors"
-                                title="Decrease quantity"
+                                title={t("Decrease quantity")}
                               >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
@@ -580,7 +584,7 @@ const ShopPage = ({ embedded = false }) => {
                                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                     : 'bg-blue-100 hover:bg-blue-200 text-blue-700'
                                 }`}
-                                title="Increase quantity"
+                                title={t("Increase quantity")}
                               >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -590,7 +594,7 @@ const ShopPage = ({ embedded = false }) => {
                               <button
                                 onClick={() => handleRemoveFromCart(product._id)}
                                 className="w-10 h-10 rounded-lg bg-red-50 hover:bg-red-100 flex items-center justify-center text-red-500 transition-colors"
-                                title="Remove from cart"
+                                title={t("Remove from cart")}
                               >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -610,7 +614,7 @@ const ShopPage = ({ embedded = false }) => {
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                               </svg>
-                              View Cart & Checkout
+                              {t("View Cart & Checkout")}
                             </button>
                           )}
                         </div>

@@ -1,3 +1,4 @@
+import { useLocale } from '../../i18n/LocaleContext';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Quote, Star, BadgeCheck, MessageSquarePlus } from 'lucide-react';
@@ -35,7 +36,7 @@ export const TestimonialCard = ({ t, dark = false }) => (
       <span className="min-w-0 flex-1">
         <span className={`flex items-center gap-1 font-semibold ${dark ? 'text-white' : 'text-slate-900'}`}>
           {t.name}
-          {t.verifiedBuyer && <BadgeCheck className="h-4 w-4 text-green-500" aria-label="Verified buyer" />}
+          {t.verifiedBuyer && <BadgeCheck className="h-4 w-4 text-green-500" aria-label={t("Verified buyer")} />}
         </span>
         <span className={`block truncate text-xs ${dark ? 'text-slate-400' : 'text-slate-500'}`}>
           {[t.role, t.company, t.city].filter(Boolean).join(' · ')}
@@ -48,6 +49,7 @@ export const TestimonialCard = ({ t, dark = false }) => (
 
 // Section for the Home and About pages. Hidden until there are approved testimonials.
 const TestimonialsSection = ({ dark = false, limit = 6, className = '' }) => {
+  const { t } = useLocale();
   const [items, setItems] = useState([]);
   useEffect(() => { fetchTestimonials(limit).then(setItems).catch(() => setItems([])); }, [limit]);
   if (!items.length) return null;
@@ -56,14 +58,14 @@ const TestimonialsSection = ({ dark = false, limit = 6, className = '' }) => {
     <section aria-labelledby="testimonials-heading" className={`px-4 py-14 ${dark ? '' : 'bg-slate-50'} ${className}`}>
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 text-center">
-          <p className={`text-sm font-semibold uppercase tracking-wide ${dark ? 'text-orange-400' : 'text-blue-600'}`}>Customer testimonials</p>
-          <h2 id="testimonials-heading" className={`mt-1 text-2xl font-bold sm:text-3xl ${dark ? 'text-white' : 'text-slate-900'}`}>What our customers say</h2>
+          <p className={`text-sm font-semibold uppercase tracking-wide ${dark ? 'text-orange-400' : 'text-blue-600'}`}>{t("Customer testimonials")}</p>
+          <h2 id="testimonials-heading" className={`mt-1 text-2xl font-bold sm:text-3xl ${dark ? 'text-white' : 'text-slate-900'}`}>{t("What our customers say")}</h2>
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((t) => <TestimonialCard key={t._id} t={t} dark={dark} />)}
         </div>
         <div className="mt-8 flex flex-wrap justify-center gap-3 text-sm">
-          <Link to="/testimonials" className={`font-semibold hover:underline ${dark ? 'text-orange-400' : 'text-blue-600'}`}>Read all testimonials →</Link>
+          <Link to="/testimonials" className={`font-semibold hover:underline ${dark ? 'text-orange-400' : 'text-blue-600'}`}>{t("Read all testimonials →")}</Link>
           <Link to="/testimonials#share" className={`inline-flex items-center gap-1 font-semibold hover:underline ${dark ? 'text-slate-300' : 'text-slate-600'}`}>
             <MessageSquarePlus className="h-4 w-4" /> Share your experience
           </Link>

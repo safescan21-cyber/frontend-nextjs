@@ -1,3 +1,4 @@
+import { useLocale } from '../../i18n/LocaleContext';
 import React, { useState, useEffect } from 'react';
 import { Cookie, X, Settings, Check } from 'lucide-react';
 
@@ -12,6 +13,7 @@ const defaultPreferences = {
 };
 
 const CookieConsent = () => {
+  const { t, href } = useLocale();
   const [visible, setVisible] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [preferences, setPreferences] = useState(defaultPreferences);
@@ -96,40 +98,38 @@ const CookieConsent = () => {
             </div>
 
             <div className="flex-1 min-w-0">
-              <h3 className="text-white font-semibold text-base mb-1.5">We use cookies</h3>
+              <h3 className="text-white font-semibold text-base mb-1.5">{t("We use cookies")}</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
-                We use necessary cookies to make our site work. With your consent, we'd also
-                like to use analytics and functional cookies to improve your experience. You
-                can change your preferences anytime.{' '}
-                <a href="/privacy" className="text-blue-400 hover:text-blue-300 underline">
-                  Read our privacy and cookie policy
+                {t("We use necessary cookies to make our site work. With your consent, we'd also like to use analytics and functional cookies to improve your experience. You can change your preferences anytime.")}{' '}
+                <a href={href('/privacy')} className="text-blue-400 hover:text-blue-300 underline">
+                  {t("Read our privacy and cookie policy")}
                 </a>
               </p>
 
               {showDetails && (
                 <div className="mt-4 space-y-3 border-t border-gray-800 pt-4">
                   <PreferenceRow
-                    label="Necessary"
-                    description="Required for the site to function (login, cart, security). Always active."
+                    label={t("Necessary")}
+                    description={t("Required for the site to function (login, cart, security). Always active.")}
                     checked={true}
                     disabled={true}
                     onToggle={() => {}}
                   />
                   <PreferenceRow
-                    label="Functional"
-                    description="Remembers preferences like saved addresses and display settings."
+                    label={t("Functional")}
+                    description={t("Remembers preferences like saved addresses and display settings.")}
                     checked={preferences.functional}
                     onToggle={() => togglePreference('functional')}
                   />
                   <PreferenceRow
-                    label="Analytics"
-                    description="Helps us understand how visitors use the site so we can improve it."
+                    label={t("Analytics")}
+                    description={t("Helps us understand how visitors use the site so we can improve it.")}
                     checked={preferences.analytics}
                     onToggle={() => togglePreference('analytics')}
                   />
                   <PreferenceRow
-                    label="Marketing"
-                    description="Used to show relevant ads and measure campaign performance."
+                    label={t("Marketing")}
+                    description={t("Used to show relevant ads and measure campaign performance.")}
                     checked={preferences.marketing}
                     onToggle={() => togglePreference('marketing')}
                   />
@@ -144,14 +144,14 @@ const CookieConsent = () => {
               className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-sm font-medium text-gray-300 hover:text-white transition-colors order-3 sm:order-1"
             >
               <Settings className="w-4 h-4" />
-              {showDetails ? 'Hide options' : 'Manage preferences'}
+              {showDetails ? t('Hide options') : t('Manage preferences')}
             </button>
 
             <button
               onClick={handleRejectNonEssential}
               className="px-4 py-2.5 text-sm font-medium text-gray-300 border border-gray-700 rounded-lg hover:bg-gray-800 transition-colors order-2"
             >
-              Reject non-essential
+              {t("Reject non-essential")}
             </button>
 
             {showDetails ? (
@@ -160,14 +160,14 @@ const CookieConsent = () => {
                 className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors order-1 sm:order-3"
               >
                 <Check className="w-4 h-4" />
-                Save preferences
+                {t("Save preferences")}
               </button>
             ) : (
               <button
                 onClick={handleAcceptAll}
                 className="px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors order-1 sm:order-3"
               >
-                Accept all
+                {t("Accept all")}
               </button>
             )}
           </div>

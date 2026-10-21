@@ -1,4 +1,5 @@
 // src/pages/ProductCategoryPage.jsx
+import { useLocale } from '../../i18n/LocaleContext';
 import { useParams, Link } from "react-router-dom";
 import Seo from "../Seo";
 import { seoPages } from "./seoPages";
@@ -14,6 +15,7 @@ const getWhatsAppLink = (productName) => {
 
 /* ─── Page Component ─── */
 export default function ProductCategoryPage() {
+  const { t } = useLocale();
   const { category } = useParams();
   const data = PRODUCT_DATA[category];
 
@@ -36,7 +38,7 @@ export default function ProductCategoryPage() {
         />
         <section className="bg-gradient-to-r from-orange-600 to-amber-700 px-5 sm:px-8 py-12">
           <div className="max-w-6xl mx-auto">
-            <h1 className="font-barlowC font-bold text-4xl sm:text-5xl tracking-tight text-white">Pharma & food machinery products</h1>
+            <h1 className="font-barlowC font-bold text-4xl sm:text-5xl tracking-tight text-white">{t("Pharma & food machinery products")}</h1>
             <p className="mt-3 text-lg text-white/80 max-w-2xl">{seoPages.products.description}</p>
           </div>
         </section>
@@ -48,8 +50,8 @@ export default function ProductCategoryPage() {
                   to={`/products/${slug}`}
                   className="flex h-full flex-col rounded-lg border border-slate-800 bg-slate-900 p-5 transition-all hover:border-orange-500/60 hover:-translate-y-0.5"
                 >
-                  <h2 className="font-barlowC font-bold text-xl text-white">{c.title}</h2>
-                  <p className="mt-2 flex-1 text-sm text-slate-400">{c.description}</p>
+                  <h2 className="font-barlowC font-bold text-xl text-white">{t(c.title)}</h2>
+                  <p className="mt-2 flex-1 text-sm text-slate-400">{t(c.description)}</p>
                   <span className="mt-4 text-sm font-semibold text-orange-400">
                     {c.products.length} {c.products.length === 1 ? "model" : "models"} &rarr;
                   </span>
@@ -68,8 +70,8 @@ export default function ProductCategoryPage() {
     <div className="min-h-screen bg-[#0d1017] text-slate-300 font-barlow">
       {/* Hero */}
       <Seo
-        title={data.title}
-        description={`${data.description} Compare models, specifications and get a quote from Food Pharma Machinery.`}
+        title={t(data.title)}
+        description={`${t(data.description)} Compare models, specifications and get a quote from Food Pharma Machinery.`}
         path={`/products/${category}`}
         jsonLd={{
           "@context": "https://schema.org",
@@ -87,10 +89,10 @@ export default function ProductCategoryPage() {
             &larr; All products
           </Link>
           <h1 className="font-barlowC font-bold text-4xl sm:text-5xl tracking-tight text-white">
-            {data.title}
+            {t(data.title)}
           </h1>
           <p className="mt-3 text-lg text-white/80 max-w-2xl">
-            {data.description}
+            {t(data.description)}
           </p>
         </div>
       </section>
@@ -130,7 +132,7 @@ export default function ProductCategoryPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="absolute top-2 left-2 bg-black/60 text-white p-1.5 rounded-full hover:bg-orange-600 transition"
-                    title="Watch demo video"
+                    title={t("Watch demo video")}
                   >
                     <svg
                       viewBox="0 0 24 24"
@@ -164,7 +166,7 @@ export default function ProductCategoryPage() {
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
                     <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.862L.057 23.486a.5.5 0 00.613.601l5.76-1.508A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.6a9.574 9.574 0 01-4.895-1.345l-.351-.208-3.62.948.972-3.51-.228-.362A9.555 9.555 0 012.4 12C2.4 6.698 6.698 2.4 12 2.4S21.6 6.698 21.6 12 17.302 21.6 12 21.6z"/>
                   </svg>
-                  Request Info via WhatsApp
+                  {t("Request Info via WhatsApp")}
                 </a>
               </div>
             </div>

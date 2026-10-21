@@ -1,3 +1,5 @@
+import LocaleSwitcher from '../i18n/LocaleSwitcher';
+import { useLocale } from '../i18n/LocaleContext';
 import { formTool } from './webmcp/webmcpTools';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -238,6 +240,7 @@ const HoverDropdown = ({ label, open, setOpen, timeoutRef, children, wide, id })
 };
 
 const Navbar = () => {
+  const { t } = useLocale();
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -452,6 +455,7 @@ const Navbar = () => {
           <div className="max-w-7xl 2xl:max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-12 text-xs">
               <div className="flex items-center space-x-4 2xl:space-x-6">
+                <LocaleSwitcher compact className="text-slate-300 hover:text-amber-400" />
                 <a
                   href="tel:+918700792607"
                   className="flex items-center space-x-2 text-slate-300 hover:text-amber-400 transition-colors"
@@ -470,17 +474,17 @@ const Navbar = () => {
               <div className="flex items-center space-x-4">
                 <div className="hidden 2xl:flex items-center space-x-2 text-amber-400">
                   <Truck className="w-3 h-3" aria-hidden="true" />
-                  <span className="font-semibold">Free Shipping on Orders ₹10,000+</span>
+                  <span className="font-semibold">{t("Free Shipping on Orders ₹10,000+")}</span>
                 </div>
                 <div className="hidden 2xl:block h-4 w-px bg-slate-600" aria-hidden="true" />
-                <nav aria-label="Company links" className="flex items-center space-x-3 text-slate-300">
-                  <Link to="/track-order" onClick={handleLinkClick} className="inline-flex items-center gap-1 font-semibold text-amber-400 hover:text-amber-300 transition-colors"><Truck className="w-3 h-3" aria-hidden="true" />Track Order</Link>
-                  <Link to="/bulk-quote" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">Bulk Orders</Link>
-                  <Link to="/shop" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">Products</Link>
-                  <Link to="/project-cost-calculator" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">Cost Calculator</Link>
-                  <Link to="/about" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">About Us</Link>
-                  <Link to="/projects" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors 2xl:hidden">Projects</Link>
-                  <Link to="/contact" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors 2xl:hidden">Contact</Link>
+                <nav aria-label={t("Company links")} className="flex items-center space-x-3 text-slate-300">
+                  <Link to="/track-order" onClick={handleLinkClick} className="inline-flex items-center gap-1 font-semibold text-amber-400 hover:text-amber-300 transition-colors"><Truck className="w-3 h-3" aria-hidden="true" />{t("Track Order")}</Link>
+                  <Link to="/bulk-quote" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">{t("Bulk Orders")}</Link>
+                  <Link to="/shop" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">{t("Products")}</Link>
+                  <Link to="/project-cost-calculator" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">{t("Cost Calculator")}</Link>
+                  <Link to="/about" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">{t("About Us")}</Link>
+                  <Link to="/projects" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors 2xl:hidden">{t("Projects")}</Link>
+                  <Link to="/contact" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors 2xl:hidden">{t("Contact")}</Link>
                 </nav>
               </div>
             </div>
@@ -514,34 +518,34 @@ const Navbar = () => {
               </div>
 
               {/* Desktop Navigation */}
-              <nav aria-label="Main navigation" className="hidden xl:flex flex-1 min-w-0 justify-start px-2 2xl:px-4 overflow-visible">
+              <nav aria-label={t("Main navigation")} className="hidden xl:flex flex-1 min-w-0 justify-start px-2 2xl:px-4 overflow-visible">
                 <ul className="flex items-center space-x-0.5 xl:space-x-1">
                   <li>
                     <Link
                       to="/"
                       onClick={handleLinkClick}
-                      title="Food Pharma Machinery home"
+                      title={t("Food Pharma Machinery home")}
                       aria-current={isActive('/') ? 'page' : undefined}
                       className="whitespace-nowrap px-2 2xl:px-3 py-2 text-xs 2xl:text-sm font-medium text-slate-200 hover:text-amber-400 hover:bg-slate-700/50 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
                     >
-                      Home
+                      {t("Home")}
                     </Link>
                   </li>
                   <li>
                     <Link
                       to="/shop"
                       onClick={handleLinkClick}
-                      title="Shop pharma and food processing machinery"
+                      title={t("Shop pharma and food processing machinery")}
                       aria-current={isActive('/shop') ? 'page' : undefined}
                       className="whitespace-nowrap px-2 2xl:px-3 py-2 text-xs 2xl:text-sm font-medium text-slate-200 hover:text-amber-400 hover:bg-slate-700/50 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
                     >
-                      Shop
+                      {t("Shop")}
                     </Link>
                   </li>
 
                   {/* Products Dropdown - showing product names */}
                   <HoverDropdown
-                    label="Products"
+                    label={t("Products")}
                     open={productsDropdown}
                     setOpen={setProductsDropdown}
                     timeoutRef={productsTimeoutRef}
@@ -551,10 +555,10 @@ const Navbar = () => {
                     {productsLoading ? (
                       <div className="flex items-center justify-center py-8">
                         <div className="w-6 h-6 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
-                        <span className="ml-2 text-sm text-slate-400">Loading products...</span>
+                        <span className="ml-2 text-sm text-slate-400">{t("Loading products...")}</span>
                       </div>
                     ) : allProducts.length === 0 ? (
-                      <div className="text-center py-6 text-slate-400 text-sm">No products available</div>
+                      <div className="text-center py-6 text-slate-400 text-sm">{t("No products available")}</div>
                     ) : (
                       <>
                         <div className="max-h-[400px] overflow-y-auto custom-scrollbar px-2">
@@ -584,10 +588,10 @@ const Navbar = () => {
                           </span>
                           <div className="flex gap-4">
                             <Link to="/products" onClick={handleLinkClick} className="text-xs text-amber-400 hover:text-amber-300">
-                              Products Overview
+                              {t("Products Overview")}
                             </Link>
                             <Link to="/shop" onClick={handleLinkClick} className="text-xs text-amber-400 hover:text-amber-300">
-                              Browse Full Catalog →
+                              {t("Browse Full Catalog →")}
                             </Link>
                           </div>
                         </div>
@@ -597,7 +601,7 @@ const Navbar = () => {
 
                   {/* Pharma APIs: active pharmaceutical ingredients catalogue */}
                   <HoverDropdown
-                    label="Pharma API"
+                    label={t("Pharma API")}
                     open={apiDropdown}
                     setOpen={setApiDropdown}
                     timeoutRef={apiTimeoutRef}
@@ -605,8 +609,8 @@ const Navbar = () => {
                     id="pharma-api"
                   >
                     <div className="px-4 pt-3 pb-1">
-                      <p className="flex items-center gap-2 text-sm font-semibold text-slate-200"><FlaskConical className="w-4 h-4 text-amber-400" aria-hidden="true" />Active Pharmaceutical Ingredients</p>
-                      <p className="mt-0.5 text-xs text-slate-400">Bulk drugs in IP, BP, USP and EP grades with COA and MSDS</p>
+                      <p className="flex items-center gap-2 text-sm font-semibold text-slate-200"><FlaskConical className="w-4 h-4 text-amber-400" aria-hidden="true" />{t("Active Pharmaceutical Ingredients")}</p>
+                      <p className="mt-0.5 text-xs text-slate-400">{t("Bulk drugs in IP, BP, USP and EP grades with COA and MSDS")}</p>
                     </div>
                     <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1 p-2 max-h-[360px] overflow-y-auto custom-scrollbar">
                       {API_CATEGORIES.map((c) => (
@@ -616,20 +620,20 @@ const Navbar = () => {
                             onClick={handleLinkClick}
                             className="block px-3 py-2 text-sm text-slate-300 hover:text-amber-400 hover:bg-slate-700/50 rounded-lg transition-colors truncate"
                           >
-                            {c}
+                            {t(c)}
                           </Link>
                         </li>
                       ))}
                     </ul>
                     <div className="border-t border-slate-700 mt-1 pt-3 px-4 flex justify-between items-center gap-2">
-                      <Link to="/bulk-quote?product=Pharma%20API&source=pharma-api" onClick={handleLinkClick} className="text-xs text-slate-400 hover:text-amber-400">Can't find an API? Send an enquiry</Link>
-                      <Link to="/pharma-api" onClick={handleLinkClick} className="text-xs text-amber-400 hover:text-amber-300">View all APIs →</Link>
+                      <Link to="/bulk-quote?product=Pharma%20API&source=pharma-api" onClick={handleLinkClick} className="text-xs text-slate-400 hover:text-amber-400">{t("Can't find an API? Send an enquiry")}</Link>
+                      <Link to="/pharma-api" onClick={handleLinkClick} className="text-xs text-amber-400 hover:text-amber-300">{t("View all APIs →")}</Link>
                     </div>
                   </HoverDropdown>
 
                   {/* Solutions Dropdown */}
                   <HoverDropdown
-                    label="Solutions"
+                    label={t("Solutions")}
                     open={solutionsDropdown}
                     setOpen={setSolutionsDropdown}
                     timeoutRef={solutionsTimeoutRef}
@@ -638,28 +642,28 @@ const Navbar = () => {
                   >
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 max-h-[500px] overflow-y-auto custom-scrollbar">
                       {solutionsData.map((category) => (
-                        <div key={category.name} className="group/sol">
+                        <div key={t(category.name)} className="group/sol">
                           <div className="flex items-center gap-2 mb-2">
                             <category.icon className="w-5 h-5 text-amber-400" aria-hidden="true" />
                             <Link
                               to={category.path}
                               onClick={handleLinkClick}
-                              title={`${category.name} – pharma machinery solutions`}
+                              title={`${t(category.name)} – pharma machinery solutions`}
                               className="font-semibold text-slate-200 hover:text-amber-400 transition-colors text-sm"
                             >
-                              {category.name}
+                              {t(category.name)}
                             </Link>
                           </div>
                           <ul className="space-y-1 pl-7">
                             {category.machines.map((machine) => (
-                              <li key={machine}>
+                              <li key={t(machine)}>
                                 <Link
                                   to={`/shop?search=${encodeURIComponent(machine)}`}
                                   onClick={handleLinkClick}
-                                  title={machine}
+                                  title={t(machine)}
                                   className="text-xs text-slate-400 hover:text-amber-400 transition-colors block py-0.5"
                                 >
-                                  • {machine}
+                                  • {t(machine)}
                                 </Link>
                               </li>
                             ))}
@@ -669,14 +673,14 @@ const Navbar = () => {
                     </div>
                     <div className="border-t border-slate-700 mt-2 pt-3 px-4 flex justify-end">
                       <Link to="/solutions" onClick={handleLinkClick} className="text-xs text-amber-400 hover:text-amber-300">
-                        View All Solutions →
+                        {t("View All Solutions →")}
                       </Link>
                     </div>
                   </HoverDropdown>
 
                   {/* Resources Dropdown */}
                   <HoverDropdown
-                    label="Resources"
+                    label={t("Resources")}
                     open={resourcesDropdown}
                     setOpen={setResourcesDropdown}
                     timeoutRef={resourcesTimeoutRef}
@@ -689,13 +693,13 @@ const Navbar = () => {
                           key={r.path}
                           to={r.path}
                           onClick={handleLinkClick}
-                          title={`${r.name} – ${r.description}`}
+                          title={`${t(r.name)} – ${t(r.description)}`}
                           className="group/r flex items-start space-x-3 px-4 py-3 hover:bg-slate-700/70 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-amber-400/50"
                         >
                           <Icon className="w-5 h-5 text-amber-400 mt-0.5" aria-hidden="true" />
                           <div>
-                            <div className="font-medium text-slate-200 group-hover/r:text-amber-400">{r.name}</div>
-                            <p className="text-xs text-slate-400">{r.description}</p>
+                            <div className="font-medium text-slate-200 group-hover/r:text-amber-400">{t(r.name)}</div>
+                            <p className="text-xs text-slate-400">{t(r.description)}</p>
                           </div>
                         </Link>
                       );
@@ -703,11 +707,11 @@ const Navbar = () => {
                     <div className="border-t border-slate-700 mt-2 pt-3 px-4 flex flex-col sm:flex-row gap-2 sm:gap-6">
                       <button type="button" className="text-xs text-slate-400 hover:text-amber-400 flex items-center space-x-1">
                         <Download className="w-3 h-3" aria-hidden="true" />
-                        <span>Downloads</span>
+                        <span>{t("Downloads")}</span>
                       </button>
                       <button type="button" className="text-xs text-slate-400 hover:text-amber-400 flex items-center space-x-1">
                         <Award className="w-3 h-3" aria-hidden="true" />
-                        <span>Certifications</span>
+                        <span>{t("Certifications")}</span>
                       </button>
                     </div>
                   </HoverDropdown>
@@ -716,22 +720,22 @@ const Navbar = () => {
                     <Link
                       to="/projects"
                       onClick={handleLinkClick}
-                      title="Pharma and food machinery projects"
+                      title={t("Pharma and food machinery projects")}
                       aria-current={isActive('/projects') ? 'page' : undefined}
                       className="whitespace-nowrap px-2 2xl:px-3 py-2 text-xs 2xl:text-sm font-medium text-slate-200 hover:text-amber-400 hover:bg-slate-700/50 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
                     >
-                      Projects
+                      {t("Projects")}
                     </Link>
                   </li>
                   <li className="hidden 2xl:block">
                     <Link
                       to="/contact"
                       onClick={handleLinkClick}
-                      title="Contact Food Pharma Machinery"
+                      title={t("Contact Food Pharma Machinery")}
                       aria-current={isActive('/contact') ? 'page' : undefined}
                       className="whitespace-nowrap px-2 2xl:px-3 py-2 text-xs 2xl:text-sm font-medium text-slate-200 hover:text-amber-400 hover:bg-slate-700/50 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
                     >
-                      Contact
+                      {t("Contact")}
                     </Link>
                   </li>
                 </ul>
@@ -746,13 +750,13 @@ const Navbar = () => {
                   className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg border border-amber-400/70 px-3 py-1.5 text-xs 2xl:text-sm font-semibold text-amber-300 hover:bg-amber-400 hover:text-slate-900 transition-all focus:outline-none focus:ring-2 focus:ring-amber-400/50"
                 >
                   <FileText className="w-4 h-4" aria-hidden="true" />
-                  Bulk Quote
+                  {t("Bulk Quote")}
                 </Link>
                 <ThemeToggle className="p-2 text-slate-300 hover:text-amber-400 hover:bg-slate-700/50 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-amber-400/50" />
                 <Link
                   to="/wishlist"
                   onClick={handleLinkClick}
-                  aria-label="Wishlist"
+                  aria-label={t("Wishlist")}
                   rel="nofollow"
                   className="p-2 text-slate-300 hover:text-amber-400 hover:bg-slate-700/50 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-amber-400/50"
                 >
@@ -779,7 +783,7 @@ const Navbar = () => {
                       </span>
                     </>
                   ) : (
-                    <span className="text-sm text-slate-400 hidden 2xl:inline">Cart</span>
+                    <span className="text-sm text-slate-400 hidden 2xl:inline">{t("Cart")}</span>
                   )}
                 </Link>
 
@@ -794,7 +798,7 @@ const Navbar = () => {
                         aria-expanded={isUserDropOpen}
                         aria-controls="user-menu"
                         className="flex items-center gap-1 2xl:gap-2 focus:outline-none focus:ring-2 focus:ring-amber-400/50 rounded-full"
-                        aria-label="User menu"
+                        aria-label={t("User menu")}
                       >
                         <UserAvatar src={user?.profileImage} name={user?.username || user?.email} size={34} ring priority />
                         <span className={`hidden 2xl:inline-block text-xs font-medium px-2 py-0.5 rounded-full ${
@@ -861,7 +865,7 @@ const Navbar = () => {
                         rel="nofollow"
                         className="whitespace-nowrap px-2 2xl:px-5 py-2 text-sm font-medium text-slate-200 hover:text-amber-400 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400/50 rounded-lg"
                       >
-                        Login
+                        {t("Login")}
                       </Link>
                       <Link
                         to="/register"
@@ -869,7 +873,7 @@ const Navbar = () => {
                         rel="nofollow"
                         className="whitespace-nowrap px-3 2xl:px-6 py-2 text-sm font-semibold text-slate-900 bg-amber-400 rounded-lg hover:bg-amber-300 hover:scale-105 transform transition-all shadow-lg focus:outline-none focus:ring-4 focus:ring-amber-400/50"
                       >
-                        Register
+                        {t("Register")}
                       </Link>
                     </>
                   )}
@@ -883,7 +887,7 @@ const Navbar = () => {
                   type="button"
                   onClick={() => { navigate('/search'); setIsOpen(false); }}
                   className="p-2 text-slate-200 hover:text-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/50 rounded-lg"
-                  aria-label="Search"
+                  aria-label={t("Search")}
                 >
                   <Search className="w-5 h-5" aria-hidden="true" />
                 </button>
@@ -930,20 +934,20 @@ const Navbar = () => {
                   name="q"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="🔍  Search for machines, categories, brands, SKU…"
-                  aria-label="Search products"
+                  placeholder={t("🔍  Search for machines, categories, brands, SKU…")}
+                  aria-label={t("Search products")}
                   className="w-full px-4 pl-10 pr-16 md:pl-14 md:pr-24 py-3 md:py-4 rounded-2xl bg-slate-700/60 border-2 border-slate-600 focus:border-amber-400 text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-amber-400/20 transition-all duration-300 text-base md:text-lg font-medium shadow-lg"
                 />
                 <button
                   type="submit"
                   className="absolute right-2 top-1/2 -translate-y-1/2 px-4 md:px-6 py-1.5 md:py-2.5 text-sm md:text-base font-bold bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-xl transition-colors shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-amber-400/50"
-                  aria-label="Submit search"
+                  aria-label={t("Submit search")}
                 >
-                  Search
+                  {t("Search")}
                 </button>
               </div>
               <div className="flex-shrink-0 flex gap-2">
-                <span className="text-sm text-slate-400 flex items-center hidden xl:inline">Popular:</span>
+                <span className="text-sm text-slate-400 flex items-center hidden xl:inline">{t("Popular:")}</span>
                 {['Tablet Press', 'Capsule Filler', 'Lyophilizer'].map(term => (
                   <button
                     key={term}
@@ -966,7 +970,7 @@ const Navbar = () => {
         {isOpen && (
           <nav
             id="mobile-menu"
-            aria-label="Mobile navigation"
+            aria-label={t("Mobile navigation")}
             className="xl:hidden bg-slate-800 border-t border-slate-700 max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain"
             ref={mobileMenuRef}
           >
@@ -980,12 +984,12 @@ const Navbar = () => {
                       name="q"
                       value={mobileSearchQuery}
                       onChange={(e) => setMobileSearchQuery(e.target.value)}
-                      placeholder="Search machines…"
-                      aria-label="Search"
+                      placeholder={t("Search machines…")}
+                      aria-label={t("Search")}
                       className="w-full px-4 py-3 pl-10 rounded-lg bg-slate-700 border border-slate-600 text-slate-200 placeholder-slate-400 focus:outline-none focus:border-amber-400"
                     />
                     <Search className="absolute left-3 top-3.5 w-4 h-4 text-slate-400" aria-hidden="true" />
-                    <button type="submit" className="absolute right-2 top-2 px-3 py-1 text-sm bg-amber-500 text-slate-900 font-semibold rounded-md">Go</button>
+                    <button type="submit" className="absolute right-2 top-2 px-3 py-1 text-sm bg-amber-500 text-slate-900 font-semibold rounded-md">{t("Go")}</button>
                   </div>
                 </form>
               </div>
@@ -1036,8 +1040,8 @@ const Navbar = () => {
                 </div>
               ) : (
                 <div className="flex gap-2 px-3 mb-3">
-                  <Link to="/login" onClick={handleLinkClick} rel="nofollow" className="flex-1 py-2.5 text-center text-sm font-medium text-slate-200 bg-slate-700 rounded-lg hover:bg-slate-600 transition-colors">Login</Link>
-                  <Link to="/register" onClick={handleLinkClick} rel="nofollow" className="flex-1 py-2.5 text-center text-sm font-semibold text-slate-900 bg-amber-400 rounded-lg hover:bg-amber-300 transition-colors">Register</Link>
+                  <Link to="/login" onClick={handleLinkClick} rel="nofollow" className="flex-1 py-2.5 text-center text-sm font-medium text-slate-200 bg-slate-700 rounded-lg hover:bg-slate-600 transition-colors">{t("Login")}</Link>
+                  <Link to="/register" onClick={handleLinkClick} rel="nofollow" className="flex-1 py-2.5 text-center text-sm font-semibold text-slate-900 bg-amber-400 rounded-lg hover:bg-amber-300 transition-colors">{t("Register")}</Link>
                 </div>
               )}
 
@@ -1049,7 +1053,7 @@ const Navbar = () => {
                     aria-current={isActive('/') ? 'page' : undefined}
                     className="block px-3 py-3 text-base font-medium text-slate-200 hover:text-amber-400 hover:bg-slate-700 rounded-lg transition-colors"
                   >
-                    Home
+                    {t("Home")}
                   </Link>
                 </li>
                 <li>
@@ -1059,7 +1063,7 @@ const Navbar = () => {
                     aria-current={isActive('/shop') ? 'page' : undefined}
                     className="block px-3 py-3 text-base font-medium text-slate-200 hover:text-amber-400 hover:bg-slate-700 rounded-lg transition-colors"
                   >
-                    Shop
+                    {t("Shop")}
                   </Link>
                 </li>
 
@@ -1072,7 +1076,7 @@ const Navbar = () => {
                     aria-controls="mobile-products"
                     className="w-full flex items-center justify-between px-3 py-3 text-base font-medium text-slate-200 hover:text-amber-400 hover:bg-slate-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400/50"
                   >
-                    <span>Products</span>
+                    <span>{t("Products")}</span>
                     <ChevronDown className={`w-5 h-5 transition-transform ${productsDropdown ? 'rotate-180' : ''}`} aria-hidden="true" />
                   </button>
                   {productsDropdown && (
@@ -1080,10 +1084,10 @@ const Navbar = () => {
                       {productsLoading ? (
                         <li className="px-3 py-4 text-sm text-slate-400 flex items-center gap-2">
                           <div className="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
-                          Loading...
+                          {t("Loading...")}
                         </li>
                       ) : allProducts.length === 0 ? (
-                        <li className="px-3 py-4 text-sm text-slate-400">No products</li>
+                        <li className="px-3 py-4 text-sm text-slate-400">{t("No products")}</li>
                       ) : (
                         <>
                           {allProducts.slice(0, 30).map((product) => (
@@ -1105,10 +1109,10 @@ const Navbar = () => {
                           )}
                           <li className="px-3 pt-2 flex gap-4">
                             <Link to="/products" onClick={handleLinkClick} className="text-xs text-amber-400 hover:text-amber-300">
-                              Products Overview
+                              {t("Products Overview")}
                             </Link>
                             <Link to="/shop" onClick={handleLinkClick} className="text-xs text-amber-400 hover:text-amber-300">
-                              Browse Full Catalog →
+                              {t("Browse Full Catalog →")}
                             </Link>
                           </li>
                         </>
@@ -1126,14 +1130,14 @@ const Navbar = () => {
                     aria-controls="mobile-pharma-api"
                     className="w-full flex items-center justify-between px-3 py-3 text-base font-medium text-slate-200 hover:text-amber-400 hover:bg-slate-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400/50"
                   >
-                    <span className="flex items-center gap-2"><FlaskConical className="w-4 h-4 text-amber-400" aria-hidden="true" />Pharma API</span>
+                    <span className="flex items-center gap-2"><FlaskConical className="w-4 h-4 text-amber-400" aria-hidden="true" />{t("Pharma API")}</span>
                     <ChevronDown className={`w-5 h-5 transition-transform ${apiMobileOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
                   </button>
                   {apiMobileOpen && (
                     <ul id="mobile-pharma-api" className="pl-4 space-y-1 mt-1 mb-2">
                       <li>
                         <Link to="/pharma-api" onClick={handleLinkClick} className="block px-3 py-2 text-sm font-semibold text-amber-400 hover:bg-slate-700 rounded-lg">
-                          All APIs →
+                          {t("All APIs →")}
                         </Link>
                       </li>
                       {API_CATEGORIES.map((c) => (
@@ -1143,7 +1147,7 @@ const Navbar = () => {
                             onClick={handleLinkClick}
                             className="block px-3 py-2 text-sm text-slate-300 hover:text-amber-400 hover:bg-slate-700 rounded-lg transition-colors truncate"
                           >
-                            {c}
+                            {t(c)}
                           </Link>
                         </li>
                       ))}
@@ -1160,13 +1164,13 @@ const Navbar = () => {
                     aria-controls="mobile-solutions"
                     className="w-full flex items-center justify-between px-3 py-3 text-base font-medium text-slate-200 hover:text-amber-400 hover:bg-slate-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400/50"
                   >
-                    <span>Solutions</span>
+                    <span>{t("Solutions")}</span>
                     <ChevronDown className={`w-5 h-5 transition-transform ${solutionsDropdown ? 'rotate-180' : ''}`} aria-hidden="true" />
                   </button>
                   {solutionsDropdown && (
                     <ul id="mobile-solutions" className="pl-4 space-y-3 mt-1 mb-2">
                       {solutionsData.map((category) => (
-                        <li key={category.name} className="border-b border-slate-700 pb-2 last:border-0">
+                        <li key={t(category.name)} className="border-b border-slate-700 pb-2 last:border-0">
                           <div className="flex items-center gap-2 mb-1">
                             <category.icon className="w-4 h-4 text-amber-400" aria-hidden="true" />
                             <Link
@@ -1174,18 +1178,18 @@ const Navbar = () => {
                               onClick={handleLinkClick}
                               className="text-sm font-semibold text-slate-200 hover:text-amber-400"
                             >
-                              {category.name}
+                              {t(category.name)}
                             </Link>
                           </div>
                           <ul className="pl-6 space-y-0.5">
                             {category.machines.map((machine) => (
-                              <li key={machine}>
+                              <li key={t(machine)}>
                                 <Link
                                   to={`/shop?search=${encodeURIComponent(machine)}`}
                                   onClick={handleLinkClick}
                                   className="text-xs text-slate-400 hover:text-amber-400 transition-colors block py-1"
                                 >
-                                  • {machine}
+                                  • {t(machine)}
                                 </Link>
                               </li>
                             ))}
@@ -1205,7 +1209,7 @@ const Navbar = () => {
                     aria-controls="mobile-resources"
                     className="w-full flex items-center justify-between px-3 py-3 text-base font-medium text-slate-200 hover:text-amber-400 hover:bg-slate-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400/50"
                   >
-                    <span>Resources</span>
+                    <span>{t("Resources")}</span>
                     <ChevronDown className={`w-5 h-5 transition-transform ${resourcesDropdown ? 'rotate-180' : ''}`} aria-hidden="true" />
                   </button>
                   {resourcesDropdown && (
@@ -1221,7 +1225,7 @@ const Navbar = () => {
                             >
                               <Icon className="w-4 h-4 text-amber-400 flex-shrink-0" aria-hidden="true" />
                               <div>
-                                <div>{item.name}</div>
+                                <div>{t(item.name)}</div>
                                 <p className="text-xs text-slate-400">{item.description}</p>
                               </div>
                             </Link>
@@ -1240,7 +1244,7 @@ const Navbar = () => {
                     className="flex items-center justify-center gap-2 px-3 py-3 mb-1 text-base font-bold text-slate-900 bg-amber-400 hover:bg-amber-300 rounded-lg transition-colors"
                   >
                     <FileText className="w-5 h-5" aria-hidden="true" />
-                    Bulk Quote / Bulk Order
+                    {t("Bulk Quote / Bulk Order")}
                   </Link>
                 </li>
                 <li>
@@ -1251,7 +1255,7 @@ const Navbar = () => {
                     className="flex items-center gap-2 px-3 py-3 text-base font-semibold text-amber-400 hover:text-amber-300 hover:bg-slate-700 rounded-lg transition-colors"
                   >
                     <Truck className="w-5 h-5" aria-hidden="true" />
-                    Track Order
+                    {t("Track Order")}
                   </Link>
                 </li>
                 <li>
@@ -1261,7 +1265,7 @@ const Navbar = () => {
                     aria-current={isActive('/projects') ? 'page' : undefined}
                     className="block px-3 py-3 text-base font-medium text-slate-200 hover:text-amber-400 hover:bg-slate-700 rounded-lg transition-colors"
                   >
-                    Projects
+                    {t("Projects")}
                   </Link>
                 </li>
                 <li>
@@ -1271,7 +1275,7 @@ const Navbar = () => {
                     aria-current={isActive('/contact') ? 'page' : undefined}
                     className="block px-3 py-3 text-base font-medium text-slate-200 hover:text-amber-400 hover:bg-slate-700 rounded-lg transition-colors"
                   >
-                    Contact
+                    {t("Contact")}
                   </Link>
                 </li>
                 {[
@@ -1284,13 +1288,14 @@ const Navbar = () => {
                       aria-current={isActive(l.path) ? 'page' : undefined}
                       className="block px-3 py-3 text-base font-medium text-slate-200 hover:text-amber-400 hover:bg-slate-700 rounded-lg transition-colors"
                     >
-                      {l.name}
+                      {t(l.name)}
                     </Link>
                   </li>
                 ))}
               </ul>
 
               <div className="mt-4 px-3 py-4 bg-slate-700/50 rounded-lg space-y-3">
+                <LocaleSwitcher className="text-sm text-slate-300" />
                 <a href="tel:+918700792607" className="flex items-center space-x-3 text-sm text-slate-300 hover:text-amber-400">
                   <Phone className="w-4 h-4 text-amber-400 flex-shrink-0" aria-hidden="true" />
                   <span>24/7 Support: 8700792607</span>
@@ -1301,7 +1306,7 @@ const Navbar = () => {
                 </a>
                 <div className="flex items-center space-x-3 text-sm text-slate-300">
                   <Truck className="w-4 h-4 text-amber-400 flex-shrink-0" aria-hidden="true" />
-                  <span>Free Shipping ₹10,000+</span>
+                  <span>{t("Free Shipping ₹10,000+")}</span>
                 </div>
               </div>
             </div>

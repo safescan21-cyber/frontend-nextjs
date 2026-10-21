@@ -1,9 +1,11 @@
+import { useLocale } from '../../../i18n/LocaleContext';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Factory, FlaskConical } from 'lucide-react';
 
 // Switch between the two catalogues: machinery (/shop) and pharma APIs (/pharma-api)
 const CatalogSwitch = ({ active, className = '' }) => {
+  const { t } = useLocale();
   const item = (key, to, Icon, label, sub) => (
     <Link
       to={to}
@@ -20,7 +22,7 @@ const CatalogSwitch = ({ active, className = '' }) => {
     </Link>
   );
   return (
-    <nav aria-label="Catalogue" className={`flex gap-2 rounded-xl border border-slate-200 bg-slate-100 p-1.5 ${className}`}>
+    <nav aria-label={t("Catalogue")} className={`flex gap-2 rounded-xl border border-slate-200 bg-slate-100 p-1.5 ${className}`}>
       {item('machinery', '/shop', Factory, 'Machinery', 'Pharma & food machines')}
       {item('api', '/pharma-api', FlaskConical, 'Pharma APIs', 'Active ingredients & bulk drugs')}
     </nav>

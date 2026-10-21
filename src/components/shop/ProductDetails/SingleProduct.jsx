@@ -1,3 +1,5 @@
+import LocalPrice from '../../../i18n/LocalPrice';
+import { useLocale } from '../../../i18n/LocaleContext';
 import { formTool } from '../../webmcp/webmcpTools';
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
@@ -63,6 +65,7 @@ const SpecBadge = ({ label, value, icon }) => (
 // Main Component
 // ─────────────────────────────────────────────
 const SingleProduct = () => {
+  const { t } = useLocale();
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -137,7 +140,7 @@ const SingleProduct = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-500">Loading product details...</p>
+          <p className="text-gray-500">{t("Loading product details...")}</p>
         </div>
       </div>
     );
@@ -147,15 +150,15 @@ const SingleProduct = () => {
   if (productError || !product) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Seo title="Product not found" path={`/shop/${id}`} noindex />
+        <Seo title={t("Product not found")} path={`/shop/${id}`} noindex />
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-red-500 mb-2">Product not found</h2>
-          <p className="text-gray-500">The product you're looking for doesn't exist or has been removed.</p>
+          <h2 className="text-xl font-semibold text-red-500 mb-2">{t("Product not found")}</h2>
+          <p className="text-gray-500">{t("The product you're looking for doesn't exist or has been removed.")}</p>
           <button
             onClick={() => navigate('/shop')}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Back to Shop
+            {t("Back to Shop")}
           </button>
         </div>
       </div>
@@ -423,9 +426,9 @@ const SingleProduct = () => {
       <div className="bg-white border-b border-gray-200">
         <div className="container mx-auto px-4 py-3">
           <nav className="flex items-center gap-2 text-sm text-gray-500 flex-wrap">
-            <Link to="/" className="hover:text-blue-600 transition-colors">Home</Link>
+            <Link to="/" className="hover:text-blue-600 transition-colors">{t("Home")}</Link>
             <span className="text-gray-300">/</span>
-            <Link to="/shop" className="hover:text-blue-600 transition-colors">Shop</Link>
+            <Link to="/shop" className="hover:text-blue-600 transition-colors">{t("Shop")}</Link>
             <span className="text-gray-300">/</span>
             <span className="text-gray-400 capitalize">{product.category?.replace(/-/g, ' ')}</span>
             <span className="text-gray-300">/</span>
@@ -463,7 +466,7 @@ const SingleProduct = () => {
                     preload="metadata"
                     className="w-full h-full bg-black object-contain"
                   >
-                    Your browser cannot play this video.
+                    {t("Your browser cannot play this video.")}
                   </video>
                 ) : (
                   <img
@@ -561,6 +564,7 @@ const SingleProduct = () => {
                 <span className="text-3xl md:text-4xl font-extrabold text-blue-600">
                   ₹{product.price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </span>
+                <LocalPrice inr={product.price} className="text-base text-slate-500 pb-1" />
                 {product.oldPrice && (
                   <>
                     <span className="text-xl text-gray-400 line-through">
@@ -585,7 +589,7 @@ const SingleProduct = () => {
 
               {product.color && (
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-semibold text-gray-700">Color:</span>
+                  <span className="text-sm font-semibold text-gray-700">{t("Color:")}</span>
                   <div className="flex items-center gap-2">
                     <div
                       className="w-7 h-7 rounded-full border-2 border-white shadow-md ring-2 ring-blue-400"
@@ -598,13 +602,13 @@ const SingleProduct = () => {
 
               {product.sellOnline === false && (
                 <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
-                  <p className="font-semibold text-amber-900">Available on enquiry</p>
-                  <p className="mt-1 text-sm text-amber-800">This machine is supplied against a quotation (configuration, installation and delivery are confirmed first).</p>
+                  <p className="font-semibold text-amber-900">{t("Available on enquiry")}</p>
+                  <p className="mt-1 text-sm text-amber-800">{t("This machine is supplied against a quotation (configuration, installation and delivery are confirmed first).")}</p>
                   <Link
                     to={`/bulk-quote?product=${encodeURIComponent(product.name)}&id=${product._id}&source=product`}
                     className="mt-3 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-semibold text-white shadow hover:bg-orange-600"
                   >
-                    Request quotation →
+                    {t("Request quotation →")}
                   </Link>
                 </div>
               )}
@@ -612,7 +616,7 @@ const SingleProduct = () => {
               {product.sellOnline !== false && (<>
               {/* ── 🔐 Quantity Selector (Disabled for guests) ── */}
               <div className="flex items-center gap-4">
-                <span className="text-sm font-semibold text-gray-700">Quantity:</span>
+                <span className="text-sm font-semibold text-gray-700">{t("Quantity:")}</span>
                 <div className={`flex items-center border rounded-xl overflow-hidden ${
                   isAuthenticated ? 'border-gray-300' : 'border-gray-200 bg-gray-100'
                 }`}>
@@ -644,7 +648,7 @@ const SingleProduct = () => {
                     +
                   </button>
                 </div>
-                <span className="text-xs text-gray-400">Max 100 units</span>
+                <span className="text-xs text-gray-400">{t("Max 100 units")}</span>
                 {!isAuthenticated && (
                   <span className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-full font-medium">
                     🔒 Login to select quantity
@@ -691,7 +695,7 @@ const SingleProduct = () => {
                 to={`/bulk-quote?product=${encodeURIComponent(product.name)}&id=${product._id}&source=product`}
                 className="mt-3 block text-center text-sm font-semibold text-amber-700 hover:underline"
               >
-                Need 5+ units or a custom spec? Request a bulk quote →
+                {t("Need 5+ units or a custom spec? Request a bulk quote →")}
               </Link>
               </>)}
 
@@ -735,7 +739,7 @@ const SingleProduct = () => {
             {/* Description */}
             {activeTab === 'description' && (
               <div className="prose prose-sm max-w-none text-gray-700 space-y-4">
-                <h3 className="text-lg font-bold text-gray-900">Product Overview</h3>
+                <h3 className="text-lg font-bold text-gray-900">{t("Product Overview")}</h3>
                 <p className="leading-relaxed whitespace-pre-line">
                   {product.description ||
                     `${product.name} for pharma and food manufacturing. Contact us for full specifications and a quote.`}
@@ -743,7 +747,7 @@ const SingleProduct = () => {
                 {/* Only facts from the product's own data (no template claims) */}
                 {atAGlance.length > 0 && (
                   <>
-                    <h4 className="text-base font-bold text-gray-900 mt-6">At a Glance</h4>
+                    <h4 className="text-base font-bold text-gray-900 mt-6">{t("At a Glance")}</h4>
                     <ul className="space-y-2">
                       {atAGlance.map((f) => (
                         <li key={f} className="flex items-start gap-2 text-sm">
@@ -762,7 +766,7 @@ const SingleProduct = () => {
             {/* Specs: the specifications entered in admin for this product, plus its basic details */}
             {activeTab === 'specs' && (
               <div>
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Technical Specifications</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-4">{t("Technical Specifications")}</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm border-collapse">
                     <tbody>
@@ -779,7 +783,7 @@ const SingleProduct = () => {
                   <p className="mt-4 text-sm text-gray-600">
                     {documents.length} technical document{documents.length === 1 ? '' : 's'} available.{' '}
                     <button type="button" onClick={() => setActiveTab('documents')} className="font-semibold text-blue-600 hover:underline">
-                      Read or download →
+                      {t("Read or download →")}
                     </button>
                   </p>
                 )}
@@ -790,7 +794,7 @@ const SingleProduct = () => {
                       to={`/bulk-quote?product=${encodeURIComponent(product.name)}&id=${product._id}&source=product`}
                       className="font-semibold text-blue-600 hover:underline"
                     >
-                      Ask for the full spec sheet →
+                      {t("Ask for the full spec sheet →")}
                     </Link>
                   </p>
                 )}
@@ -803,7 +807,7 @@ const SingleProduct = () => {
             {/* Shipping */}
             {activeTab === 'shipping' && (
               <div className="space-y-6">
-                <h3 className="text-lg font-bold text-gray-900">Shipping & Delivery</h3>
+                <h3 className="text-lg font-bold text-gray-900">{t("Shipping & Delivery")}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
                     { icon: '🚚', title: 'Standard Delivery', desc: '5–7 business days. Free on orders over ₹10,000.', tag: 'FREE' },
@@ -839,7 +843,7 @@ const SingleProduct = () => {
               <div className="space-y-8">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-bold text-gray-900">
-                    Customer Reviews
+                    {t("Customer Reviews")}
                     {reviews.length > 0 && (
                       <span className="ml-2 text-sm font-normal text-gray-400">
                         ({reviews.length} {reviews.length === 1 ? 'review' : 'reviews'})
@@ -860,35 +864,35 @@ const SingleProduct = () => {
 
                 {showReviewForm && (
                   <div className="border border-blue-200 rounded-2xl p-6 bg-gradient-to-br from-blue-50/50 to-indigo-50/30">
-                    <h4 className="text-base font-bold text-gray-900 mb-5">Share Your Experience</h4>
+                    <h4 className="text-base font-bold text-gray-900 mb-5">{t("Share Your Experience")}</h4>
                     <form {...formTool('review')} onSubmit={handleSubmitComment} className="space-y-5">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Your Name</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("Your Name")}</label>
                         <input
                           type="text"
                           name="name"
                           value={userName}
                           onChange={(e) => setUserName(e.target.value)}
-                          placeholder="Enter your name"
+                          placeholder={t("Enter your name")}
                           className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white text-sm"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Your Rating</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("Your Rating")}</label>
                         <div className="flex items-center gap-2">
                           <StarRating rating={newRating} size="lg" onRatingChange={setNewRating} />
                           <span className="text-sm text-gray-500">({newRating}/5)</span>
                         </div>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Your Review</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("Your Review")}</label>
                         <textarea
                           name="review"
                           value={newComment}
                           onChange={(e) => setNewComment(e.target.value)}
                           rows="4"
-                          placeholder="Share your experience with this product..."
+                          placeholder={t("Share your experience with this product...")}
                           className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white text-sm resize-none"
                           required
                         />
@@ -929,7 +933,7 @@ const SingleProduct = () => {
                           {isPosting ? (
                             <>
                               <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                              Submitting...
+                              {t("Submitting...")}
                             </>
                           ) : 'Submit Review'}
                         </button>
@@ -938,7 +942,7 @@ const SingleProduct = () => {
                           onClick={() => setShowReviewForm(false)}
                           className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm"
                         >
-                          Cancel
+                          {t("Cancel")}
                         </button>
                       </div>
                     </form>
@@ -957,14 +961,14 @@ const SingleProduct = () => {
                 {reviewsLoading && (
                   <div className="text-center py-12">
                     <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                    <p className="text-gray-400 text-sm">Loading reviews...</p>
+                    <p className="text-gray-400 text-sm">{t("Loading reviews...")}</p>
                   </div>
                 )}
 
                 {reviewsError && (
                   <div className="text-center py-10 bg-red-50 rounded-xl border border-red-100">
-                    <p className="text-red-500 font-medium">Failed to load reviews.</p>
-                    <p className="text-red-400 text-sm mt-1">Please refresh the page and try again.</p>
+                    <p className="text-red-500 font-medium">{t("Failed to load reviews.")}</p>
+                    <p className="text-red-400 text-sm mt-1">{t("Please refresh the page and try again.")}</p>
                   </div>
                 )}
 
@@ -973,7 +977,7 @@ const SingleProduct = () => {
                     {reviewsFetching && (
                       <div className="flex items-center gap-2 text-xs text-blue-500 bg-blue-50 px-3 py-1.5 rounded-lg w-fit">
                         <span className="w-3 h-3 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
-                        Updating reviews...
+                        {t("Updating reviews...")}
                       </div>
                     )}
 
@@ -1024,7 +1028,7 @@ const SingleProduct = () => {
                           className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                             filterRating === 0 ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                           }`}
-                        >All</button>
+                        >{t("All")}</button>
                         {[5, 4, 3, 2, 1].map((star) => (
                           <button
                             key={star}
@@ -1042,22 +1046,22 @@ const SingleProduct = () => {
                         onChange={(e) => setSortBy(e.target.value)}
                         className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                       >
-                        <option value="newest">Newest First</option>
-                        <option value="oldest">Oldest First</option>
-                        <option value="highest">Highest Rated</option>
-                        <option value="lowest">Lowest Rated</option>
-                        <option value="helpful">Most Helpful</option>
+                        <option value="newest">{t("Newest First")}</option>
+                        <option value="oldest">{t("Oldest First")}</option>
+                        <option value="highest">{t("Highest Rated")}</option>
+                        <option value="lowest">{t("Lowest Rated")}</option>
+                        <option value="helpful">{t("Most Helpful")}</option>
                       </select>
                     </div>
 
                     {filteredSortedReviews.length === 0 ? (
                       <div className="text-center py-10 text-gray-400">
                         <div className="text-3xl mb-2">🔍</div>
-                        <p className="font-medium">No reviews match this filter.</p>
+                        <p className="font-medium">{t("No reviews match this filter.")}</p>
                         <button
                           onClick={() => setFilterRating(0)}
                           className="mt-3 text-sm text-blue-600 hover:underline"
-                        >Clear filter</button>
+                        >{t("Clear filter")}</button>
                       </div>
                     ) : (
                       <div className="space-y-6">
@@ -1113,14 +1117,14 @@ const SingleProduct = () => {
                 {!reviewsLoading && !reviewsError && reviews.length === 0 && (
                   <div className="text-center py-16">
                     <div className="text-5xl mb-4">💬</div>
-                    <p className="font-semibold text-gray-600 text-lg">No reviews yet</p>
-                    <p className="text-gray-400 text-sm mt-1 mb-5">Be the first to share your experience!</p>
+                    <p className="font-semibold text-gray-600 text-lg">{t("No reviews yet")}</p>
+                    <p className="text-gray-400 text-sm mt-1 mb-5">{t("Be the first to share your experience!")}</p>
                     {!showReviewForm && (
                       <button
                         onClick={() => setShowReviewForm(true)}
                         className="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
                       >
-                        Write the First Review
+                        {t("Write the First Review")}
                       </button>
                     )}
                   </div>
@@ -1135,9 +1139,9 @@ const SingleProduct = () => {
       {!relatedLoading && relatedProducts.length > 0 && (
         <section className="container mx-auto px-4 pb-12">
           <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-xl md:text-2xl font-bold text-gray-800">Related Products</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-gray-800">{t("Related Products")}</h2>
             <Link to="/shop" className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1">
-              View All
+              {t("View All")}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
@@ -1192,7 +1196,7 @@ const SingleProduct = () => {
           <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          Back to Shop
+          {t("Back to Shop")}
         </button>
       </div>
     </div>

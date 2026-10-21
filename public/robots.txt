@@ -12,5 +12,16 @@ Disallow: /checkout
 Disallow: /forgotpassword
 Disallow: /resetpassword
 
+# Same pages in the country versions (/fr/cart, /ja/login…)
+Disallow: /*/dashboard
+Disallow: /*/cart
+Disallow: /*/login
+Disallow: /*/register
+Disallow: /*/wishlist
+Disallow: /*/search
+Disallow: /*/checkout
+Disallow: /*/forgotpassword
+Disallow: /*/resetpassword
+
 Sitemap: https://www.foodpharmamachinery.com/sitemap.xml
 Sitemap: https://www.foodpharmamachinery.com/sitemap-content.xml

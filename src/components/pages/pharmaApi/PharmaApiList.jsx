@@ -1,3 +1,5 @@
+import LocalPrice from '../../../i18n/LocalPrice';
+import { useLocale } from '../../../i18n/LocaleContext';
 import { formTool } from '../../webmcp/webmcpTools';
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -10,6 +12,7 @@ const PAGE_SIZE = 24;
 // Public catalogue of Active Pharmaceutical Ingredients (/pharma-api).
 // Each API opens on its own page in a new window (chemical name, composition, documents).
 const PharmaApiList = () => {
+  const { t } = useLocale();
   const [params, setParams] = useSearchParams();
   const q = params.get('q') || '';
   const category = params.get('category') || '';
@@ -47,7 +50,7 @@ const PharmaApiList = () => {
           <p className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-100">
             <FlaskConical className="h-3.5 w-3.5" /> Pharmaceutical APIs
           </p>
-          <h1 className="text-2xl font-bold sm:text-3xl lg:text-4xl">Active Pharmaceutical Ingredients (APIs)</h1>
+          <h1 className="text-2xl font-bold sm:text-3xl lg:text-4xl">{t("Active Pharmaceutical Ingredients (APIs)")}</h1>
           <p className="mt-2 max-w-3xl text-sm text-blue-100 sm:text-base">
             Bulk drugs in IP, BP, USP and EP grades with chemical name, CAS number, composition and documents (COA, MSDS).
             Open any API for full details and send an enquiry for price and availability.
@@ -64,25 +67,25 @@ const PharmaApiList = () => {
             <input
               name="q" value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              placeholder="Search by API name, chemical name, CAS number or formula…"
-              aria-label="Search APIs"
+              placeholder={t("Search by API name, chemical name, CAS number or formula…")}
+              aria-label={t("Search APIs")}
               className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-9 pr-9 text-sm focus:border-blue-500 focus:outline-none"
             />
-            {draft && <button type="button" onClick={() => { setDraft(''); update({ q: '' }); }} aria-label="Clear search" className="absolute right-2 top-2 rounded p-1 text-slate-400 hover:text-slate-700"><X className="h-4 w-4" /></button>}
+            {draft && <button type="button" onClick={() => { setDraft(''); update({ q: '' }); }} aria-label={t("Clear search")} className="absolute right-2 top-2 rounded p-1 text-slate-400 hover:text-slate-700"><X className="h-4 w-4" /></button>}
           </div>
-          <button type="submit" className="rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700">Search</button>
+          <button type="submit" className="rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700">{t("Search")}</button>
         </form>
 
         {categories.length > 0 && (
-          <div className="mb-5 flex flex-wrap gap-2" role="group" aria-label="Filter by category">
+          <div className="mb-5 flex flex-wrap gap-2" role="group" aria-label={t("Filter by category")}>
             <button type="button" onClick={() => update({ category: '' })} aria-pressed={!category}
               className={`rounded-full border px-3 py-1 text-sm ${!category ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'}`}>
-              All
+              {t("All")}
             </button>
             {categories.map((c) => (
               <button key={c.category} type="button" onClick={() => update({ category: c.category })} aria-pressed={category === c.category}
                 className={`rounded-full border px-3 py-1 text-sm ${category === c.category ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'}`}>
-                {c.category} <span className="opacity-60">({c.count})</span>
+                {t(c.category)} <span className="opacity-60">({c.count})</span>
               </button>
             ))}
           </div>
@@ -98,7 +101,7 @@ const PharmaApiList = () => {
             <p className="font-medium text-slate-700">{q || category ? 'No APIs match your search.' : 'API listings are coming soon.'}</p>
             <p className="mt-1 text-sm text-slate-500">
               Looking for a specific API?{' '}
-              <Link to={`/bulk-quote?product=${encodeURIComponent(q || 'Pharma API')}&source=pharma-api`} className="font-semibold text-blue-600 hover:underline">Send us an enquiry →</Link>
+              <Link to={`/bulk-quote?product=${encodeURIComponent(q || 'Pharma API')}&source=pharma-api`} className="font-semibold text-blue-600 hover:underline">{t("Send us an enquiry →")}</Link>
             </p>
           </div>
         ) : (
@@ -108,7 +111,7 @@ const PharmaApiList = () => {
               {data.items.map((a) => (
                 <li key={a._id} className="flex flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
                   <div className="mb-2 flex items-start justify-between gap-2">
-                    <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-800">{a.category}</span>
+                    <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-800">{t(a.category)}</span>
                     {a.grades?.length > 0 && <span className="text-xs font-semibold text-slate-500">{a.grades.join(' · ')}</span>}
                   </div>
                   <h2 className="text-lg font-bold text-slate-900">
@@ -117,14 +120,14 @@ const PharmaApiList = () => {
                   {a.chemicalName && <p className="mt-0.5 line-clamp-2 text-sm italic text-slate-600" title={a.chemicalName}>{a.chemicalName}</p>}
                   <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
                     {a.casNumber && <><dt className="text-slate-500">CAS</dt><dd className="font-medium text-slate-800">{a.casNumber}</dd></>}
-                    {a.molecularFormula && <><dt className="text-slate-500">Formula</dt><dd className="font-medium text-slate-800">{prettyFormula(a.molecularFormula)}</dd></>}
-                    {a.molecularWeight && <><dt className="text-slate-500">Mol. weight</dt><dd className="font-medium text-slate-800">{a.molecularWeight}</dd></>}
+                    {a.molecularFormula && <><dt className="text-slate-500">{t("Formula")}</dt><dd className="font-medium text-slate-800">{prettyFormula(a.molecularFormula)}</dd></>}
+                    {a.molecularWeight && <><dt className="text-slate-500">{t("Mol. weight")}</dt><dd className="font-medium text-slate-800">{a.molecularWeight}</dd></>}
                     {a.moq && <><dt className="text-slate-500">MOQ</dt><dd className="font-medium text-slate-800">{a.moq}</dd></>}
                   </dl>
-                  {a.composition && <p className="mt-2 line-clamp-2 text-xs text-slate-500"><span className="font-semibold text-slate-600">Composition:</span> {a.composition}</p>}
+                  {a.composition && <p className="mt-2 line-clamp-2 text-xs text-slate-500"><span className="font-semibold text-slate-600">{t("Composition:")}</span> {a.composition}</p>}
                   {a.sellOnline && a.unitPrice > 0 && (
                     <p className="mt-3 flex items-center justify-between rounded-lg bg-green-50 px-3 py-2 text-sm">
-                      <span className="font-bold text-slate-900">₹{Number(a.unitPrice).toLocaleString('en-IN')} <span className="font-normal text-slate-600">/ {a.unit}</span></span>
+                      <span className="font-bold text-slate-900">₹{Number(a.unitPrice).toLocaleString('en-IN')} <span className="font-normal text-slate-600">/ {a.unit}</span> <LocalPrice inr={a.unitPrice} /></span>
                       <span className="text-xs font-semibold text-green-800">Buy online · min {a.minOrderQty} {a.unit}</span>
                     </p>
                   )}
@@ -142,10 +145,10 @@ const PharmaApiList = () => {
               ))}
             </ul>
             {data.pages > 1 && (
-              <nav aria-label="Pages" className="mt-6 flex items-center justify-center gap-2">
-                <button type="button" disabled={page <= 1} onClick={() => update({ page: String(page - 1) })} className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm disabled:opacity-40">Previous</button>
+              <nav aria-label={t("Pages")} className="mt-6 flex items-center justify-center gap-2">
+                <button type="button" disabled={page <= 1} onClick={() => update({ page: String(page - 1) })} className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm disabled:opacity-40">{t("Previous")}</button>
                 <span className="text-sm text-slate-600">Page {page} of {data.pages}</span>
-                <button type="button" disabled={page >= data.pages} onClick={() => update({ page: String(page + 1) })} className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm disabled:opacity-40">Next</button>
+                <button type="button" disabled={page >= data.pages} onClick={() => update({ page: String(page + 1) })} className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm disabled:opacity-40">{t("Next")}</button>
               </nav>
             )}
           </>
