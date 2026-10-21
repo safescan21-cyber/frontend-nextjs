@@ -15,6 +15,22 @@ const nextConfig = {
   // ClientApp can swap it for react-helmet-async's tags without duplicates.
   htmlLimitedBots: /.*/,
   poweredByHeader: false,
+  // Addresses from the old site that Google still has: 301 to the closest page today
+  async redirects() {
+    const moved = (source, destination) => ({ source, destination, statusCode: 301 });
+    return [
+      moved('/services', '/solutions'),
+      moved('/services/installation', '/solutions/turnkey'),
+      moved('/services/validation', '/solutions/compliance'),
+      moved('/services/aftersales', '/contact'),
+      moved('/services/:slug*', '/solutions'),
+      moved('/product/:id', '/shop/:id'),
+      moved('/terms', '/privacy'),
+      moved('/packaging', '/solutions/packaging'),
+      moved('/tablet-press', '/products/tablet-press'),
+      moved('/capsule-filling', '/products/capsule-filling'),
+    ];
+  },
   async headers() {
     return [
       {
