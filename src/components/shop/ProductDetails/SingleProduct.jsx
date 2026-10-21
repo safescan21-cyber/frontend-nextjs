@@ -442,7 +442,7 @@ const SingleProduct = () => {
             <div className="p-6 md:p-8 bg-gradient-to-br from-gray-50 to-blue-50/30 border-b lg:border-b-0 lg:border-r border-gray-100">
               <div className="relative rounded-2xl overflow-hidden bg-white shadow-md mb-4 aspect-square max-h-[420px]">
                 {discount && (
-                  <div className="absolute top-4 left-4 z-10 bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  <div className="absolute top-4 left-4 z-10 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
                     -{discount}% OFF
                   </div>
                 )}

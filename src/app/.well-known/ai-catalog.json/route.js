@@ -6,7 +6,8 @@ import { SITE_URL, SITE_NAME } from '../../../components/seo/organization';
 
 export const dynamic = 'force-static';
 
-const URN = 'urn:foodpharmamachinery';
+// Identifiers follow the ARD pattern urn:air:<publisher>:<namespace>:<name>
+const URN = 'urn:air:foodpharmamachinery.com';
 const WEBMCP_TYPE = 'application/vnd.webmcp.tool+json';
 
 export function GET() {
@@ -20,11 +21,12 @@ export function GET() {
     },
     entries: [
       {
-        identifier: `${URN}:llms-txt`,
+        identifier: `${URN}:docs:llms-txt`,
         displayName: `${SITE_NAME} guide for AI assistants`,
         description: 'Markdown summary of the site with links to the main pages, machines and pharma APIs.',
         type: 'text/markdown',
         url: `${SITE_URL}/llms.txt`,
+        representativeQueries: ['What machines does Food Pharma Machinery sell?', 'How do I contact Food Pharma Machinery for a quote?'],
       },
       ...WEBMCP_TOOLS.map((t) => ({
         identifier: `${URN}:webmcp:${t.name}`,
@@ -32,6 +34,7 @@ export function GET() {
         description: t.description,
         type: WEBMCP_TYPE,
         tags: ['webmcp', 'read-only'],
+        ...(t.queries && { representativeQueries: t.queries }),
         data: { name: t.name, description: t.description, inputSchema: t.inputSchema, annotations: t.annotations, registration: 'imperative', availableOn: `${SITE_URL}/` },
       })),
       ...Object.values(FORM_TOOLS).map((t) => ({
@@ -40,6 +43,7 @@ export function GET() {
         description: t.description,
         type: WEBMCP_TYPE,
         tags: ['webmcp', 'form', t.autoSubmit ? 'read-only' : 'user-confirms'],
+        ...(t.queries && { representativeQueries: t.queries }),
         data: {
           name: t.name,
           description: t.description,

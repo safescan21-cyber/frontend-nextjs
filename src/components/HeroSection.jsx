@@ -355,10 +355,10 @@ const Home = () => {
                     {/* Navigation Arrows */}
                     {images.length > 1 && (
                         <>
-                            <button onClick={prevSlide} className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-all">
+                            <button onClick={prevSlide} aria-label="Previous slide" className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-all">
                                 <ChevronLeft size={20} className="sm:w-6 sm:h-6" />
                             </button>
-                            <button onClick={nextSlide} className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-all">
+                            <button onClick={nextSlide} aria-label="Next slide" className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-all">
                                 <ChevronRight size={20} className="sm:w-6 sm:h-6" />
                             </button>
                         </>
@@ -366,15 +366,19 @@ const Home = () => {
 
                     {/* Dots */}
                     {images.length > 1 && (
-                        <div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-2 sm:space-x-3">
+                        <div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-1 sm:space-x-2">
                             {images.map((_, idx) => (
                                 <button
                                     key={idx}
                                     onClick={() => goToSlide(idx)}
-                                    className={`h-1.5 sm:h-2 rounded-full transition-all duration-300 ${
-                                        currentIndex === idx ? 'bg-blue-500 w-6 sm:w-8' : 'bg-white/50 w-1.5 sm:w-2'
-                                    }`}
-                                />
+                                    aria-label={`Go to slide ${idx + 1}`}
+                                    aria-current={currentIndex === idx ? 'true' : undefined}
+                                    className="flex h-6 min-w-6 items-center justify-center"
+                                >
+                                    <span className={`block h-1.5 sm:h-2 rounded-full transition-all duration-300 ${
+                                      currentIndex === idx ? 'bg-blue-500 w-6 sm:w-8' : 'bg-white/50 w-1.5 sm:w-2'
+                                    }`} />
+                                </button>
                             ))}
                         </div>
                     )}
@@ -383,6 +387,7 @@ const Home = () => {
                     {images.length > 1 && (
                         <button
                             onClick={() => setIsAutoPlaying(!isAutoPlaying)}
+                            aria-label={isAutoPlaying ? 'Pause slideshow' : 'Play slideshow'}
                             className="absolute top-4 right-4 z-20 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-lg text-sm"
                         >
                             {isAutoPlaying ? '⏸' : '▶'}
@@ -465,7 +470,7 @@ const Home = () => {
                                                         </span>
                                                     )}
                                                     {product.oldPrice && product.oldPrice > product.price && (
-                                                        <span className="absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow-md">
+                                                        <span className="absolute top-3 right-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow-md">
                                                             SAVE {Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}%
                                                         </span>
                                                     )}
@@ -500,7 +505,7 @@ const Home = () => {
                                                             ${(product.price || 0).toFixed(2)}
                                                         </span>
                                                         {product.oldPrice && product.oldPrice > product.price && (
-                                                            <span className="text-sm text-gray-400 line-through">
+                                                            <span className="text-sm text-gray-500 line-through">
                                                                 ${product.oldPrice.toFixed(2)}
                                                             </span>
                                                         )}

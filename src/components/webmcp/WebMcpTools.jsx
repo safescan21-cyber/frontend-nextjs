@@ -37,7 +37,8 @@ export default function WebMcpTools() {
     const controller = new AbortController();
     for (const tool of WEBMCP_TOOLS) {
       try {
-        mc.registerTool(tool, { signal: controller.signal });
+        const { name, description, inputSchema, annotations, execute } = tool;
+        mc.registerTool({ name, description, inputSchema, annotations, execute }, { signal: controller.signal });
       } catch {
         // already registered (fast refresh) or not supported – skip
       }

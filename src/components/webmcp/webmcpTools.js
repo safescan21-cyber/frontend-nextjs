@@ -40,6 +40,7 @@ const apiSummary = (a) => ({
 export const WEBMCP_TOOLS = [
   {
     name: 'find_machines',
+    queries: ['Find a tablet press under 5 lakh rupees', 'Which capsule filling machines are available?'],
     description:
       'Search the Food Pharma Machinery catalogue of pharmaceutical and food processing machines (tablet presses, capsule fillers, mixers, tanks, packaging…). Returns names, prices in INR and page links. Use get_machine for full details.',
     inputSchema: {
@@ -65,6 +66,7 @@ export const WEBMCP_TOOLS = [
   },
   {
     name: 'get_machine',
+    queries: ['What is the price and warranty of this machine?', 'Show the specifications of this mixer'],
     description: 'Get full details of one machine from find_machines: description, price, stock and specifications.',
     inputSchema: {
       type: 'object',
@@ -84,6 +86,7 @@ export const WEBMCP_TOOLS = [
   },
   {
     name: 'find_pharma_apis',
+    queries: ['Do you sell paracetamol API?', 'Find the API with CAS number 103-90-2'],
     description:
       'Search the pharma API (active pharmaceutical ingredient) catalogue by name, chemical name, CAS number or formula. Returns grades, prices per unit in INR where sold online, and page links.',
     inputSchema: {
@@ -103,6 +106,7 @@ export const WEBMCP_TOOLS = [
   },
   {
     name: 'get_pharma_api',
+    queries: ['What grades of paracetamol are available?', 'What is the minimum order for this API?'],
     description: 'Get full details of one pharma API: identity, composition/assay, grades, form, minimum order and price.',
     inputSchema: {
       type: 'object',
@@ -129,50 +133,59 @@ export const WEBMCP_TOOLS = [
 export const FORM_TOOLS = {
   search: {
     name: 'search_site',
+    queries: ['Search for blister packing machines', 'Search the site for a lyophilizer'],
     description: 'Search the machine catalogue by name, category or model and open the results page.',
     page: '/',
     autoSubmit: true,
   },
   searchPage: {
     name: 'search_products',
+    queries: ['Filter machines by category', 'Show stainless steel mixers'],
     description: 'Filter the machine list on the search page by name, category or colour.',
     page: '/search',
     autoSubmit: true,
   },
   pharmaApiSearch: {
     name: 'search_pharma_api_catalog',
+    queries: ['Search APIs for ibuprofen', 'Find an API by formula C8H9NO2'],
     description: 'Search the pharma API list by API name, chemical name, CAS number or formula.',
     page: '/pharma-api',
     autoSubmit: true,
   },
   trackOrder: {
     name: 'track_order',
+    queries: ['Where is my order?', 'Track order ORD-1760000000000-123'],
     description: 'Look up the delivery status of an order by its order ID (starts with ORD-).',
     page: '/track-order',
     autoSubmit: true,
   },
   contact: {
     name: 'send_contact_message',
+    queries: ['Send a message to the sales team', 'Ask about installation support'],
     description: 'Fill in the contact form to send a message to the Food Pharma Machinery sales team. The visitor reviews it and presses Send.',
     page: '/contact',
   },
   bulkQuote: {
     name: 'request_bulk_quote',
+    queries: ['Get a quote for 3 tablet presses', 'Request bulk pricing for machine spares'],
     description: 'Fill in a bulk quotation request: products and quantities, delivery place and date, and the buyer\'s contact details. The visitor reviews it and presses Submit.',
     page: '/bulk-quote',
   },
   newsletter: {
     name: 'subscribe_newsletter',
+    queries: ['Subscribe me to new machine updates', 'Sign up for offers by email'],
     description: 'Fill in an email address to subscribe to new machine and offer updates. The visitor presses Subscribe.',
     page: '/',
   },
   testimonial: {
     name: 'submit_testimonial',
+    queries: ['Write a testimonial about my capsule filler', 'Leave feedback for Food Pharma Machinery'],
     description: 'Fill in a customer testimonial about a machine or API bought from Food Pharma Machinery. The customer must tick the consent box and press Submit themselves.',
     page: '/testimonials',
   },
   review: {
     name: 'write_product_review',
+    queries: ['Review this machine', 'Rate this product 5 stars'],
     description: 'Fill in a review of this product (needs a logged-in customer). The customer chooses the star rating and presses Submit.',
     page: '/shop/<id>',
   },

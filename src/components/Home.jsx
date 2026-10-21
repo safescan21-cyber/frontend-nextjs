@@ -1,3 +1,4 @@
+import { sizedImage } from '../utlis/imageUrl';
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Play, Pause, Grid } from 'lucide-react';
 import ShopPage from '../components/pages/ShopePage';
@@ -37,6 +38,8 @@ const styles = `
 // Unsplash serves any width on request: give phones a small file and big screens a large one
 const SLIDE_WIDTHS = [640, 960, 1280, 1600];
 const slideSrcSet = (url) => {
+  // Cloudinary slides (uploaded by the admin): resized, compressed copies
+  if (sizedImage(url, 640) !== url) return SLIDE_WIDTHS.map((w) => `${sizedImage(url, w)} ${w}w`).join(', ');
   if (!/^https:\/\/images\.unsplash\.com\//.test(url || '')) return undefined;
   const base = url.replace(/([?&])w=\d+&?/, '$1').replace(/[?&]$/, '');
   const join = base.includes('?') ? '&' : '?';
@@ -391,25 +394,29 @@ const Home = () => {
 
         {images.length > 1 && (
           <>
-            <button onClick={prevSlide} className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-all">
+            <button onClick={prevSlide} aria-label="Previous slide" className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-all">
               <ChevronLeft size={20} className="sm:w-6 sm:h-6" />
             </button>
-            <button onClick={nextSlide} className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-all">
+            <button onClick={nextSlide} aria-label="Next slide" className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-all">
               <ChevronRight size={20} className="sm:w-6 sm:h-6" />
             </button>
           </>
         )}
 
         {images.length > 1 && (
-          <div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-2 sm:space-x-3">
+          <div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-1 sm:space-x-2">
             {images.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => goToSlide(idx)}
-                className={`h-1.5 sm:h-2 rounded-full transition-all duration-300 ${
+                aria-label={`Go to slide ${idx + 1}`}
+                aria-current={currentIndex === idx ? 'true' : undefined}
+                className="flex h-6 min-w-6 items-center justify-center"
+              >
+                <span className={`block h-1.5 sm:h-2 rounded-full transition-all duration-300 ${
                   currentIndex === idx ? 'bg-blue-500 w-6 sm:w-8' : 'bg-white/50 w-1.5 sm:w-2'
-                }`}
-              />
+                }`} />
+              </button>
             ))}
           </div>
         )}
@@ -454,8 +461,10 @@ const Home = () => {
                   }`}
                 >
                   <img
-                    src={image.url}
+                    src={sizedImage(image.url, 200)}
                     alt=""
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover"
                     onError={handleImageError}
                   />

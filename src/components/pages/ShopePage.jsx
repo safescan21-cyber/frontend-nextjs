@@ -1,3 +1,4 @@
+import { sizedImage } from '../../utlis/imageUrl';
 import React, { useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
@@ -441,7 +442,11 @@ const ShopPage = ({ embedded = false }) => {
                         <Link to={`/shop/${product._id}`}>
                           <div className="relative overflow-hidden bg-gray-100 h-48">
                             <img
-                              src={productImage}
+                              src={sizedImage(productImage, 480)}
+                              srcSet={productImage.includes('res.cloudinary.com/') ? `${sizedImage(productImage, 480)} 480w, ${sizedImage(productImage, 800)} 800w` : undefined}
+                              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                              loading="lazy"
+                              decoding="async"
                               alt={product.name}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                               onError={(e) => {
@@ -449,7 +454,7 @@ const ShopPage = ({ embedded = false }) => {
                               }}
                             />
                             {product.oldPrice && (
-                              <span className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                              <span className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
                                 SAVE {Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}%
                               </span>
                             )}
@@ -523,7 +528,7 @@ const ShopPage = ({ embedded = false }) => {
                           <div className="flex items-center gap-2 mb-4">
                             <span className="text-xl font-bold text-blue-600">{formatPrice(product.price)}</span>
                             {product.oldPrice && (
-                              <span className="text-sm text-gray-400 line-through">{formatPrice(product.oldPrice)}</span>
+                              <span className="text-sm text-gray-500 line-through">{formatPrice(product.oldPrice)}</span>
                             )}
                           </div>
 

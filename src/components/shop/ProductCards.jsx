@@ -1,3 +1,4 @@
+import { sizedImage } from '../../utlis/imageUrl';
 import React, { useState } from 'react';
 import products from "../../assets/data/products.json";
 
@@ -60,7 +61,9 @@ const ProductCards = ({ products: propProducts }) => {
               {/* Product Image */}
               <div className="relative h-64 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
                 <img
-                  src={product.image}
+                  src={sizedImage(product.image, 600)}
+                  loading="lazy"
+                  decoding="async"
                   alt={product.name}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   onError={(e) => {
@@ -103,7 +106,7 @@ const ProductCards = ({ products: propProducts }) => {
                     <span className="text-2xl font-bold text-blue-600">
                       ${product.price}
                     </span>
-                    <span className="text-sm text-gray-400 line-through">
+                    <span className="text-sm text-gray-500 line-through">
                       ${(product.price * 1.25).toFixed(2)}
                     </span>
                   </div>
