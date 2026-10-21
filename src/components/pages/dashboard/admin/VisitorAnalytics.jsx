@@ -1,3 +1,4 @@
+import DangerConfirm from '../../../ui/DangerConfirm';
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import getBaseURL from '../../../../utlis/baseURL';
@@ -69,6 +70,8 @@ const VisitorAnalytics = () => {
   // ── Selection for "Delete selected" ──
   const [selected, setSelected] = useState(() => new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [confirmAll, setConfirmAll] = useState(false);
+  const [deletingAll, setDeletingAll] = useState(false);
   const selectAllRef = useRef(null);
   useEffect(() => { setSelected(new Set()); }, [visitors]); // new list → nothing selected
   const allSelected = visitors.length > 0 && visitors.every((v) => selected.has(v._id));
@@ -80,6 +83,29 @@ const VisitorAnalytics = () => {
     return next;
   });
   const toggleAll = () => setSelected(allSelected ? new Set() : new Set(visitors.map((v) => v._id)));
+
+  // Every visit record, all dates (accounts, orders and Customer Insights stay)
+  const deleteAll = async () => {
+    setDeletingAll(true);
+    try {
+      const res = await fetch(`${getBaseURL()}/api/admin/visitors/delete-all`, {
+        method: 'POST',
+        headers: { ...authHeaders(token), 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ confirm: 'DELETE ALL' }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || `Delete failed (${res.status})`);
+      toast.success(`Deleted all visitor data (${data.deleted} record${data.deleted === 1 ? '' : 's'})`);
+      setConfirmAll(false);
+      setSelected(new Set());
+      fetchData(dateRange, who);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setDeletingAll(false);
+    }
+  };
 
   const deleteSelected = async () => {
     const chosen = visitors.filter((v) => selected.has(v._id));
@@ -197,8 +223,25 @@ const VisitorAnalytics = () => {
           <span className="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
             Updated: {new Date().toLocaleString()}
           </span>
+          <button
+            type="button"
+            onClick={() => setConfirmAll(true)}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-semibold text-red-700 hover:bg-red-600 hover:text-white transition-colors"
+          >
+            <Trash2 className="w-4 h-4" aria-hidden="true" /> Delete all visitor data
+          </button>
         </div>
       </div>
+
+      <DangerConfirm
+        open={confirmAll}
+        title="Delete all visitor data?"
+        busy={deletingAll}
+        onCancel={() => setConfirmAll(false)}
+        onConfirm={deleteAll}
+      >
+        Every visit record is removed, for all dates, guests and logged-in users. The analytics start again from zero. Accounts, orders and Customer Insights are not affected. <strong>This cannot be undone.</strong>
+      </DangerConfirm>
 
       {/* ---------- STATS CARDS ---------- */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">

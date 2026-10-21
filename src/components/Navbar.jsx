@@ -2,7 +2,7 @@ import LocaleSwitcher from '../i18n/LocaleSwitcher';
 import { useLocale } from '../i18n/LocaleContext';
 import { formTool } from './webmcp/webmcpTools';
 import useSiteLogout from './useSiteLogout';
-import { ADMIN_LINKS } from './pages/dashboard/admin/adminNav';
+import { ADMIN_LINKS, USER_LINKS } from './pages/dashboard/dashboardNav';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -33,13 +33,7 @@ const SITE_NAME = 'Food Pharma Machinery';
 
 const adminDropDownMenus = ADMIN_LINKS; // same list as the admin side menu
 
-const userDropDownMenus = [
-  { label: "Dashboard", path: "/dashboard",          icon: LayoutDashboard },
-  { label: "Profile",   path: "/dashboard/profile",  icon: User },
-  { label: "Payments",  path: "/dashboard/payments", icon: CreditCard },
-  { label: "Orders",    path: "/dashboard/orders",   icon: ShoppingBag },
-  { label: "Reviews",   path: "/dashboard/reviews",  icon: MessageSquare },
-];
+const userDropDownMenus = USER_LINKS; // same list as the account side menu
 
 // ✅ Pharma Solutions with machine lists
 const solutionsData = [

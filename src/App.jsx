@@ -28,7 +28,7 @@ const UserReviews = lazy(() => import('./components/pages/dashboard/user/UserRev
 const UserProfile = lazy(() => import('./components/pages/dashboard/user/UserProfile'));
 
 const AdminDMain = lazy(() => import('./components/pages/dashboard/admin/dashboard/AdminDMain'));
-import AdminShell from './components/pages/dashboard/admin/AdminShell';
+import DashboardShell from './components/pages/dashboard/DashboardShell';
 const AddProduct = lazy(() => import('./components/pages/dashboard/admin/addProduct/AddProduct'));
 const ManageProduct = lazy(() => import('./components/pages/dashboard/admin/manageProduct/ManageProduct'));
 const UpdateProduct = lazy(() => import('./components/pages/dashboard/admin/manageProduct/UpdateProduct'));
@@ -147,16 +147,18 @@ function App() {
 
           {/* ── Dashboard (protected) ── */}
           <Route path="/dashboard" element={<PrivateRoute />}>
-            <Route index element={<UserDMain />} />
-            <Route path="orders" element={<UserOrders />} />
-            <Route path="orders/:id" element={<OrderDetails />} />
-            <Route path="payments" element={<UserPayments />} />
-            <Route path="profile" element={<UserProfile />} />
-            <Route path="reviews" element={<UserReviews />} />
+            <Route element={<DashboardShell kind="user" />}>
+              <Route index element={<UserDMain />} />
+              <Route path="orders" element={<UserOrders />} />
+              <Route path="orders/:id" element={<OrderDetails />} />
+              <Route path="payments" element={<UserPayments />} />
+              <Route path="profile" element={<UserProfile />} />
+              <Route path="reviews" element={<UserReviews />} />
+            </Route>
 
             {/* Admin routes */}
             <Route element={<PrivateRoute role="admin" />}>
-              <Route element={<AdminShell />}>
+              <Route element={<DashboardShell kind="admin" />}>
               <Route path="admin" element={<AdminDMain />} />
               <Route path="add-product" element={<AddProduct />} />
               <Route path="manage-products" element={<ManageProduct />} />

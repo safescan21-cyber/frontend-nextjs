@@ -1,16 +1,18 @@
+import DangerConfirm from '../../../../ui/DangerConfirm';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, Eye, Heart, ShoppingCart, UserCheck, X, Loader2, RefreshCw, Info, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import getBaseURL from '../../../../../utlis/baseURL';
 
-const api = async (path, method = 'GET') => {
+const api = async (path, method = 'GET', body) => {
   let token = null;
   try { token = localStorage.getItem('token'); } catch { /* storage blocked */ }
   const res = await fetch(`${getBaseURL()}/api/insights${path}`, {
     method,
     credentials: 'include',
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(body ? { 'Content-Type': 'application/json' } : {}) },
+    ...(body ? { body: JSON.stringify(body) } : {}),
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.message || `Request failed (${res.status})`);
@@ -184,6 +186,8 @@ const CustomerInsights = () => {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [confirmAll, setConfirmAll] = useState(false);
+  const [deletingAll, setDeletingAll] = useState(false);
   const [selected, setSelected] = useState(null);
 
   const [reloadKey, setReloadKey] = useState(0);
@@ -198,6 +202,21 @@ const CustomerInsights = () => {
   }, [days, reloadKey]);
 
   const load = () => { setLoading(true); setReloadKey((k) => k + 1); };
+
+  // All tracked activity (views, likes, carts…); accounts and orders stay
+  const deleteAll = async () => {
+    setDeletingAll(true);
+    try {
+      const r = await api('/delete-all', 'POST', { confirm: 'DELETE ALL' });
+      toast.success(`Deleted all insights data (${r.deleted} record${r.deleted === 1 ? '' : 's'})`);
+      setConfirmAll(false);
+      load();
+    } catch (e) {
+      toast.error(e.message);
+    } finally {
+      setDeletingAll(false);
+    }
+  };
   const changeDays = (d) => { setLoading(true); setDays(d); };
 
   const t = data?.totals || {};
@@ -225,8 +244,25 @@ const CustomerInsights = () => {
           <button type="button" onClick={load} aria-label="Refresh" className="rounded-lg border border-gray-300 bg-white p-2 hover:bg-gray-50">
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
+          <button
+            type="button"
+            onClick={() => setConfirmAll(true)}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-semibold text-red-700 transition-colors hover:bg-red-600 hover:text-white"
+          >
+            <Trash2 className="h-4 w-4" aria-hidden="true" /> Delete all insights data
+          </button>
         </div>
       </div>
+
+      <DangerConfirm
+        open={confirmAll}
+        title="Delete all insights data?"
+        busy={deletingAll}
+        onCancel={() => setConfirmAll(false)}
+        onConfirm={deleteAll}
+      >
+        All tracked activity is removed: product views, likes and cart activity of every customer and guest, for all dates. Customer accounts, orders and the User Analytics visits are not affected. <strong>This cannot be undone.</strong>
+      </DangerConfirm>
 
       <p className="mb-5 flex items-start gap-2 rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-800">
         <Info className="mt-0.5 h-4 w-4 shrink-0" />

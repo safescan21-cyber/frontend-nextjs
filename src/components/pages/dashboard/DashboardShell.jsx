@@ -1,20 +1,28 @@
-// Frame for every admin page: a side menu with all admin pages and Logout always in
-// reach. Large screens: pinned on the left, slides closed to icons (remembered).
-// Phones/tablets: slides in from the floating "Admin" button; tap outside or Esc closes.
-// It sits right under the site header (--site-header-h, set by Navbar.jsx).
+// Frame for the dashboard pages (admin and customer): a side menu with every page of
+// that dashboard and Logout always in reach. Large screens: pinned on the left, slides
+// closed to icons (remembered). Phones/tablets: slides in from a floating button; tap
+// outside or Esc closes. It sits right under the site header (--site-header-h, set by
+// Navbar.jsx).
+//   <DashboardShell kind="admin" />   <DashboardShell kind="user" />
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { LogOut, PanelLeftClose, PanelLeftOpen, X, Menu, ExternalLink, ShieldCheck, Loader2 } from 'lucide-react';
-import { ADMIN_NAV } from './adminNav';
-import useSiteLogout from '../../../useSiteLogout';
+import { LogOut, PanelLeftClose, PanelLeftOpen, X, Menu, ExternalLink, ShieldCheck, UserRound, Loader2 } from 'lucide-react';
+import { ADMIN_NAV, USER_NAV } from './dashboardNav';
+import useSiteLogout from '../../useSiteLogout';
 
-const KEY = 'admin_menu_collapsed';
-const readCollapsed = () => {
-  try { return localStorage.getItem(KEY) === '1'; } catch { return false; }
+const KINDS = {
+  admin: { nav: ADMIN_NAV, title: 'Admin panel', button: 'Admin', icon: ShieldCheck, key: 'admin_menu_collapsed' },
+  user: { nav: USER_NAV, title: 'My account', button: 'My account', icon: UserRound, key: 'account_menu_collapsed' },
 };
 
-export default function AdminShell() {
+export default function DashboardShell({ kind = 'admin' }) {
+  const cfg = KINDS[kind] || KINDS.admin;
+  const KEY = cfg.key;
+  const readCollapsed = () => {
+    try { return localStorage.getItem(KEY) === '1'; } catch { return false; }
+  };
+  const TitleIcon = cfg.icon;
   const { user } = useSelector((s) => s.auth ?? {});
   const { signOut, isLoggingOut } = useSiteLogout();
   const { pathname } = useLocation();
@@ -40,7 +48,7 @@ export default function AdminShell() {
   }, [open]);
 
   const narrow = collapsed && !open; // icon-only (large screens only)
-  const name = user?.username || user?.name || user?.email || 'Admin';
+  const name = user?.username || user?.name || user?.email || '';
 
   return (
     <div className={`transition-[padding] duration-300 ${collapsed ? 'lg:ps-[4.5rem]' : 'lg:ps-64'}`}>
@@ -53,7 +61,7 @@ export default function AdminShell() {
 
       <aside
         id="admin-menu"
-        aria-label="Admin menu"
+        aria-label={`${cfg.title} menu`}
         className={`fixed bottom-0 start-0 z-[70] flex flex-col border-e border-slate-800 bg-slate-900 text-slate-200 shadow-2xl transition-all duration-300 ease-out
           top-0 lg:top-[var(--site-header-h,0px)] lg:z-30 lg:shadow-none
           ${open ? 'translate-x-0' : '-translate-x-full rtl:translate-x-full'} lg:translate-x-0 rtl:lg:translate-x-0
@@ -62,19 +70,19 @@ export default function AdminShell() {
         {/* Header */}
         <div className="flex items-center justify-between gap-2 border-b border-slate-800 px-3 py-3">
           <div className={`flex min-w-0 items-center gap-2 ${narrow ? 'lg:hidden' : ''}`}>
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600"><ShieldCheck className="h-4 w-4 text-white" aria-hidden="true" /></span>
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600"><TitleIcon className="h-4 w-4 text-white" aria-hidden="true" /></span>
             <div className="min-w-0">
-              <p className="text-sm font-bold text-white">Admin panel</p>
+              <p className="text-sm font-bold text-white">{cfg.title}</p>
               <p className="truncate text-xs text-slate-400">{name}</p>
             </div>
           </div>
-          <button type="button" onClick={() => setOpen(false)} aria-label="Close admin menu" className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white lg:hidden">
+          <button type="button" onClick={() => setOpen(false)} aria-label="Close menu" className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white lg:hidden">
             <X className="h-5 w-5" />
           </button>
           <button
             type="button"
             onClick={() => setCollapsed((c) => !c)}
-            aria-label={collapsed ? 'Expand admin menu' : 'Collapse admin menu'}
+            aria-label={collapsed ? 'Expand menu' : 'Collapse menu'}
             title={collapsed ? 'Expand menu' : 'Collapse menu'}
             className={`hidden rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white lg:inline-flex ${narrow ? 'lg:mx-auto' : ''}`}
           >
@@ -84,7 +92,7 @@ export default function AdminShell() {
 
         {/* Pages */}
         <nav className="flex-1 overflow-y-auto overscroll-contain px-2 py-3 [scrollbar-width:thin]">
-          {ADMIN_NAV.map((g) => (
+          {cfg.nav.map((g) => (
             <div key={g.group} className="mb-3">
               <p className={`px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500 ${narrow ? 'lg:sr-only' : ''}`}>{g.group}</p>
               <ul className="space-y-0.5">
@@ -137,7 +145,7 @@ export default function AdminShell() {
         aria-expanded={open}
         className={`fixed bottom-24 start-4 z-40 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-xl shadow-blue-900/30 transition-transform hover:scale-105 active:scale-95 lg:hidden ${open ? 'pointer-events-none opacity-0' : ''}`}
       >
-        <Menu className="h-4 w-4" aria-hidden="true" /> Admin
+        <Menu className="h-4 w-4" aria-hidden="true" /> {cfg.button}
       </button>
 
       <Outlet />

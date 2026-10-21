@@ -1,8 +1,8 @@
-// Admin pages, in menu order. Used by the admin side menu (AdminShell.jsx) and the
-// profile dropdown in the header (Navbar.jsx).
+// Dashboard pages, in menu order: admin and customer. Used by the side menu
+// (DashboardShell.jsx) and the profile dropdown in the header (Navbar.jsx).
 import {
   LayoutDashboard, Package, Truck, PlusCircle, FileText, Users, TrendingUp, BarChart3,
-  FlaskConical, MessageSquare, CreditCard, Image, Newspaper, Star, ClipboardList,
+  FlaskConical, MessageSquare, CreditCard, Image, Newspaper, Star, ClipboardList, User, ShoppingBag,
 } from 'lucide-react';
 
 export const ADMIN_NAV = [
@@ -34,3 +34,16 @@ export const ADMIN_NAV = [
 ];
 
 export const ADMIN_LINKS = ADMIN_NAV.flatMap((g) => g.items);
+
+// Customer dashboard
+export const USER_NAV = [
+  { group: 'My account', items: [
+    { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { label: 'Orders', path: '/dashboard/orders', icon: ShoppingBag },
+    { label: 'Payments', path: '/dashboard/payments', icon: CreditCard },
+    { label: 'Reviews', path: '/dashboard/reviews', icon: MessageSquare },
+    { label: 'Profile', path: '/dashboard/profile', icon: User },
+  ] },
+];
+
+export const USER_LINKS = USER_NAV.flatMap((g) => g.items);
