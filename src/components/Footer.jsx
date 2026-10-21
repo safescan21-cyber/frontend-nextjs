@@ -81,13 +81,14 @@ const NAV_SERVICES = [
 ];
 
 const NAV_COMPANY = [
-  { label: "About PharmaMachine", to: "/about" },
+  { label: "About Food Pharma Machinery", to: "/about" },
   { label: "Careers", to: "/career" },
   { label: "Press & Media", to: "/press" },
   { label: "Customer Testimonials", to: "/testimonials" },
 ];
 
-const CERTIFICATIONS = ["ISO 9001:2015", "cGMP Compliant", "CE Marked", "FDA Approved", "GAMP 5"];
+// Indian government registrations (PureLine Machinery Pvt. Ltd.)
+const CERTIFICATIONS = ["Govt. of India Registered", "Made in India", "cGMP-Ready Machines"];
 
 const STATS = [
   { value: "35+", label: "Years of Experience" },
@@ -97,8 +98,8 @@ const STATS = [
 ];
 
 const HOURS = [
-  { day: "Mon – Fri", time: "08:00 – 18:00 EST", open: true },
-  { day: "Saturday", time: "09:00 – 13:00 EST", open: true },
+  { day: "Mon – Fri", time: "08:00 – 18:00 IST", open: true },
+  { day: "Saturday", time: "09:00 – 13:00 IST", open: true },
   { day: "Sunday", time: "Emergency Support", open: false },
 ];
 
@@ -250,8 +251,9 @@ export default function PharmaMachineFooter() {
       className="relative bg-[#080b11] text-slate-400 font-barlow w-full overflow-hidden"
       aria-label="Site footer"
     >
-      <meta itemProp="name" content="PharmaMachine Pharmaceutical Machinery" />
-      <meta itemProp="url" content="https://foodpharmamachinery.com" />
+      <meta itemProp="name" content="Food Pharma Machinery" />
+      <meta itemProp="legalName" content="PureLine Machinery Pvt. Ltd." />
+      <meta itemProp="url" content="https://www.foodpharmamachinery.com/" />
 
       {/* Decorative background: blueprint grid + orange glow */}
       <div
@@ -340,16 +342,16 @@ export default function PharmaMachineFooter() {
       <div className="relative max-w-7xl mx-auto px-5 sm:px-8 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8">
         {/* Brand */}
         <div className="lg:col-span-3">
-          <Link to="/" aria-label="PharmaMachine — Home" className="flex items-center gap-3 mb-4 group">
+          <Link to="/" aria-label="Food Pharma Machinery — Home" className="flex items-center gap-3 mb-4 group">
             <span className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-orange-700 text-white flex items-center justify-center shadow-lg shadow-orange-900/40 group-hover:rotate-90 transition-transform duration-700">
               <IconGear />
             </span>
             <span>
-              <span className="block font-barlowC font-bold text-[28px] leading-none text-white tracking-tight">
-                PHARMA<span className="text-orange-500">MACHINE</span>
+              <span className="block font-barlowC font-bold text-[24px] leading-none text-white tracking-tight">
+                FOOD PHARMA <span className="text-orange-500">MACHINERY</span>
               </span>
               <span className="block mt-1 font-barlowC text-[11px] tracking-[0.2em] uppercase text-slate-500">
-                Pharmaceutical Machinery
+                by PureLine Machinery Pvt. Ltd.
               </span>
             </span>
           </Link>
@@ -633,7 +635,7 @@ export default function PharmaMachineFooter() {
 
       {/* ─── Trust bar ─── */}
       <div className="relative border-y border-slate-800/80 bg-[#0a0e15]/80 px-5 sm:px-8 py-5 flex flex-wrap items-center justify-center gap-x-9 gap-y-3">
-        {["cGMP Compliant", "ISO 9001:2015", "CE Marked", "On-Site Validation", "Pan-India & Global Delivery"].map(
+        {["Govt. of India Registered", "cGMP-Ready Machines", "Made in India", "On-Site Validation", "Pan-India & Global Delivery"].map(
           (item) => (
             <span
               key={item}
@@ -651,7 +653,7 @@ export default function PharmaMachineFooter() {
       {/* ─── Legal footer ─── */}
       <div className="relative max-w-7xl mx-auto px-5 sm:px-8 py-6 flex flex-col lg:flex-row items-center justify-between gap-4">
         <p className="text-[12.5px] text-slate-500 order-3 lg:order-1 text-center">
-          &copy; {new Date().getFullYear()} PharmaMachine. All rights reserved.
+          &copy; {new Date().getFullYear()} Food Pharma Machinery (PureLine Machinery Pvt. Ltd.). All rights reserved.
         </p>
         <nav aria-label="Legal links" className="order-2 flex flex-wrap justify-center gap-x-6 gap-y-1">
           <Link to="/privacy" className="text-[12.5px] text-slate-500 hover:text-orange-400 transition-colors">
@@ -673,7 +675,7 @@ export default function PharmaMachineFooter() {
           className="order-1 lg:order-3 flex flex-wrap items-center justify-center gap-2"
           aria-label="Accepted payment methods"
         >
-          {["VISA", "MC", "AMEX", "Wire", "NET 30", "PayPal"].map((m) => (
+          {["VISA", "Mastercard", "AMEX", "Cash on Delivery"].map((m) => (
             <span
               key={m}
               className="bg-slate-900 border border-slate-700/80 rounded-md px-2.5 py-1 text-[10.5px] font-barlowC font-bold tracking-wide text-slate-400"

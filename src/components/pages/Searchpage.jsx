@@ -672,9 +672,9 @@ const SearchPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { icon: Truck,   title: 'Free Shipping',  sub: 'On orders ₹1000+' },
-              { icon: Clock,   title: '24/7 Support',   sub: '9773910846' },
-              { icon: Shield,  title: 'ISO 9001:2024',  sub: 'Certified supplier' },
+              { icon: Truck,   title: 'Free Shipping',  sub: 'On orders ₹10,000+' },
+              { icon: Clock,   title: '24/7 Support',   sub: '8700792607' },
+              { icon: Shield,  title: 'Govt. of India',  sub: 'Registered company' },
               { icon: Package, title: 'Bulk Discounts', sub: 'Volume pricing' },
             ].map(({ icon: Icon, title, sub }) => (
               <div key={title} className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/30">

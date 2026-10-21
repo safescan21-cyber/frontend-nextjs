@@ -37,7 +37,7 @@
 
   <!-- Wordmark -->
   <g transform="translate(210,78)" font-family="Arial, Helvetica, sans-serif">
-    <text x="0" y="0" font-size="40" font-weight="700" fill="#F8FAFC">Pharma<tspan fill="url(#pmhGrad)">Machine</tspan>Hub</text>
-    <text x="2" y="30" font-size="15" letter-spacing="3" fill="#94A3B8">INDUSTRIAL PHARMA EQUIPMENT MARKETPLACE</text>
+    <text x="0" y="0" font-size="36" font-weight="700" fill="#F8FAFC" textLength="415" lengthAdjust="spacingAndGlyphs">Food Pharma <tspan fill="url(#pmhGrad)">Machinery</tspan></text>
+    <text x="2" y="30" font-size="14" letter-spacing="2" fill="#94A3B8" textLength="410" lengthAdjust="spacingAndGlyphs">PHARMA &amp; FOOD PROCESSING MACHINERY</text>
   </g>
 </svg>

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 const WHATSAPP_NUMBER = "918700792607"; // +91 87007 92607
 const WHATSAPP_DEFAULT_MSG = "Hi! I'm interested in your pharmaceutical machinery.";
 
-const COMPANY_SYSTEM = `You are "Nova", a smart, warm, and helpful support assistant for PharmaMachine – a B2B provider of pharmaceutical machinery.
+const COMPANY_SYSTEM = `You are "Nova", a smart, warm, and helpful support assistant for Food Pharma Machinery (PureLine Machinery Pvt. Ltd., Haridwar) – a B2B provider of pharmaceutical machinery.
 Our services: tablet presses, capsule fillers, blister packaging, liquid filling, sterile processing, and turnkey pharma plants.
 Rules:
 - Keep replies to 2–3 sentences. Be conversational and human.
@@ -21,7 +21,7 @@ const QUICK_REPLIES = [
 
 const INIT_MSG = {
   role: "assistant",
-  content: "Hey there! 👋 I'm Nova, your PharmaMachine assistant. Ask me about our equipment, or jump to WhatsApp to speak with a real expert.",
+  content: "Hey there! 👋 I'm Nova, your Food Pharma Machinery assistant. Ask me about our equipment, or jump to WhatsApp to speak with a real expert.",
   isNew: false,
 };
 
@@ -271,7 +271,7 @@ function LiveChat() {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${openRouterKey}`,
             "HTTP-Referer": window.location.origin,
-            "X-Title": "PharmaMachine Chat",
+            "X-Title": "Food Pharma Machinery Chat",
           },
           body: JSON.stringify({
             model: model,
@@ -440,7 +440,7 @@ function LiveChat() {
               <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-[#1c1a17]" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-white font-sans truncate">Nova · PharmaMachine AI</p>
+              <p className="text-sm font-bold text-white font-sans truncate">Nova · Food Pharma Machinery AI</p>
               <p className="text-xs text-emerald-400 font-sans flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
                 Online · replies instantly

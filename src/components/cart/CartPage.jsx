@@ -415,8 +415,8 @@ const CartPage = () => {
                 <div className="flex justify-center gap-4">
                   <span className="text-xs text-gray-500">Visa</span>
                   <span className="text-xs text-gray-500">Mastercard</span>
-                  <span className="text-xs text-gray-500">PayPal</span>
                   <span className="text-xs text-gray-500">Amex</span>
+                  <span className="text-xs text-gray-500">Cash on Delivery</span>
                 </div>
               </div>
             </div>

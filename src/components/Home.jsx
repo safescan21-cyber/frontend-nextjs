@@ -314,7 +314,7 @@ const Home = () => {
     <>
       <Seo {...seoPages.home} />
       {/* The page's one h1 (the slider and sections below use h2) */}
-      <h1 className="sr-only">Food Pharma Machinery — industrial pharma and food processing equipment, load cells and weighing scales</h1>
+      <h1 className="sr-only">Food Pharma Machinery — pharma and food processing machinery, pharma APIs and spares from India</h1>
       <style>{styles}</style>
       <div className="relative h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] w-full overflow-hidden bg-black">
         {/* Background pattern */}

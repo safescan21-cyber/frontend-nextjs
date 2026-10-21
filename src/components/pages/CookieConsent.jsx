@@ -101,7 +101,7 @@ const CookieConsent = () => {
                 We use necessary cookies to make our site work. With your consent, we'd also
                 like to use analytics and functional cookies to improve your experience. You
                 can change your preferences anytime.{' '}
-                <a href="/privacy-policy" className="text-blue-400 hover:text-blue-300 underline">
+                <a href="/privacy" className="text-blue-400 hover:text-blue-300 underline">
                   Learn more
                 </a>
               </p>

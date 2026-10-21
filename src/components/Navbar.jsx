@@ -469,7 +469,7 @@ const Navbar = () => {
               <div className="flex items-center space-x-4">
                 <div className="hidden 2xl:flex items-center space-x-2 text-amber-400">
                   <Truck className="w-3 h-3" aria-hidden="true" />
-                  <span className="font-semibold">Free Shipping on Orders ₹1000+</span>
+                  <span className="font-semibold">Free Shipping on Orders ₹10,000+</span>
                 </div>
                 <div className="hidden 2xl:block h-4 w-px bg-slate-600" aria-hidden="true" />
                 <nav aria-label="Company links" className="flex items-center space-x-3 text-slate-300">
@@ -1300,7 +1300,7 @@ const Navbar = () => {
                 </a>
                 <div className="flex items-center space-x-3 text-sm text-slate-300">
                   <Truck className="w-4 h-4 text-amber-400 flex-shrink-0" aria-hidden="true" />
-                  <span>Free Shipping ₹1000+</span>
+                  <span>Free Shipping ₹10,000+</span>
                 </div>
               </div>
             </div>
