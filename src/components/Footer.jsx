@@ -691,8 +691,9 @@ export default function PharmaMachineFooter() {
       </div>
 
       {/* ─── Floating buttons: WhatsApp + back to top ─── */}
-      {/* On phones/tablets the bottom action bar already has WhatsApp, so only "back to top" shows, above the chat bubble */}
-      <div className="fixed bottom-[160px] right-5 z-50 flex flex-col items-end gap-3 lg:bottom-5">
+      {/* On phones/tablets the bottom action bar already has WhatsApp, so only "back to top" shows, above the chat bubble.
+          On large screens the stack also sits above the chat bubble (bottom-6, 64px tall), lined up with its centre. */}
+      <div className="fixed bottom-[160px] right-5 z-50 flex flex-col items-end gap-3 lg:bottom-28 lg:right-7">
         <button
           type="button"
           onClick={scrollToTop}
