@@ -5,7 +5,8 @@
 // Static pages come from the same lists the Vite site used (seoPages, SOLUTIONS);
 // product and press pages are looked up from the API.
 import { seoPages } from '../components/pages/seoPages';
-import { SOLUTIONS } from '../components/seo/solutionsData';
+import { SOLUTIONS, RESOURCES } from '../components/seo/solutionsData';
+import { PRODUCT_DATA } from '../components/pages/productCategoryData';
 import { SITE_URL, SITE_NAME } from '../components/seo/organization';
 
 export const DEFAULT_TITLE = `${SITE_NAME} | Industrial Pharma & Food Equipment Marketplace`;
@@ -235,6 +236,39 @@ export async function seoForPath(segments = []) {
 
   // A solution page that doesn't exist
   if (/^\/solutions\/[^/]+$/.test(path)) return { notFound: true };
+
+  // ── Machine category pages (/products/tablet-press…): their own title and canonical,
+  // so Google doesn't take them for copies of the home page ──
+  const category = path.match(/^\/products\/([^/]+)$/);
+  if (category) {
+    const c = Object.hasOwn(PRODUCT_DATA, category[1]) ? PRODUCT_DATA[category[1]] : null;
+    if (!c) return { notFound: true };
+    const description = `${c.description} Compare models, specifications and get a quote from ${SITE_NAME}.`;
+    return {
+      title: fullTitle(c.title),
+      description,
+      canonical: `${SITE_URL}${path}`,
+      jsonLd: [breadcrumbLd([['Home', '/'], ['Products', '/products'], [c.title, null]])],
+      summary: {
+        crumbs: [['Home', '/'], ['Products', '/products'], [c.title, null]],
+        heading: c.title,
+        lines: [description],
+        list: (c.products || []).map((m) => [m.name, m.spec].filter(Boolean).join(' – ')),
+        links: [['/shop', 'Shop machinery'], ['/bulk-quote', 'Request a quote'], ['/products', 'All categories']],
+      },
+    };
+  }
+
+  // ── Resource pages: kept out of Google (the app marks them noindex too) ──
+  const resource = path.match(/^\/resources\/([^/]+)$/);
+  if (resource) {
+    const r = RESOURCES.find((x) => x.slug === resource[1]);
+    if (!r) return { notFound: true };
+    return { title: fullTitle(r.title), description: r.description, canonical: `${SITE_URL}${path}`, noindex: true };
+  }
+
+  // ── Old template category pages (/categories/…): not part of this catalogue ──
+  if (/^\/categories\/[^/]+$/.test(path)) return { title: fullTitle('Product categories'), noindex: true };
 
   // Other pages the app has (login, cart, dashboard…): the site defaults, no canonical
   if (APP_ROUTES.some((re) => re.test(path))) return {};
