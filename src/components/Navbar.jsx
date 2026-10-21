@@ -452,8 +452,8 @@ const Navbar = () => {
                   <Link to="/shop" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">{t("Products")}</Link>
                   <Link to="/project-cost-calculator" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">{t("Cost Calculator")}</Link>
                   <Link to="/about" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">{t("About Us")}</Link>
-                  <Link to="/projects" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors 2xl:hidden">{t("Projects")}</Link>
-                  <Link to="/contact" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors 2xl:hidden">{t("Contact")}</Link>
+                  <Link to="/projects" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">{t("Projects")}</Link>
+                  <Link to="/contact" onClick={handleLinkClick} className="hover:text-amber-400 transition-colors">{t("Contact")}</Link>
                 </nav>
               </div>
             </div>
@@ -685,28 +685,7 @@ const Navbar = () => {
                     </div>
                   </HoverDropdown>
 
-                  <li className="hidden 2xl:block">
-                    <Link
-                      to="/projects"
-                      onClick={handleLinkClick}
-                      title={t("Pharma and food machinery projects")}
-                      aria-current={isActive('/projects') ? 'page' : undefined}
-                      className="whitespace-nowrap px-2 2xl:px-3 py-2 text-xs 2xl:text-sm font-medium text-slate-200 hover:text-amber-400 hover:bg-slate-700/50 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
-                    >
-                      {t("Projects")}
-                    </Link>
-                  </li>
-                  <li className="hidden 2xl:block">
-                    <Link
-                      to="/contact"
-                      onClick={handleLinkClick}
-                      title={t("Contact Food Pharma Machinery")}
-                      aria-current={isActive('/contact') ? 'page' : undefined}
-                      className="whitespace-nowrap px-2 2xl:px-3 py-2 text-xs 2xl:text-sm font-medium text-slate-200 hover:text-amber-400 hover:bg-slate-700/50 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
-                    >
-                      {t("Contact")}
-                    </Link>
-                  </li>
+                  {/* Projects and Contact live in the top bar: the main row has no room for them (content stops at 1536px) */}
                 </ul>
               </nav>
 
