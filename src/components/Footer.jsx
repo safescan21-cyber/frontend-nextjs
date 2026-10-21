@@ -84,6 +84,7 @@ const NAV_COMPANY = [
   { label: "About PharmaMachine", to: "/about" },
   { label: "Careers", to: "/career" },
   { label: "Press & Media", to: "/press" },
+  { label: "Customer Testimonials", to: "/testimonials" },
 ];
 
 const CERTIFICATIONS = ["ISO 9001:2015", "cGMP Compliant", "CE Marked", "FDA Approved", "GAMP 5"];

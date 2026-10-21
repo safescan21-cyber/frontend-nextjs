@@ -62,6 +62,8 @@ const PharmaApiList = lazy(() => import('./components/pages/pharmaApi/PharmaApiL
 const PharmaApiDetail = lazy(() => import('./components/pages/pharmaApi/PharmaApiDetail'));
 const ManagePharmaApis = lazy(() => import('./components/pages/dashboard/admin/pharmaApi/ManagePharmaApis'));
 const PharmaApiForm = lazy(() => import('./components/pages/dashboard/admin/pharmaApi/PharmaApiForm'));
+const TestimonialsPage = lazy(() => import('./components/testimonials/TestimonialsPage'));
+const ManageTestimonials = lazy(() => import('./components/pages/dashboard/admin/testimonials/ManageTestimonials'));
 const ManageBulkQuotes = lazy(() => import('./components/pages/dashboard/admin/quotes/ManageBulkQuotes'));
 import { SolutionsHub, SolutionPage, ResourcePage } from './components/seo/SolutionPages';
 
@@ -167,6 +169,7 @@ function App() {
               <Route path="pharma-apis" element={<ManagePharmaApis />} />
               <Route path="pharma-apis/new" element={<PharmaApiForm />} />
               <Route path="pharma-apis/:id/edit" element={<PharmaApiForm />} />
+              <Route path="testimonials" element={<ManageTestimonials />} />
               <Route path="offers" element={<ManageOffers />} />
               <Route path="manage-reviews" element={<ManageReviews />} />
               <Route path="bulk-quotes" element={<ManageBulkQuotes />} />
@@ -180,6 +183,7 @@ function App() {
           <Route path="/project-cost-calculator" element={<ProjectCostCalculator />} />
           <Route path="/pharma-api" element={<PharmaApiList />} />
           <Route path="/pharma-api/:slug" element={<PharmaApiDetail />} />
+          <Route path="/testimonials" element={<TestimonialsPage />} />
 
           {/* Anything else */}
           <Route path="*" element={<NotFound />} />

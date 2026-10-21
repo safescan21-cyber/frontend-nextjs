@@ -23,7 +23,7 @@ const clip = (s, n) => (s.length > n ? `${s.slice(0, n - 1).replace(/\s+\S*$/, '
 const isId = (id) => /^[a-f0-9]{24}$/i.test(id || '');
 
 // Public, indexable pages (same list scripts/prerender-meta.mjs used)
-const EXISTING_ROUTES = new Set(['/', '/shop', '/about', '/products', '/career', '/press', '/track-order', '/contact', '/projects', '/solutions', '/privacy', '/bulk-quote', '/project-cost-calculator', '/pharma-api']);
+const EXISTING_ROUTES = new Set(['/', '/shop', '/about', '/products', '/career', '/press', '/track-order', '/contact', '/projects', '/solutions', '/privacy', '/bulk-quote', '/project-cost-calculator', '/pharma-api', '/testimonials']);
 export const STATIC_PAGES = (() => {
   const pages = Object.values(seoPages).filter((p) => EXISTING_ROUTES.has(p.path) || p.path.startsWith('/solutions/'));
   for (const s of SOLUTIONS) {
@@ -199,6 +199,25 @@ export async function seoForPath(segments = []) {
     };
   }
 
+  // ── Testimonials: the real quotes as readable text for crawlers (no rating markup) ──
+  if (path === '/testimonials') {
+    const page = STATIC_PAGES.find((p) => p.path === path);
+    const { data } = await getJson('/api/testimonials?limit=50');
+    const items = Array.isArray(data?.items) ? data.items : [];
+    return {
+      title: fullTitle(page.title),
+      description: page.description,
+      canonical: `${SITE_URL}/testimonials`,
+      summary: {
+        crumbs: [['Home', '/'], ['Testimonials', null]],
+        heading: 'Customer testimonials',
+        lines: [page.description],
+        list: items.map((t) => `“${clip(plain(t.quote), 400)}” — ${[t.name, t.role, t.company, t.city].filter(Boolean).join(', ')}`),
+        links: [['/shop', 'Shop machinery'], ['/pharma-api', 'Pharma APIs'], ['/contact', 'Contact']],
+      },
+    };
+  }
+
   // ── Static pages ──
   const page = STATIC_PAGES.find((p) => p.path === path);
   if (page) {
@@ -228,6 +247,6 @@ export async function seoForPath(segments = []) {
 const APP_ROUTES = [
   /^\/$/, /^\/about$/, /^\/contact$/, /^\/shop$/, /^\/products$/, /^\/products\/[^/]+$/, /^\/categories\/[^/]+$/,
   /^\/press$/, /^\/projects$/, /^\/career$/, /^\/solutions$/, /^\/resources\/[^/]+$/, /^\/privacy$/, /^\/bulk-quote$/,
-  /^\/track-order$/, /^\/project-cost-calculator$/, /^\/pharma-api$/, /^\/search$/, /^\/login$/, /^\/register$/, /^\/forgotpassword$/, /^\/resetpassword\/[^/]+$/,
+  /^\/track-order$/, /^\/project-cost-calculator$/, /^\/pharma-api$/, /^\/testimonials$/, /^\/search$/, /^\/login$/, /^\/register$/, /^\/forgotpassword$/, /^\/resetpassword\/[^/]+$/,
   /^\/cart$/, /^\/checkout$/, /^\/wishlist$/, /^\/dashboard(\/.*)?$/,
 ];

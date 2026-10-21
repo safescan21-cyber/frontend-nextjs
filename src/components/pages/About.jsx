@@ -7,6 +7,7 @@ import {
 
 import Seo from '../Seo';
 import { seoPages } from './seoPages';
+import TestimonialsSection from '../testimonials/TestimonialsSection';
 
 const aboutJsonLd = {
   '@context': 'https://schema.org',
@@ -162,6 +163,9 @@ const About = () => (
           ))}
         </div>
       </section>
+
+      {/* ─── TESTIMONIALS (approved, real customers) ─── */}
+      <TestimonialsSection dark />
 
       {/* ─── CALL TO ACTION ─── */}
       <section className="py-16 px-4" aria-labelledby="cta">

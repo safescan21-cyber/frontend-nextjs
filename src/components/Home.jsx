@@ -5,6 +5,7 @@ import { useGetHeroSlidesQuery } from '../components/store/heroApi';
 import OfferBanner from './offers/OfferBanner';
 import Seo from './Seo';
 import { seoPages } from './pages/seoPages';
+import TestimonialsSection from './testimonials/TestimonialsSection';
 
 const styles = `
   @keyframes fadeIn {
@@ -470,6 +471,7 @@ const Home = () => {
       <div className="[&>*:first-child]:mt-0 [&>*:first-child]:pt-0 -mt-1">
         <ShopPage embedded />
       </div>
+      <TestimonialsSection />
     </>
   );
 };

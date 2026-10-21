@@ -127,6 +127,12 @@ export const seoPages = {
     description:
       'Request a bulk quote for pharma and food processing machinery, spares and load cells. Volume pricing, delivery across India and a reply within 1 business day.',
   },
+  testimonials: {
+    path: '/testimonials',
+    title: 'Customer Testimonials – Pharma & Food Machinery Buyers',
+    description:
+      'What pharma and food manufacturers say about PureLine Machinery: machines, APIs, delivery, installation and support. Real customer testimonials, published with permission.',
+  },
   pharmaApi: {
     path: '/pharma-api',
     title: 'Pharma APIs – Active Pharmaceutical Ingredients & Bulk Drugs',
