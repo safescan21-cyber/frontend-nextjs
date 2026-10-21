@@ -27,7 +27,7 @@ const VisitorAnalytics = () => {
   const [visitors, setVisitors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [dateRange, setDateRange] = useState('7d'); // '7d', '30d', '90d'
+  const [dateRange, setDateRange] = useState('7d'); // data is kept 7 days (server deletes older)
   const [who, setWho] = useState(''); // '' everyone, 'users' logged-in, 'guests'
   const [visitorTotal, setVisitorTotal] = useState(0);
   const [openRow, setOpenRow] = useState(null); // visitor whose pages are expanded
@@ -189,7 +189,7 @@ const VisitorAnalytics = () => {
     return (
       <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-yellow-700">
         <p className="font-semibold">📊 No visitor data yet</p>
-        <p className="text-sm mt-1">Start by visiting your website – visits will appear here.</p>
+        <p className="text-sm mt-1">Visits from the last 7 days appear here. Older records are deleted automatically.</p>
       </div>
     );
   }
@@ -201,15 +201,7 @@ const VisitorAnalytics = () => {
         <h2 className="text-2xl font-bold text-slate-800">User Analytics</h2>
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-slate-500" />
-          <select
-            value={dateRange}
-            onChange={(e) => setDateRange(e.target.value)}
-            className="border border-slate-300 rounded-lg px-3 py-1.5 text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="7d">Last 7 days</option>
-            <option value="30d">Last 30 days</option>
-            <option value="90d">Last 90 days</option>
-          </select>
+          <span className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 shadow-sm">Last 7 days</span>
           <select
             value={who}
             onChange={(e) => setWho(e.target.value)}
@@ -232,6 +224,11 @@ const VisitorAnalytics = () => {
           </button>
         </div>
       </div>
+
+      <p className="flex items-center gap-2 rounded-lg border border-blue-100 bg-blue-50 px-3 py-2 text-sm text-blue-800">
+        <Clock className="w-4 h-4 shrink-0" aria-hidden="true" />
+        Visitor data is kept for 7 days. Older records are deleted automatically.
+      </p>
 
       <DangerConfirm
         open={confirmAll}

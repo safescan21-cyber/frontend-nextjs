@@ -182,7 +182,7 @@ const CustomerDrawer = ({ userId, onClose, onDeleted }) => {
 };
 
 const CustomerInsights = () => {
-  const [days, setDays] = useState(30);
+  const [days, setDays] = useState(7); // activity is kept 7 days (server deletes older)
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -227,20 +227,10 @@ const CustomerInsights = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Customer insights</h1>
           <p className="text-sm text-gray-500">Who visits your site and which products they look at and like.</p>
+          <p className="mt-1 text-xs font-medium text-blue-700">Activity is kept for 7 days. Older records are deleted automatically.</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="inline-flex overflow-hidden rounded-lg border border-gray-300 text-sm">
-            {[7, 30, 90].map((d) => (
-              <button
-                key={d}
-                type="button"
-                onClick={() => changeDays(d)}
-                className={`px-3 py-1.5 ${days === d ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-              >
-                {d} days
-              </button>
-            ))}
-          </div>
+          <span className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700">Last 7 days</span>
           <button type="button" onClick={load} aria-label="Refresh" className="rounded-lg border border-gray-300 bg-white p-2 hover:bg-gray-50">
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
