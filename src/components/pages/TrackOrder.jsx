@@ -1,3 +1,4 @@
+import { formTool } from '../webmcp/webmcpTools';
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Search, Package, CheckCircle, Truck, Home, XCircle, ExternalLink, Loader2 } from 'lucide-react';
@@ -78,6 +79,7 @@ const TrackOrder = () => {
           </p>
 
           <form
+            {...formTool('trackOrder')}
             onSubmit={(e) => {
               e.preventDefault();
               lookup(orderId);
@@ -87,6 +89,7 @@ const TrackOrder = () => {
             <label htmlFor="track-order-id" className="sr-only">Order ID</label>
             <input
               id="track-order-id"
+              name="orderId"
               value={orderId}
               onChange={(e) => setOrderId(e.target.value)}
               placeholder="ORD-…"

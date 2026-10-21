@@ -1,3 +1,4 @@
+import { formTool } from '../../webmcp/webmcpTools';
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { FlaskConical, Search, ExternalLink, FileText, Loader2, X } from 'lucide-react';
@@ -57,11 +58,11 @@ const PharmaApiList = () => {
       <div className="mx-auto max-w-7xl px-4 pt-6">
         <CatalogSwitch active="api" className="mb-5 max-w-xl" />
 
-        <form onSubmit={(e) => { e.preventDefault(); update({ q: draft.trim() }); }} className="mb-4 flex gap-2">
+        <form {...formTool('pharmaApiSearch')} onSubmit={(e) => { e.preventDefault(); update({ q: draft.trim() }); }} className="mb-4 flex gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" aria-hidden="true" />
             <input
-              value={draft}
+              name="q" value={draft}
               onChange={(e) => setDraft(e.target.value)}
               placeholder="Search by API name, chemical name, CAS number or formula…"
               aria-label="Search APIs"

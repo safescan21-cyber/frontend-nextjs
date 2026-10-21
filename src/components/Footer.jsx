@@ -2,6 +2,7 @@
 // Requirements: react-router-dom, tailwindcss, axios
 // Add to tailwind.config.js => fontFamily: { barlow: ['"Barlow"','sans-serif'], barlowC: ['"Barlow Condensed"','sans-serif'] }
 
+import { formTool } from './webmcp/webmcpTools';
 import { Link } from "react-router-dom";
 import { useFetchAllProductsQuery } from "../components/store/products/productsApi"; // ✅ adjust path
 import { useState, useEffect } from "react";
@@ -510,7 +511,7 @@ export default function PharmaMachineFooter() {
                 </div>
               </div>
             ) : (
-              <form onSubmit={handleSubscribe} noValidate>
+              <form {...formTool('newsletter')} onSubmit={handleSubscribe} noValidate>
                 <label htmlFor="footer-email" className="mb-1.5 block text-[13px] font-medium text-slate-300">
                   Your email address
                 </label>
@@ -523,6 +524,7 @@ export default function PharmaMachineFooter() {
                 >
                   <input
                     id="footer-email"
+                    name="email"
                     type="email"
                     inputMode="email"
                     enterKeyHint="go"

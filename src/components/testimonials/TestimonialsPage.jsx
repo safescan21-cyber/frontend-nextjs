@@ -1,3 +1,4 @@
+import { formTool } from '../webmcp/webmcpTools';
 import React, { useEffect, useState } from 'react';
 import { Star, Send, CheckCircle, Loader2, MessageSquareQuote } from 'lucide-react';
 import getBaseURL from '../../utlis/baseURL';
@@ -68,17 +69,17 @@ const TestimonialsPage = () => {
           {done ? (
             <p className="mt-6 flex items-center gap-2 rounded-lg bg-green-50 p-4 text-green-800"><CheckCircle className="h-5 w-5" /> {done}</p>
           ) : (
-            <form onSubmit={submit} className="mt-6 grid gap-4 sm:grid-cols-2" noValidate>
+            <form {...formTool('testimonial')} onSubmit={submit} className="mt-6 grid gap-4 sm:grid-cols-2" noValidate>
               <label className="block"><span className="text-sm font-medium text-slate-700">Your name *</span>
-                <input value={form.name} onChange={(e) => set({ name: e.target.value })} required maxLength={80} autoComplete="name" className={input} /></label>
+                <input name="name" value={form.name} onChange={(e) => set({ name: e.target.value })} required maxLength={80} autoComplete="name" className={input} /></label>
               <label className="block"><span className="text-sm font-medium text-slate-700">Email * <span className="font-normal text-slate-400">(not shown)</span></span>
-                <input type="email" value={form.email} onChange={(e) => set({ email: e.target.value })} required maxLength={200} autoComplete="email" className={input} /></label>
+                <input type="email" name="email" value={form.email} onChange={(e) => set({ email: e.target.value })} required maxLength={200} autoComplete="email" className={input} /></label>
               <label className="block"><span className="text-sm font-medium text-slate-700">Job title</span>
-                <input value={form.role} onChange={(e) => set({ role: e.target.value })} maxLength={80} placeholder="e.g. Production Manager" className={input} /></label>
+                <input name="role" value={form.role} onChange={(e) => set({ role: e.target.value })} maxLength={80} placeholder="e.g. Production Manager" className={input} /></label>
               <label className="block"><span className="text-sm font-medium text-slate-700">Company</span>
-                <input value={form.company} onChange={(e) => set({ company: e.target.value })} maxLength={120} autoComplete="organization" className={input} /></label>
+                <input name="company" value={form.company} onChange={(e) => set({ company: e.target.value })} maxLength={120} autoComplete="organization" className={input} /></label>
               <label className="block"><span className="text-sm font-medium text-slate-700">City</span>
-                <input value={form.city} onChange={(e) => set({ city: e.target.value })} maxLength={60} className={input} /></label>
+                <input name="city" value={form.city} onChange={(e) => set({ city: e.target.value })} maxLength={60} className={input} /></label>
               <div>
                 <span className="text-sm font-medium text-slate-700">Rating</span>
                 <div className="mt-1 flex gap-1" role="radiogroup" aria-label="Rating">
@@ -90,12 +91,12 @@ const TestimonialsPage = () => {
                 </div>
               </div>
               <label className="block sm:col-span-2"><span className="text-sm font-medium text-slate-700">Your testimonial *</span>
-                <textarea value={form.quote} onChange={(e) => set({ quote: e.target.value })} required minLength={20} maxLength={1000} rows={5} placeholder="Which machine or API did you buy, and how were the quality, delivery and support?" className={input} />
+                <textarea name="quote" value={form.quote} onChange={(e) => set({ quote: e.target.value })} required minLength={20} maxLength={1000} rows={5} placeholder="Which machine or API did you buy, and how were the quality, delivery and support?" className={input} />
                 <span className="text-xs text-slate-400">{form.quote.length}/1000</span></label>
               {/* hidden from people; bots fill it in */}
               <label className="hidden" aria-hidden="true">Website<input tabIndex={-1} autoComplete="off" value={form.website} onChange={(e) => set({ website: e.target.value })} /></label>
               <label className="flex items-start gap-2 text-sm text-slate-700 sm:col-span-2">
-                <input type="checkbox" checked={form.consent} onChange={(e) => set({ consent: e.target.checked })} className="mt-0.5 h-4 w-4 accent-blue-600" />
+                <input type="checkbox" name="consent" checked={form.consent} onChange={(e) => set({ consent: e.target.checked })} className="mt-0.5 h-4 w-4 accent-blue-600" />
                 I agree that PureLine Machinery may publish this testimonial with my name, job title, company and city on its website.
               </label>
               {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700 sm:col-span-2">{error}</p>}

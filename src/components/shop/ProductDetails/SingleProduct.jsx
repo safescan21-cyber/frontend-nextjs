@@ -1,3 +1,4 @@
+import { formTool } from '../../webmcp/webmcpTools';
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -860,11 +861,12 @@ const SingleProduct = () => {
                 {showReviewForm && (
                   <div className="border border-blue-200 rounded-2xl p-6 bg-gradient-to-br from-blue-50/50 to-indigo-50/30">
                     <h4 className="text-base font-bold text-gray-900 mb-5">Share Your Experience</h4>
-                    <form onSubmit={handleSubmitComment} className="space-y-5">
+                    <form {...formTool('review')} onSubmit={handleSubmitComment} className="space-y-5">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">Your Name</label>
                         <input
                           type="text"
+                          name="name"
                           value={userName}
                           onChange={(e) => setUserName(e.target.value)}
                           placeholder="Enter your name"
@@ -882,6 +884,7 @@ const SingleProduct = () => {
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">Your Review</label>
                         <textarea
+                          name="review"
                           value={newComment}
                           onChange={(e) => setNewComment(e.target.value)}
                           rows="4"
@@ -896,6 +899,7 @@ const SingleProduct = () => {
                         </label>
                         <input
                           type="file"
+                          name="photos"
                           accept="image/*"
                           multiple
                           onChange={handleImageUpload}

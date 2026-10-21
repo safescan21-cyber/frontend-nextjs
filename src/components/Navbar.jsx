@@ -1,3 +1,4 @@
+import { formTool } from './webmcp/webmcpTools';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -920,7 +921,7 @@ const Navbar = () => {
         {/* Search Row (desktop) */}
         <div className="hidden xl:block bg-slate-800/50 backdrop-blur-sm py-4 border-b border-slate-600/30">
           <div className="max-w-7xl 2xl:max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-            <form onSubmit={(e) => handleSearchSubmit(e, searchQuery)} className="flex gap-4 items-center" role="search">
+            <form {...formTool('search')} onSubmit={(e) => handleSearchSubmit(e, searchQuery)} className="flex gap-4 items-center" role="search">
               <div className="relative flex-1">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" aria-hidden="true" />
                 <input
@@ -972,7 +973,7 @@ const Navbar = () => {
             <div className="px-4 py-3 space-y-1">
               {/* Mobile search */}
               <div className="px-3 py-4 border-b border-slate-700 mb-2">
-                <form onSubmit={(e) => handleSearchSubmit(e, mobileSearchQuery)} role="search">
+                <form {...formTool('search')} onSubmit={(e) => handleSearchSubmit(e, mobileSearchQuery)} role="search">
                   <div className="relative">
                     <input
                       type="search"

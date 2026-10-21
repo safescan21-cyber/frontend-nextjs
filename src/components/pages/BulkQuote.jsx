@@ -1,3 +1,4 @@
+import { formTool } from '../webmcp/webmcpTools';
 import React, { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -127,7 +128,7 @@ const BulkQuote = () => {
                 <li className="flex items-center gap-1.5"><Truck className="h-4 w-4 text-amber-500" /> Delivery across India</li>
               </ul>
 
-              <form onSubmit={submit} noValidate className="mt-6 grid gap-6 lg:grid-cols-3">
+              <form {...formTool('bulkQuote')} onSubmit={submit} noValidate className="mt-6 grid gap-6 lg:grid-cols-3">
                 <div className="space-y-6 lg:col-span-2">
                   <section className="rounded-2xl border border-gray-200 bg-white p-5" aria-labelledby="items-h">
                     <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
@@ -143,15 +144,15 @@ const BulkQuote = () => {
                         <div key={i} className="grid grid-cols-12 gap-2 rounded-xl bg-gray-50 p-3">
                           <div className="col-span-12 sm:col-span-6">
                             <label className="sr-only" htmlFor={`item-name-${i}`}>Product {i + 1}</label>
-                            <input id={`item-name-${i}`} className={input} placeholder="Product / machine name or model" value={it.name} onChange={setItem(i, 'name')} maxLength={200} />
+                            <input id={`item-name-${i}`} className={input} placeholder="Product / machine name or model" name={`item${i + 1}_name`} toolparamdescription={`Product ${i + 1}: machine or product name or model`} value={it.name} onChange={setItem(i, 'name')} maxLength={200} />
                           </div>
                           <div className="col-span-4 sm:col-span-2">
                             <label className="sr-only" htmlFor={`item-qty-${i}`}>Quantity</label>
-                            <input id={`item-qty-${i}`} className={input} type="number" min="1" inputMode="numeric" placeholder="Qty" value={it.quantity} onChange={setItem(i, 'quantity')} />
+                            <input id={`item-qty-${i}`} className={input} type="number" min="1" inputMode="numeric" placeholder="Qty" name={`item${i + 1}_quantity`} toolparamdescription={`Product ${i + 1}: quantity`} value={it.quantity} onChange={setItem(i, 'quantity')} />
                           </div>
                           <div className="col-span-6 sm:col-span-3">
                             <label className="sr-only" htmlFor={`item-notes-${i}`}>Notes</label>
-                            <input id={`item-notes-${i}`} className={input} placeholder="Notes (optional)" value={it.notes} onChange={setItem(i, 'notes')} maxLength={500} />
+                            <input id={`item-notes-${i}`} className={input} placeholder="Notes (optional)" name={`item${i + 1}_notes`} toolparamdescription={`Product ${i + 1}: notes, e.g. capacity or model (optional)`} value={it.notes} onChange={setItem(i, 'notes')} maxLength={500} />
                           </div>
                           <div className="col-span-2 flex items-center justify-end sm:col-span-1">
                             <button
@@ -176,13 +177,13 @@ const BulkQuote = () => {
                   <section className="rounded-2xl border border-gray-200 bg-white p-5" aria-labelledby="delivery-h">
                     <h2 id="delivery-h" className="mb-4 text-lg font-bold text-slate-800">Delivery & timeline</h2>
                     <div className="grid gap-4 sm:grid-cols-3">
-                      <Field label="City"><input className={input} value={form.deliveryCity} onChange={set('deliveryCity')} maxLength={100} /></Field>
-                      <Field label="State"><input className={input} value={form.deliveryState} onChange={set('deliveryState')} maxLength={100} /></Field>
-                      <Field label="Needed by"><input type="date" min={minDate} className={input} value={form.requiredBy} onChange={set('requiredBy')} /></Field>
+                      <Field label="City"><input className={input} name="deliveryCity" value={form.deliveryCity} onChange={set('deliveryCity')} maxLength={100} /></Field>
+                      <Field label="State"><input className={input} name="deliveryState" value={form.deliveryState} onChange={set('deliveryState')} maxLength={100} /></Field>
+                      <Field label="Needed by"><input type="date" min={minDate} className={input} name="requiredBy" value={form.requiredBy} onChange={set('requiredBy')} /></Field>
                     </div>
                     <div className="mt-4">
                       <Field label="Anything else we should know?" hint="Specifications, voltage, materials, installation needs…">
-                        <textarea rows={4} className={input} value={form.message} onChange={set('message')} maxLength={3000} />
+                        <textarea rows={4} className={input} name="message" value={form.message} onChange={set('message')} maxLength={3000} />
                       </Field>
                     </div>
                   </section>
@@ -191,13 +192,13 @@ const BulkQuote = () => {
                 <aside className="lg:col-span-1">
                   <section className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 lg:sticky lg:top-28" aria-labelledby="contact-h">
                     <h2 id="contact-h" className="text-lg font-bold text-slate-800">Your details</h2>
-                    <Field label="Full name" required><input className={input} value={form.name} onChange={set('name')} autoComplete="name" maxLength={100} /></Field>
-                    <Field label="Company"><input className={input} value={form.company} onChange={set('company')} autoComplete="organization" maxLength={150} /></Field>
-                    <Field label="Email" required><input type="email" className={input} value={form.email} onChange={set('email')} autoComplete="email" maxLength={150} /></Field>
-                    <Field label="Phone / WhatsApp" required><input type="tel" className={input} value={form.phone} onChange={set('phone')} autoComplete="tel" maxLength={30} /></Field>
-                    <Field label="GSTIN" hint="For a GST invoice (optional)"><input className={`${input} uppercase`} value={form.gstin} onChange={set('gstin')} maxLength={20} /></Field>
+                    <Field label="Full name" required><input className={input} name="name" required value={form.name} onChange={set('name')} autoComplete="name" maxLength={100} /></Field>
+                    <Field label="Company"><input className={input} name="company" value={form.company} onChange={set('company')} autoComplete="organization" maxLength={150} /></Field>
+                    <Field label="Email" required><input type="email" className={input} name="email" required value={form.email} onChange={set('email')} autoComplete="email" maxLength={150} /></Field>
+                    <Field label="Phone / WhatsApp" required><input type="tel" className={input} name="phone" required value={form.phone} onChange={set('phone')} autoComplete="tel" maxLength={30} /></Field>
+                    <Field label="GSTIN" hint="For a GST invoice (optional)"><input className={`${input} uppercase`} name="gstin" value={form.gstin} onChange={set('gstin')} maxLength={20} /></Field>
                     {/* Honeypot: hidden from people, bots fill it in */}
-                    <input type="text" name="website" value={form.website} onChange={set('website')} tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
+                    <input type="text" value={form.website} onChange={set('website')} tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
 
                     {errors && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{errors}</p>}
                     <button type="submit" disabled={sending} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-500 px-5 py-3 font-bold text-slate-900 hover:bg-amber-400 disabled:opacity-60">

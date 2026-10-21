@@ -1,4 +1,5 @@
 // pages/SearchPage.jsx
+import { formTool } from '../webmcp/webmcpTools';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
@@ -396,13 +397,15 @@ const SearchPage = () => {
           <p className="text-slate-400 text-sm mb-5">
             {isLoading ? 'Loading...' : `${products.length} products`} · {displayCategories.length - 1} categories
           </p>
-          <form onSubmit={handleSubmit}>
+          <form {...formTool('searchPage')} onSubmit={handleSubmit}>
             <div className="flex flex-col sm:flex-row gap-3 relative">
               <div className="relative flex-1">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
                 <input
                   ref={inputRef}
                   type="text"
+                  name="q"
+                  aria-label="Search products"
                   value={inputValue}
                   onChange={e => setInputValue(e.target.value)}
                   onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}

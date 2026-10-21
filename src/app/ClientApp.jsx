@@ -3,6 +3,7 @@
 // loaded in the browser, then swaps it for the app. The app uses window,
 // localStorage etc. at import time, so it is never rendered on the server.
 import { useEffect, useState } from 'react';
+import WebMcpTools from '../components/webmcp/WebMcpTools';
 
 // Next.js writes these head tags for crawlers; once the app runs, its <Seo>
 // component (react-helmet-async) writes its own. The newest copy of each wins.
@@ -52,5 +53,10 @@ export default function ClientApp({ children }) {
     };
   }, []);
 
-  return Spa ? <Spa /> : children;
+  return (
+    <>
+      {Spa ? <Spa /> : children}
+      <WebMcpTools />
+    </>
+  );
 }

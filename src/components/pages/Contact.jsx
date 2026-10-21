@@ -1,3 +1,4 @@
+import { formTool } from '../webmcp/webmcpTools';
 import { useState } from "react";
 import axios from "axios";
 import getBaseUrl from "../../utlis/baseURL";
@@ -253,7 +254,7 @@ export default function Contact() {
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-7" noValidate>
+                <form {...formTool('contact')} onSubmit={handleSubmit} className="space-y-7" noValidate>
                   <p className="text-[10px] tracking-[0.3em] uppercase text-stone-500">Send a message</p>
 
                   <div className="grid sm:grid-cols-2 gap-6">
@@ -282,7 +283,7 @@ export default function Contact() {
                   {/* Honeypot — hidden from people, bots fill it */}
                   <div className="hidden" aria-hidden="true">
                     <label htmlFor="c-website">Website</label>
-                    <input id="c-website" name="website" value={form.website} onChange={handleChange} tabIndex={-1} autoComplete="off" />
+                    <input id="c-website" value={form.website} onChange={handleChange} tabIndex={-1} autoComplete="off" />
                   </div>
 
                   {serverError && (
