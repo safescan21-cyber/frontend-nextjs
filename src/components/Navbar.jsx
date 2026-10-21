@@ -1,6 +1,8 @@
 import LocaleSwitcher from '../i18n/LocaleSwitcher';
 import { useLocale } from '../i18n/LocaleContext';
 import { formTool } from './webmcp/webmcpTools';
+import useSiteLogout from './useSiteLogout';
+import { ADMIN_LINKS } from './pages/dashboard/admin/adminNav';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,7 +23,6 @@ import { organizationNode, websiteNode } from './seo/organization';
 import PharmaLogoAsset from "../assets/pharmamachinehub-logo-v2_2.svg";
 // Next.js gives image imports as { src, width, height }
 const PharmaLogo = PharmaLogoAsset?.src ?? PharmaLogoAsset;
-import { useLogoutUserMutation } from '../components/store/authApi';
 import { logout } from '../components/store/authSlice';
 import { selectCartTotalQuantity, clearCart } from '../components/store/cartSlice';
 import { useFetchAllProductsQuery } from '../components/store/products/productsApi';
@@ -30,25 +31,7 @@ import { useFetchAllProductsQuery } from '../components/store/products/productsA
 const SITE_URL = 'https://www.foodpharmamachinery.com';
 const SITE_NAME = 'Food Pharma Machinery';
 
-const adminDropDownMenus = [
-  { label: "Dashboard",    path: "/dashboard/admin",           icon: LayoutDashboard },
-  { label: "Manage Items", path: "/dashboard/manage-products", icon: Package },
-  { label: "All Orders",   path: "/dashboard/manage-orders",   icon: Truck },
-  { label: "Add Product",  path: "/dashboard/add-product",     icon: PlusCircle },
-  { label: "Manage Jobs",  path: "/dashboard/manage-jobs",     icon: FileText },
-  { label: "Post Job",     path: "/dashboard/add-job",         icon: PlusCircle },
-  { label: "Users",        path: "/dashboard/users",           icon: Users },
-  { label: "User Analytics", path: "/dashboard/visitors",      icon: TrendingUp },
-  { label: "Customer Insights", path: "/dashboard/insights",  icon: BarChart3 },
-  { label: "Market Trends", path: "/dashboard/market-trends", icon: TrendingUp },
-  { label: "Pharma APIs", path: "/dashboard/pharma-apis", icon: FlaskConical },
-  { label: "Testimonials", path: "/dashboard/testimonials", icon: MessageSquare },
-  { label: "Discount Offers", path: "/dashboard/offers",      icon: CreditCard },
-  { label: "Reviews & Comments", path: "/dashboard/manage-reviews", icon: MessageSquare },
-  { label: "Bulk Quotes", path: "/dashboard/bulk-quotes", icon: FileText },
-  { label: "Hero Slides",  path: "/dashboard/hero-slides",     icon: Image },
-  { label: "Press Releases", path: "/dashboard/press",         icon: Newspaper },
-];
+const adminDropDownMenus = ADMIN_LINKS; // same list as the admin side menu
 
 const userDropDownMenus = [
   { label: "Dashboard", path: "/dashboard",          icon: LayoutDashboard },
@@ -247,7 +230,6 @@ const Navbar = () => {
 
   const { user } = useSelector((state) => state.auth ?? {});
   const cartTotalQuantity = useSelector(selectCartTotalQuantity);
-  const [logoutUser, { isLoading: logoutLoading }] = useLogoutUserMutation();
 
   const { data: apiData, isLoading: productsLoading } = useFetchAllProductsQuery({
     page: 1,
@@ -290,6 +272,10 @@ const Navbar = () => {
     update();
     return () => ro.disconnect();
   }, []);
+  // Shared with fixed elements that sit under the header (admin side menu)
+  useEffect(() => {
+    if (headerHeight) document.documentElement.style.setProperty('--site-header-h', `${headerHeight}px`);
+  }, [headerHeight]);
   menuOpenRef.current = isOpen; // set during render, before the resize observer fires
   useEffect(() => {
     if (!isOpen && headerRef.current) setHeaderHeight(headerRef.current.offsetHeight);
@@ -350,19 +336,8 @@ const Navbar = () => {
 
   const dropdownMenus = user?.role === 'admin' ? adminDropDownMenus : userDropDownMenus;
 
-  const handleLogout = async () => {
-    try {
-      await logoutUser().unwrap();
-      dispatch(logout());
-      dispatch(clearCart());
-      setIsUserDropOpen(false);
-      navigate('/');
-      toast.success('Logged out successfully');
-    } catch (err) {
-      console.error('Logout failed:', err);
-      toast.error('Logout failed. Please try again.');
-    }
-  };
+  const { signOut, isLoggingOut: logoutLoading } = useSiteLogout();
+  const handleLogout = () => signOut(() => { setIsUserDropOpen(false); setIsOpen(false); });
 
   const handleSearchSubmit = (e, query) => {
     e.preventDefault();
@@ -823,7 +798,19 @@ const Navbar = () => {
                             </p>
                             <p className="text-xs text-slate-400 truncate mt-0.5">{user?.email || ''}</p>
                           </div>
-                          <ul className="py-1">
+                          <div className="border-b border-slate-700 py-1">
+                            <button
+                              type="button"
+                              onClick={handleLogout}
+                              disabled={logoutLoading}
+                              role="menuitem"
+                              className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-colors disabled:opacity-50 focus:outline-none focus:bg-red-900/20"
+                            >
+                              <LogOut className="w-4 h-4" aria-hidden="true" />
+                              {logoutLoading ? t('Logging out…') : t('Logout')}
+                            </button>
+                          </div>
+                          <ul className="py-1 max-h-[min(60vh,26rem)] overflow-y-auto overscroll-contain">
                             {dropdownMenus.map((menu) => {
                               const Icon = menu.icon;
                               return (
@@ -842,18 +829,6 @@ const Navbar = () => {
                               );
                             })}
                           </ul>
-                          <div className="border-t border-slate-700 py-1">
-                            <button
-                              type="button"
-                              onClick={handleLogout}
-                              disabled={logoutLoading}
-                              role="menuitem"
-                              className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-colors disabled:opacity-50 focus:outline-none focus:bg-red-900/20"
-                            >
-                              <LogOut className="w-4 h-4" aria-hidden="true" />
-                              {logoutLoading ? t('Logging out…') : t('Logout')}
-                            </button>
-                          </div>
                         </div>
                       )}
                     </div>

@@ -28,6 +28,7 @@ const UserReviews = lazy(() => import('./components/pages/dashboard/user/UserRev
 const UserProfile = lazy(() => import('./components/pages/dashboard/user/UserProfile'));
 
 const AdminDMain = lazy(() => import('./components/pages/dashboard/admin/dashboard/AdminDMain'));
+import AdminShell from './components/pages/dashboard/admin/AdminShell';
 const AddProduct = lazy(() => import('./components/pages/dashboard/admin/addProduct/AddProduct'));
 const ManageProduct = lazy(() => import('./components/pages/dashboard/admin/manageProduct/ManageProduct'));
 const UpdateProduct = lazy(() => import('./components/pages/dashboard/admin/manageProduct/UpdateProduct'));
@@ -155,6 +156,7 @@ function App() {
 
             {/* Admin routes */}
             <Route element={<PrivateRoute role="admin" />}>
+              <Route element={<AdminShell />}>
               <Route path="admin" element={<AdminDMain />} />
               <Route path="add-product" element={<AddProduct />} />
               <Route path="manage-products" element={<ManageProduct />} />
@@ -175,6 +177,7 @@ function App() {
               <Route path="bulk-quotes" element={<ManageBulkQuotes />} />
               <Route path="/dashboard/hero-slides" element={<AdminHeroSlides />} />
               <Route path="press" element={<PressManagement />} />
+              </Route>
             </Route>
           </Route>
 

@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { isLoggingOut } from '../useSiteLogout';
 
 const PrivateRoute = ({ role }) => {
   const { user } = useSelector((state) => state.auth ?? {});
@@ -7,6 +8,7 @@ const PrivateRoute = ({ role }) => {
 
   // Not logged in at all → send to login, remember where they wanted to go
   if (!user) {
+    if (isLoggingOut()) return null; // on the way to the home page after Logout
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
