@@ -1,8 +1,9 @@
+import Toggle from '../../../../ui/Toggle';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
-import { Package, Plus, Pencil, Trash2, ExternalLink, Eye, EyeOff, ShoppingCart, MessageSquareQuote, Search, Loader2 } from 'lucide-react';
+import { Package, Plus, Pencil, Trash2, ExternalLink, EyeOff, MessageSquareQuote, Search, Loader2 } from 'lucide-react';
 import getBaseURL from '../../../../../utlis/baseURL';
 import productsApi from '../../../../store/products/productsApi';
 
@@ -118,27 +119,19 @@ const ManageProduct = () => {
                     <td className="whitespace-nowrap px-4 py-3 text-right text-gray-900">{inr(p.price)}</td>
                     <td className="px-4 py-3 text-right text-gray-700">{p.stock ?? '—'}</td>
                     <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-1">
-                        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${hidden ? 'bg-gray-100 text-gray-600' : 'bg-green-100 text-green-800'}`}>{hidden ? 'Hidden' : 'Visible'}</span>
-                        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${online ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'}`}>{online ? 'Sell online' : 'Enquiry only'}</span>
+                      <div className="flex flex-col gap-2">
+                        <Toggle size="sm" tone="green" checked={!hidden} busy={busyId === p._id}
+                          onChange={(v) => update(p, { active: v }, v ? 'Now visible on the website' : 'Hidden from the website')}
+                          label="Visible" aria-label={`Visible on website: ${p.name}`} labelClassName="font-medium text-gray-700" />
+                        <Toggle size="sm" checked={online} busy={busyId === p._id}
+                          onChange={(v) => update(p, { sellOnline: v }, v ? 'Now sold online' : 'Now enquiry only (no Add to cart)')}
+                          label={online ? 'Sell online' : 'Enquiry only'} aria-label={`Sell online: ${p.name}`} labelClassName="font-medium text-gray-700" />
                       </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-1">
                         <a href={`/shop/${p._id}`} target="_blank" rel="noopener noreferrer" title="Open page" aria-label={`Open ${p.name}`} className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-blue-600"><ExternalLink className="h-4 w-4" /></a>
                         <Link to={`/dashboard/update-product/${p._id}`} title="Edit" aria-label={`Edit ${p.name}`} className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-blue-600"><Pencil className="h-4 w-4" /></Link>
-                        <button type="button" disabled={busyId === p._id}
-                          onClick={() => update(p, { sellOnline: !online }, online ? 'Now enquiry only (no Add to cart)' : 'Now sold online')}
-                          title={online ? 'Make enquiry only' : 'Sell online'} aria-label={`${online ? 'Make enquiry only' : 'Sell online'}: ${p.name}`}
-                          className="rounded p-1.5 text-gray-500 hover:bg-gray-100 disabled:opacity-50">
-                          {online ? <MessageSquareQuote className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
-                        </button>
-                        <button type="button" disabled={busyId === p._id}
-                          onClick={() => update(p, { active: hidden }, hidden ? 'Now visible on the website' : 'Hidden from the website')}
-                          title={hidden ? 'Show' : 'Hide'} aria-label={`${hidden ? 'Show' : 'Hide'} ${p.name}`}
-                          className="rounded p-1.5 text-gray-500 hover:bg-gray-100 disabled:opacity-50">
-                          {hidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                        </button>
                         <button type="button" disabled={busyId === p._id} onClick={() => remove(p)} title="Delete" aria-label={`Delete ${p.name}`} className="rounded p-1.5 text-gray-500 hover:bg-red-50 hover:text-red-600 disabled:opacity-50"><Trash2 className="h-4 w-4" /></button>
                       </div>
                     </td>
@@ -151,7 +144,7 @@ const ManageProduct = () => {
         </div>
       )}
       <p className="mt-3 text-xs text-gray-500">
-        <EyeOff className="inline h-3 w-3" /> Hide removes a product from the shop, search and Google without deleting it. <MessageSquareQuote className="inline h-3 w-3" /> Enquiry only keeps it visible but replaces Add to cart with a quotation request.
+        <EyeOff className="inline h-3 w-3" /> Turning <strong>Visible</strong> off removes a product from the shop, search and Google without deleting it. <MessageSquareQuote className="inline h-3 w-3" /> Turning <strong>Sell online</strong> off keeps it visible but replaces Add to cart with a quotation request.
       </p>
     </div>
   );

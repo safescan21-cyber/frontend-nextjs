@@ -1,3 +1,4 @@
+import Toggle from '../../../../ui/Toggle';
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -121,10 +122,7 @@ const PharmaApiForm = () => {
               ))}
             </div>
           </div>
-          <label className="flex items-center gap-2 text-sm text-gray-700 sm:col-span-2">
-            <input type="checkbox" checked={api.active} onChange={(e) => set({ active: e.target.checked })} className="h-4 w-4 accent-blue-600" />
-            Show on the website (untick to hide without deleting)
-          </label>
+          <Toggle className="sm:col-span-2" checked={api.active} onChange={(v) => set({ active: v })} label="Show on the website" description="Off = hidden without deleting" />
         </section>
 
         <section className="grid gap-4 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-2">
@@ -150,11 +148,7 @@ const PharmaApiForm = () => {
         </section>
 
         <section className={`rounded-xl border p-4 ${api.sellOnline ? 'border-green-300 bg-green-50/60' : 'border-gray-200 bg-white'}`}>
-          <label className="flex items-center gap-2 font-semibold text-gray-800">
-            <input type="checkbox" checked={api.sellOnline} onChange={(e) => set({ sellOnline: e.target.checked })} className="h-4 w-4 accent-green-600" />
-            Sell online (Add to cart, checkout &amp; payment like machines)
-          </label>
-          <p className="mt-1 pl-6 text-xs text-gray-500">Off = enquiry only. Buyers must enter their drug licence number at checkout.</p>
+          <Toggle tone="green" checked={api.sellOnline} onChange={(v) => set({ sellOnline: v })} label="Sell online (Add to cart, checkout & payment like machines)" labelClassName="font-semibold text-gray-800" description="Off = enquiry only. Buyers must enter their drug licence number at checkout." />
           {api.sellOnline && (
             <div className="mt-3 grid gap-4 pl-6 sm:grid-cols-3">
               <Field label="Price per unit (₹) *" hint="Charged at checkout; GST as for machines">

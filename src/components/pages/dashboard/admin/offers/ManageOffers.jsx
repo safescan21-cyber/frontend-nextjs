@@ -1,3 +1,4 @@
+import Toggle from '../../../../ui/Toggle';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Plus, Pencil, Trash2, Loader2, Eye } from 'lucide-react';
@@ -248,10 +249,7 @@ const ManageOffers = () => {
           <Field label="Priority" hint="If several offers run at once, higher shows first">
             <input type="number" className={input} value={form.priority} onChange={set('priority')} />
           </Field>
-          <label className="flex items-center gap-2 self-end pb-2 text-sm font-medium text-gray-700">
-            <input type="checkbox" checked={form.isActive} onChange={set('isActive')} className="h-4 w-4" />
-            Show this offer on the home page
-          </label>
+          <Toggle className="self-end pb-2" tone="green" checked={!!form.isActive} onChange={(v) => setForm((f) => ({ ...f, isActive: v }))} label="Show this offer on the home page" />
 
           <div className="flex gap-2 md:col-span-2">
             <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-60">
@@ -312,10 +310,7 @@ const ManageOffers = () => {
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
-                  <label className="flex items-center gap-1.5 text-sm text-gray-600">
-                    <input type="checkbox" checked={o.isActive} onChange={() => toggle(o)} className="h-4 w-4" />
-                    On
-                  </label>
+                  <Toggle size="sm" tone="green" checked={!!o.isActive} onChange={() => toggle(o)} label={o.isActive ? 'On' : 'Off'} aria-label={`Offer active: ${o.title || o.code || ''}`} labelClassName="font-medium text-gray-600" />
                   <button type="button" onClick={() => startEdit(o)} aria-label="Edit offer" className="rounded-lg border border-gray-300 p-2 hover:bg-gray-50"><Pencil className="h-4 w-4" /></button>
                   <button type="button" onClick={() => remove(o)} aria-label="Delete offer" className="rounded-lg border border-red-200 p-2 text-red-600 hover:bg-red-50"><Trash2 className="h-4 w-4" /></button>
                 </div>

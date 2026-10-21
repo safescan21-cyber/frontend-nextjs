@@ -1,3 +1,4 @@
+import Toggle from '../../../../ui/Toggle';
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useFetchProductByIdQuery, useUpdateProductMutation } from '../../../../store/products/productsApi';
@@ -156,15 +157,9 @@ const UpdateProduct = () => {
                 ></textarea>
                 </div>
 
-                <div className='flex flex-wrap gap-x-6 gap-y-2 rounded-lg border border-gray-200 p-3'>
-                    <label className='flex items-center gap-2 text-sm font-medium text-gray-700'>
-                        <input type='checkbox' checked={flags.active} onChange={(e) => setFlags((f) => ({ ...f, active: e.target.checked }))} className='h-4 w-4 accent-blue-600' />
-                        Show on website
-                    </label>
-                    <label className='flex items-center gap-2 text-sm font-medium text-gray-700'>
-                        <input type='checkbox' checked={flags.sellOnline} onChange={(e) => setFlags((f) => ({ ...f, sellOnline: e.target.checked }))} className='h-4 w-4 accent-blue-600' />
-                        Sell online (untick = enquiry only, no Add to cart)
-                    </label>
+                <div className='grid gap-4 rounded-xl border border-gray-200 bg-gray-50/60 p-4 sm:grid-cols-2'>
+                    <Toggle checked={flags.active} onChange={(v) => setFlags((f) => ({ ...f, active: v }))} label='Show on website' description='Off = hidden from shop, search and Google' />
+                    <Toggle checked={flags.sellOnline} onChange={(v) => setFlags((f) => ({ ...f, sellOnline: v }))} label='Sell online' description='Off = enquiry only, no Add to cart' />
                 </div>
 
                 <DocumentUploader documents={documents} setDocuments={setDocuments} onBusyChange={setDocsUploading} />

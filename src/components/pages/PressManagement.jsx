@@ -1,3 +1,4 @@
+import Toggle from '../ui/Toggle';
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import getBaseUrl from '../../utlis/baseURL';
@@ -473,16 +474,7 @@ const PressManagement = () => {
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                <label className="flex items-center gap-2 text-sm text-gray-700 sm:mt-6">
-                  <input
-                    type="checkbox"
-                    name="isActive"
-                    checked={formData.isActive}
-                    onChange={handleChange}
-                    className="w-4 h-4"
-                  />
-                  Active (visible on the website)
-                </label>
+                <Toggle className="sm:mt-6" tone="green" checked={!!formData.isActive} onChange={(v) => setFormData((f) => ({ ...f, isActive: v }))} label="Active" description="Visible on the website" />
               </div>
 
               {/* Media */}

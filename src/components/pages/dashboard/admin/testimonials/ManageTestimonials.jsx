@@ -1,3 +1,4 @@
+import Toggle from '../../../../ui/Toggle';
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -140,7 +141,7 @@ const ManageTestimonials = () => {
             <input type="checkbox" checked={form.consent} onChange={(e) => setForm({ ...form, consent: e.target.checked })} className="mt-0.5 h-4 w-4 accent-blue-600" />
             The customer agreed to publish this testimonial (and the photo/logo, if added) with their name and company.
           </label>
-          <label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} className="h-4 w-4 accent-blue-600" /> Featured (shown first)</label>
+          <Toggle tone="amber" checked={!!form.featured} onChange={(v) => setForm({ ...form, featured: v })} label="Featured" description="Shown first on the website" />
           <div className="flex gap-2 sm:col-span-2">
             <button type="submit" disabled={saving} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60">{saving ? 'Saving…' : editing === 'new' ? 'Add & publish' : 'Save'}</button>
             <button type="button" onClick={() => setEditing(null)} className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Cancel</button>
@@ -176,7 +177,7 @@ const ManageTestimonials = () => {
                 <div className="flex shrink-0 flex-wrap gap-1">
                   {t.status !== 'approved' && <button type="button" onClick={() => patch(t, { status: 'approved' }, 'Published')} className="inline-flex items-center gap-1 rounded-md bg-green-600 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-green-700"><Check className="h-3.5 w-3.5" /> Approve</button>}
                   {t.status !== 'rejected' && <button type="button" onClick={() => patch(t, { status: 'rejected', featured: false }, t.status === 'approved' ? 'Unpublished' : 'Rejected')} className="inline-flex items-center gap-1 rounded-md border border-gray-300 px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"><X className="h-3.5 w-3.5" /> {t.status === 'approved' ? 'Unpublish' : 'Reject'}</button>}
-                  {t.status === 'approved' && <button type="button" onClick={() => patch(t, { featured: !t.featured }, t.featured ? 'No longer featured' : 'Featured')} title={t.featured ? 'Unfeature' : 'Feature'} aria-label={`${t.featured ? 'Unfeature' : 'Feature'} ${t.name}`} className="rounded-md p-1.5 text-gray-500 hover:bg-gray-100"><Star className={`h-4 w-4 ${t.featured ? 'fill-amber-400 text-amber-400' : ''}`} /></button>}
+                  {t.status === 'approved' && <Toggle size="sm" tone="amber" className="self-center px-1" checked={!!t.featured} onChange={(v) => patch(t, { featured: v }, v ? 'Featured' : 'No longer featured')} label="Featured" aria-label={`Featured: ${t.name}`} labelClassName="font-medium text-gray-600" />}
                   <button type="button" onClick={() => openForm(t)} title="Edit" aria-label={`Edit ${t.name}`} className="rounded-md p-1.5 text-gray-500 hover:bg-gray-100"><Pencil className="h-4 w-4" /></button>
                   <button type="button" onClick={() => remove(t)} title="Delete" aria-label={`Delete ${t.name}`} className="rounded-md p-1.5 text-gray-500 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
                 </div>

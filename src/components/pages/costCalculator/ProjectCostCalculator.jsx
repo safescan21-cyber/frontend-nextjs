@@ -1,3 +1,4 @@
+import Toggle from '../../ui/Toggle';
 import React, { useMemo, useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
@@ -355,11 +356,11 @@ const ProjectCostCalculator = () => {
                 const s = state.sections[k];
                 return (
                   <div key={k} className={`rounded-lg border p-3 transition-colors ${s.on ? 'border-blue-300 bg-blue-50/60' : 'border-slate-200'}`}>
-                    <label className="flex cursor-pointer items-center gap-3">
-                      <input type="checkbox" checked={s.on} onChange={(e) => setSection(k, { on: e.target.checked })} className="h-4 w-4 accent-blue-600" />
+                    <div className="flex items-center gap-3">
+                      <Toggle checked={s.on} onChange={(v) => setSection(k, { on: v })} aria-label={sec.label} />
                       <Icon className={`h-5 w-5 ${s.on ? 'text-blue-600' : 'text-slate-400'}`} aria-hidden="true" />
-                      <span className="font-medium text-slate-800">{sec.label}</span>
-                    </label>
+                      <button type="button" onClick={() => setSection(k, { on: !s.on })} className="font-medium text-slate-800">{sec.label}</button>
+                    </div>
                     {s.on && (
                       <div className="mt-3 pl-7">
                         <label htmlFor={`daily-${k}`} className="text-xs font-medium text-slate-600">Output per day ({sec.unit})</label>
@@ -387,10 +388,7 @@ const ProjectCostCalculator = () => {
                         />
                         <p className="text-xs text-slate-500">{num(s.daily)} {sec.unit}/day · {sec.hint}</p>
                         {k === 'tablets' && (
-                          <label className="mt-2 flex items-center gap-2 text-sm text-slate-700">
-                            <input type="checkbox" checked={state.coating} onChange={(e) => set({ coating: e.target.checked })} className="h-4 w-4 accent-blue-600" />
-                            Film coating section
-                          </label>
+                          <Toggle className="mt-2" size="sm" checked={!!state.coating} onChange={(v) => set({ coating: v })} label="Film coating section" labelClassName="text-slate-700" />
                         )}
                       </div>
                     )}

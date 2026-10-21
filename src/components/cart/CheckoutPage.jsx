@@ -1,3 +1,4 @@
+import Toggle from '../ui/Toggle';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -691,10 +692,7 @@ const CheckoutPage = () => {
                 </div>
 
                 <div className="mt-5">
-                  <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-600">
-                    <input type="checkbox" name="saveAddress" checked={formData.saveAddress} onChange={handleInputChange} className="accent-blue-600 w-4 h-4 rounded" />
-                    Save this address for future orders
-                  </label>
+                  <Toggle checked={!!formData.saveAddress} onChange={(v) => setFormData((f) => ({ ...f, saveAddress: v }))} label="Save this address for future orders" labelClassName="text-gray-600" />
                 </div>
 
                 <div className="mt-8 flex justify-end">

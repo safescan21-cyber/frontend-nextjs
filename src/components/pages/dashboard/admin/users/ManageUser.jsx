@@ -1,3 +1,4 @@
+import Toggle from '../../../../ui/Toggle';
 import React, { useMemo, useState } from 'react';
 import { Search, Mail, Phone, MessageCircle, X } from 'lucide-react';
 import { useDeleteUserMutation, useGetUserQuery, useUpdateUserRoleMutation } from '../../../../store/authApi';
@@ -184,18 +185,8 @@ const ManageUser = () => {
                             {user?.role}
                           </span>
                           {/* Toggle Switch */}
-                          <label className="relative inline-flex items-center cursor-pointer" title="Make admin / user">
-                            <input
-                              type="checkbox"
-                              className="sr-only peer"
-                              checked={user?.role === 'admin'}
-                              onChange={() => handleToggleRole(user)}
-                              disabled={isUpdating}
-                              aria-label={`Admin role for ${user.name || user.email}`}
-                            />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                            {isUpdating && <span className="ml-2 text-xs text-gray-500">Updating...</span>}
-                          </label>
+                          <Toggle size="sm" checked={user?.role === 'admin'} busy={isUpdating} onChange={() => handleToggleRole(user)}
+                            title="Make admin / user" aria-label={`Admin role for ${user.name || user.email}`} />
                         </div>
                       </td>
                       <td className={`${td} whitespace-nowrap`}>

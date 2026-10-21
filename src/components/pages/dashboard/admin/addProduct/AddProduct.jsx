@@ -1,3 +1,4 @@
+import Toggle from '../../../../ui/Toggle';
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
@@ -612,29 +613,26 @@ const AddProduct = () => {
           onChange={handleChange}
         />
 
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            name="readyToDispatch"
-            id="readyToDispatch"
-            checked={product.readyToDispatch}
-            onChange={handleChange}
-            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+        <div className="grid gap-4 rounded-xl border border-gray-200 bg-gray-50/60 p-4 sm:grid-cols-3">
+          <Toggle
+            checked={!!product.readyToDispatch}
+            onChange={(v) => setProduct((p) => ({ ...p, readyToDispatch: v }))}
+            label="Ready to dispatch"
+            description="Available for immediate shipping"
+            tone="green"
           />
-          <label htmlFor="readyToDispatch" className="text-sm font-medium text-gray-700">
-            Ready to Dispatch (available for immediate shipping)
-          </label>
-        </div>
-
-        <div className="flex flex-wrap gap-x-6 gap-y-2 rounded-lg border border-gray-200 p-3">
-          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-            <input type="checkbox" checked={product.active !== false} onChange={(e) => setProduct((p) => ({ ...p, active: e.target.checked }))} className="h-4 w-4 accent-blue-600" />
-            Show on website
-          </label>
-          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-            <input type="checkbox" checked={product.sellOnline !== false} onChange={(e) => setProduct((p) => ({ ...p, sellOnline: e.target.checked }))} className="h-4 w-4 accent-blue-600" />
-            Sell online (untick = enquiry only, no Add to cart)
-          </label>
+          <Toggle
+            checked={product.active !== false}
+            onChange={(v) => setProduct((p) => ({ ...p, active: v }))}
+            label="Show on website"
+            description="Off = hidden from shop, search and Google"
+          />
+          <Toggle
+            checked={product.sellOnline !== false}
+            onChange={(v) => setProduct((p) => ({ ...p, sellOnline: v }))}
+            label="Sell online"
+            description="Off = enquiry only, no Add to cart"
+          />
         </div>
 
         {/* Images */}

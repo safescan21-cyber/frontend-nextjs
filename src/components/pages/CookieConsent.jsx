@@ -1,3 +1,4 @@
+import Toggle from '../ui/Toggle';
 import { useLocale } from '../../i18n/LocaleContext';
 import React, { useState, useEffect } from 'react';
 import { Cookie, X, Settings, Check } from 'lucide-react';
@@ -183,21 +184,7 @@ const PreferenceRow = ({ label, description, checked, disabled, onToggle }) => (
       <p className="text-sm font-medium text-white">{label}</p>
       <p className="text-xs text-gray-500 mt-0.5">{description}</p>
     </div>
-    <button
-      role="switch"
-      aria-checked={checked}
-      disabled={disabled}
-      onClick={onToggle}
-      className={`flex-shrink-0 relative w-11 h-6 rounded-full transition-colors ${
-        checked ? 'bg-blue-600' : 'bg-gray-700'
-      } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-    >
-      <span
-        className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-          checked ? 'translate-x-5' : 'translate-x-0'
-        }`}
-      />
-    </button>
+    <Toggle checked={checked} disabled={disabled} onChange={() => onToggle()} aria-label={label} />
   </div>
 );
 

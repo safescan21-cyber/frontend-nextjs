@@ -1,7 +1,8 @@
+import Toggle from '../../../../ui/Toggle';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { FlaskConical, Plus, Pencil, Trash2, ExternalLink, Eye, EyeOff, Search, Loader2, FileText } from 'lucide-react';
+import { FlaskConical, Plus, Pencil, Trash2, ExternalLink, Search, Loader2, FileText } from 'lucide-react';
 import { apiBase, fetchJson } from '../../../pharmaApi/pharmaApiShared';
 
 // Admin: all Pharma APIs (incl. hidden) with edit, show/hide and delete
@@ -100,13 +101,12 @@ const ManagePharmaApis = () => {
                   <td className="px-4 py-3 text-gray-700">{i.category}</td>
                   <td className="px-4 py-3 text-gray-700">{i.grades?.join(', ') || '—'}</td>
                   <td className="px-4 py-3">
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${i.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>{i.active ? 'Visible' : 'Hidden'}</span>
+                    <Toggle size="sm" tone="green" checked={!!i.active} busy={busyId === i._id} onChange={() => toggle(i)} label={i.active ? 'Visible' : 'Hidden'} aria-label={`Visible on website: ${i.name}`} labelClassName="font-medium text-gray-700" />
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-1">
                       <a href={`/pharma-api/${i.slug}`} target="_blank" rel="noopener noreferrer" title="Open page" aria-label={`Open ${i.name}`} className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-blue-600"><ExternalLink className="h-4 w-4" /></a>
                       <Link to={`/dashboard/pharma-apis/${i._id}/edit`} title="Edit" aria-label={`Edit ${i.name}`} className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-blue-600"><Pencil className="h-4 w-4" /></Link>
-                      <button type="button" onClick={() => toggle(i)} disabled={busyId === i._id} title={i.active ? 'Hide' : 'Show'} aria-label={`${i.active ? 'Hide' : 'Show'} ${i.name}`} className="rounded p-1.5 text-gray-500 hover:bg-gray-100 disabled:opacity-50">{i.active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
                       <button type="button" onClick={() => remove(i)} disabled={busyId === i._id} title="Delete" aria-label={`Delete ${i.name}`} className="rounded p-1.5 text-gray-500 hover:bg-red-50 hover:text-red-600 disabled:opacity-50"><Trash2 className="h-4 w-4" /></button>
                     </div>
                   </td>

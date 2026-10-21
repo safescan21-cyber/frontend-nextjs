@@ -1,3 +1,4 @@
+import Toggle from '../../../ui/Toggle';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   useGetHeroSlidesQuery,
@@ -395,14 +396,7 @@ const AdminHeroSlides = () => {
           onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
           className="border p-2 rounded"
         />
-        <div className="flex items-center">
-          <label className="mr-2">Active:</label>
-          <input
-            type="checkbox"
-            checked={formData.active}
-            onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-          />
-        </div>
+        <Toggle className="self-center" tone="green" checked={!!formData.active} onChange={(v) => setFormData({ ...formData, active: v })} label="Active" description="Shown in the home page slider" />
         <div className="col-span-2 flex gap-2">
           <button
             type="submit"
@@ -462,16 +456,7 @@ const AdminHeroSlides = () => {
                 >
                   Delete
                 </button>
-                <button
-                  onClick={() => toggleActive(slide)}
-                  className={`px-2 py-0.5 rounded text-xs ${
-                    slide.active
-                      ? 'bg-green-500 hover:bg-green-600 text-white'
-                      : 'bg-gray-400 hover:bg-gray-500 text-white'
-                  }`}
-                >
-                  {slide.active ? 'Active' : 'Inactive'}
-                </button>
+                <Toggle size="sm" tone="green" checked={!!slide.active} onChange={() => toggleActive(slide)} label={slide.active ? 'Active' : 'Inactive'} aria-label={`Slide active: ${slide.title || index + 1}`} labelClassName="font-medium text-gray-700" />
                 <button
                   onClick={() => moveSlide(index, -1)}
                   disabled={index === 0 || isBulkUpdating}
