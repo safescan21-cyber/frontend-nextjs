@@ -1,3 +1,4 @@
+'use client';
 import Toggle from '../../ui/Toggle';
 import React, { useMemo, useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -291,7 +292,7 @@ const ProjectCostCalculator = () => {
       `Power: ${num(result.power.connectedKw)} kW connected, ${num(result.power.transformer)} kVA transformer, DG ${num(result.power.dgSet)} kVA`,
       '',
       'Please send me a detailed quotation.',
-      typeof window !== 'undefined' ? window.location.href : '',
+      `https://www.foodpharmamachinery.com/project-cost-calculator${params.toString() ? `?${params}` : ''}`, // this calculation
     ].join('\n');
   };
 

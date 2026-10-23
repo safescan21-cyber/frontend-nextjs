@@ -1,11 +1,12 @@
+'use client';
 // Frame for the dashboard pages (admin and customer): a side menu with every page of
 // that dashboard and Logout always in reach. Large screens: pinned on the left, slides
 // closed to icons (remembered). Phones/tablets: slides in from a floating button; tap
 // outside or Esc closes. It sits right under the site header (--site-header-h, set by
 // Navbar.jsx).
-//   <DashboardShell kind="admin" />   <DashboardShell kind="user" />
+//   <DashboardShell kind="admin">{page}</DashboardShell>   (app/[locale]/dashboard/layout.jsx)
 import { useEffect, useState } from 'react';
-import { NavLink, Outlet, Link, useLocation } from 'react-router-dom';
+import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { LogOut, PanelLeftClose, PanelLeftOpen, X, Menu, ExternalLink, ShieldCheck, UserRound, Loader2 } from 'lucide-react';
 import { ADMIN_NAV, USER_NAV } from './dashboardNav';
@@ -16,7 +17,7 @@ const KINDS = {
   user: { nav: USER_NAV, title: 'My account', button: 'My account', icon: UserRound, key: 'account_menu_collapsed' },
 };
 
-export default function DashboardShell({ kind = 'admin' }) {
+export default function DashboardShell({ kind = 'admin', children }) {
   const cfg = KINDS[kind] || KINDS.admin;
   const KEY = cfg.key;
   const readCollapsed = () => {
@@ -148,7 +149,7 @@ export default function DashboardShell({ kind = 'admin' }) {
         <Menu className="h-4 w-4" aria-hidden="true" /> {cfg.button}
       </button>
 
-      <Outlet />
+      {children}
     </div>
   );
 }

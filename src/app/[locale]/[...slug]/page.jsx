@@ -1,24 +1,8 @@
-// Pages that are not Next.js pages yet (login, cart, dashboard, pharma APIs…).
-// The server sends the page's SEO tags, structured data and a short readable
-// summary; in the browser App.jsx (React Router) renders the real page.
+// Any address no page above matches: 404 inside the site header and footer
+// (app/[locale]/not-found.jsx). Without this route Next.js would show the bare
+// root 404 page.
 import { notFound } from 'next/navigation';
-import ClientApp from '../../ClientApp';
-import SeoSummary from '../../SeoSummary';
-import { getSeo, seoMetadata, PageJsonLd } from '../../pageMeta';
 
-export const generateMetadata = seoMetadata((p) => p.slug);
-
-export default async function Page({ params }) {
-  const { locale, slug } = await params;
-  const seo = await getSeo(locale, slug);
-  if (seo.notFound) notFound();
-
-  return (
-    <>
-      <PageJsonLd seo={seo} />
-      <ClientApp>
-        <SeoSummary summary={seo.summary} />
-      </ClientApp>
-    </>
-  );
+export default function UnknownPage() {
+  notFound();
 }

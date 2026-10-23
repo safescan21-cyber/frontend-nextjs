@@ -1,8 +1,10 @@
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
+'use client';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { isLoggingOut } from '../useSiteLogout';
 
-const PrivateRoute = ({ role }) => {
+// Shows children only to a logged-in user (with `role`, only to that role)
+const PrivateRoute = ({ role, children }) => {
   const { user, ready } = useSelector((state) => state.auth ?? {});
   const location = useLocation();
 
@@ -20,8 +22,8 @@ const PrivateRoute = ({ role }) => {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // Authorized → render whatever nested route matched
-  return <Outlet />;
+  // Authorized
+  return children;
 };
 
 export default PrivateRoute;
