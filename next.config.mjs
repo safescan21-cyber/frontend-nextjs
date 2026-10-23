@@ -31,6 +31,20 @@ const nextConfig = {
       moved('/capsule-filling', '/products/capsule-filling'),
     ];
   },
+  // Every page lives under src/app/[locale]/…: /fr/shop is served as it is, and the
+  // India site (no country folder) as /_in/… (never visible to visitors). Keep the
+  // folder list in step with LOCALES and DEFAULT_SEGMENT in src/i18n/locales.js.
+  // Not for Next's own files, API routes or files with an extension.
+  async rewrites() {
+    const skip = '(?!(?:en-us|en-gb|fr|ja|ko|ur|_in|_next|api)(?:/|$))(?!.*\\.)';
+    return {
+      beforeFiles: [
+        { source: '/', destination: '/_in' },
+        { source: `/:first(${skip}[^/]+)`, destination: '/_in/:first' },
+        { source: `/:first(${skip}[^/]+)/:rest*`, destination: '/_in/:first/:rest*' },
+      ],
+    };
+  },
   async headers() {
     return [
       {
