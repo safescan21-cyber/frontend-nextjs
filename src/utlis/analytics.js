@@ -29,7 +29,23 @@ export const gaPageView = () => {
   });
 };
 
+// Goals in Google Analytics (only with analytics consent and a GA id, like page views):
+//   gaEvent('generate_lead', { form: 'quick_quote' })   gaEvent('file_download', { file_name })
+// WhatsApp and phone links are counted automatically (whatsapp_click, phone_click).
+export const gaEvent = (name, params = {}) => {
+  initAnalytics();
+  if (!loaded || !window.gtag) return;
+  window.gtag('event', name, { page_path: window.location.pathname, ...params });
+};
+
 // Start as soon as the visitor accepts analytics in the cookie banner
 if (typeof window !== 'undefined') {
   window.addEventListener('cookieConsentUpdated', () => gaPageView());
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest?.('a[href]');
+    if (!a) return;
+    const href = a.getAttribute('href') || '';
+    if (/^https:\/\/(wa\.me|api\.whatsapp\.com)\//.test(href)) gaEvent('whatsapp_click', { link_text: (a.textContent || '').trim().slice(0, 60) });
+    else if (href.startsWith('tel:')) gaEvent('phone_click', { link_text: href.slice(4) });
+  }, { capture: true });
 }

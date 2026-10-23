@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { Plus, Trash2, ShoppingCart, CheckCircle, Loader2, FileText, MessageCircle, Clock, BadgePercent, Truck } from 'lucide-react';
 import getBaseURL from '../../utlis/baseURL';
 import { getLeadOrigin } from '../../utlis/leadOrigin';
+import { gaEvent } from '../../utlis/analytics';
 import { selectCartItems } from '../store/cartSlice';
 import Seo from '../Seo';
 import { seoPages } from './seoPages';
@@ -88,6 +89,7 @@ const BulkQuote = () => {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || 'Could not send your request. Please try again.');
       setDone({ quoteNumber: data.quoteNumber, email: form.email.trim() });
+      gaEvent('generate_lead', { form: 'bulk_quote', items: filled.length });
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       setErrors(err.message);

@@ -163,6 +163,24 @@ export const seoPages = {
     description:
       'Report a breakdown or book a service visit for your tablet press, capsule filler or packaging machine. Our service team calls you back, urgent cases first.',
   },
+  factory: {
+    path: '/factory',
+    title: 'Our Factory, Team and Installations',
+    description:
+      'See where your machine is built and tested: the PureLine Machinery factory in Haridwar, our team, machine testing, dispatch and installations across India.',
+  },
+  hubs: {
+    path: '/pharma-machinery-supplier',
+    title: 'Pharma Machinery Supplier for India’s Pharma Hubs',
+    description:
+      'Pharma machinery, installation support, AMC and spares for plants in Haridwar, Baddi, Ahmedabad, Hyderabad, Vapi, Mumbai, Pune, Indore and Sikkim.',
+  },
+  plantChecklist: {
+    path: '/pharma-plant-checklist',
+    title: 'Pharma Plant Setup Checklist (Free PDF)',
+    description:
+      'Free checklist for setting up a pharma plant or line: building, clean rooms and HVAC, utilities, machines, validation, licences and people.',
+  },
   privacy: {
     path: '/privacy',
     title: 'Privacy Policy',

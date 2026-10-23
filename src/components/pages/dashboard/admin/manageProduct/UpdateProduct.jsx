@@ -1,3 +1,4 @@
+import FaqEditor from '../FaqEditor';
 import Toggle from '../../../../ui/Toggle';
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from '../../../../../shell/router';
@@ -46,6 +47,7 @@ const UpdateProduct = () => {
 
     const [newImage, setNewImage] = useState(null)
     const [documents, setDocuments] = useState([])
+    const [faqs, setFaqs] = useState([])
     const [flags, setFlags] = useState({ active: true, sellOnline: true })
     const [docsUploading, setDocsUploading] = useState(false)
 
@@ -65,6 +67,7 @@ const UpdateProduct = () => {
                 fitsModels: (productData.product?.fitsModels || []).join(', ')
             })
             setDocuments(productData.product?.documents || [])
+            setFaqs(productData.product?.faqs || [])
             setFlags({ active: productData.product?.active !== false, sellOnline: productData.product?.sellOnline !== false })
         }
     }, [productData])
@@ -91,6 +94,7 @@ const UpdateProduct = () => {
             ...product,
             image: newImage ? newImage : product.image, 
             documents,
+            faqs: faqs.filter((f) => f.q.trim() && f.a.trim()),
             ...flags,
             author: user?._id
         };
@@ -148,6 +152,8 @@ const UpdateProduct = () => {
                     value={product.price}
                     onChange={handleChange}
                 />
+
+                <FaqEditor value={faqs} onChange={setFaqs} />
 
                  <UploadImage
                 name="image"

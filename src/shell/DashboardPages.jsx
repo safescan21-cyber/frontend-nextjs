@@ -34,4 +34,5 @@ export const AdminHeroSlides = browserOnly(() => import('../components/pages/das
 export const UserServiceRequests = browserOnly(() => import('../components/pages/dashboard/user/UserServiceRequests'));
 export const ManageServiceRequests = browserOnly(() => import('../components/pages/dashboard/admin/service/ManageServiceRequests'));
 export const ManageAmcPlans = browserOnly(() => import('../components/pages/dashboard/admin/service/ManageAmcPlans'));
+export const ManageShowcase = browserOnly(() => import('../components/pages/dashboard/admin/showcase/ManageShowcase'));
 export const PressManagement = browserOnly(() => import('../components/pages/PressManagement'));

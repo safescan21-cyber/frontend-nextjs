@@ -17,6 +17,7 @@ import ReviewActions from './ReviewActions';
 import ShareProduct from '../ShareProduct';
 import ProductDocuments from './ProductDocuments';
 import QuickQuote from '../../quote/QuickQuote';
+import ProductFaqs from './ProductFaqs';
 import CompareButton from '../../compare/CompareButton';
 import { downloadSpecSheet } from '../../../utlis/specSheet';
 import Seo from '../../Seo';
@@ -1178,6 +1179,8 @@ const SingleProduct = () => {
           </div>
         </div>
       </section>
+
+      <ProductFaqs faqs={product.faqs} title={t('Frequently asked questions')} />
 
       {/* Related Products */}
       {!relatedLoading && relatedProducts.length > 0 && (

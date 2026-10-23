@@ -12,13 +12,14 @@ import getBaseURL from '../../utlis/baseURL';
 import { whatsappLink } from '../../utlis/contact';
 import { useLocale } from '../../i18n/LocaleContext';
 import { getLeadOrigin } from '../../utlis/leadOrigin';
+import { gaEvent } from '../../utlis/analytics';
 
 const field = 'mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200';
 
-export default function QuickQuote({ id, machine = '', machines = [], productId = '', className = '' }) {
+export default function QuickQuote({ id, machine = '', machines = [], productId = '', city = '', className = '' }) {
   const { t } = useLocale();
   const user = useSelector((s) => s.auth?.user);
-  const [form, setForm] = useState({ machine: machine || machines[0] || '', capacity: '', city: '', name: '', phone: '', email: '', website: '' });
+  const [form, setForm] = useState({ machine: machine || machines[0] || '', capacity: '', city, name: '', phone: '', email: '', website: '' });
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [done, setDone] = useState(null); // quote number
@@ -48,6 +49,7 @@ export default function QuickQuote({ id, machine = '', machines = [], productId 
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || t('Could not send your request. Please try WhatsApp.'));
       setDone(data.quoteNumber);
+      gaEvent('generate_lead', { form: 'quick_quote', machine: form.machine.slice(0, 100) });
     } catch (err) {
       setError(err.message);
     } finally {

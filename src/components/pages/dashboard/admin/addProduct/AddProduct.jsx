@@ -1,3 +1,4 @@
+import FaqEditor from '../FaqEditor';
 import Toggle from '../../../../ui/Toggle';
 import React, { useState } from 'react';
 import axios from 'axios';
@@ -231,6 +232,7 @@ const AddProduct = () => {
     fitsModels: '', // spare parts: machine models, comma separated
   });
   const [images, setImages] = useState([]);
+  const [faqs, setFaqs] = useState([]);
   const [specifications, setSpecifications] = useState([]);
   const [videos, setVideos] = useState([]);
   const [documents, setDocuments] = useState([]);
@@ -428,6 +430,7 @@ const AddProduct = () => {
         documents,
         author: user._id,
         specifications: cleanSpecs,
+        faqs: faqs.filter((f) => f.q.trim() && f.a.trim()),
       };
 
       await addProductApi(payload).unwrap();
@@ -710,6 +713,8 @@ const AddProduct = () => {
             onChange={handleChange}
           />
         </div>
+
+        <FaqEditor value={faqs} onChange={setFaqs} />
 
         {/* ── Specifications ── */}
         <div>

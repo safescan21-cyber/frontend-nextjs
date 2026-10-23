@@ -9,6 +9,7 @@ import getBaseURL from '../../utlis/baseURL';
 import { Link } from '../../shell/router';
 import { whatsappLink } from '../../utlis/contact';
 import { getLeadOrigin } from '../../utlis/leadOrigin';
+import { gaEvent } from '../../utlis/analytics';
 
 const field = 'mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200';
 const token = () => { try { return localStorage.getItem('token'); } catch { return null; } };
@@ -67,6 +68,7 @@ export default function ServiceForm({ type = 'service', plans = [], planId = '',
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || 'Could not send your request. Please call or WhatsApp us.');
       setDone(data.number);
+      gaEvent('generate_lead', { form: isAmc ? 'amc' : 'service_request' });
     } catch (err) {
       setError(err.message);
     } finally {

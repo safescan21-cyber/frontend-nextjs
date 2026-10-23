@@ -9,6 +9,7 @@ import { SOLUTIONS, RESOURCES } from '../components/seo/solutionsData';
 import { PRODUCT_DATA } from '../components/pages/productCategoryData';
 import { SITE_URL, SITE_NAME } from '../components/seo/organization';
 import { brandTitle } from '../i18n/seoText';
+import { CITY_PAGES } from '../components/seo/cityHubs';
 
 export const DEFAULT_TITLE = `${SITE_NAME} | Pharma & Food Processing Machinery`;
 export const DEFAULT_DESCRIPTION = seoPages.home.description;
@@ -25,9 +26,10 @@ const clip = (s, n) => (s.length > n ? `${s.slice(0, n - 1).replace(/\s+\S*$/, '
 const isId = (id) => /^[a-f0-9]{24}$/i.test(id || '');
 
 // Public, indexable pages (same list scripts/prerender-meta.mjs used)
-const EXISTING_ROUTES = new Set(['/', '/shop', '/about', '/products', '/career', '/press', '/track-order', '/contact', '/projects', '/solutions', '/privacy', '/bulk-quote', '/project-cost-calculator', '/pharma-api', '/testimonials', '/spares', '/amc', '/service-request']);
+const EXISTING_ROUTES = new Set(['/', '/shop', '/about', '/products', '/career', '/press', '/track-order', '/contact', '/projects', '/solutions', '/privacy', '/bulk-quote', '/project-cost-calculator', '/pharma-api', '/testimonials', '/spares', '/amc', '/service-request', '/factory', '/pharma-machinery-supplier', '/pharma-plant-checklist']);
 export const STATIC_PAGES = (() => {
   const pages = Object.values(seoPages).filter((p) => EXISTING_ROUTES.has(p.path) || p.path.startsWith('/solutions/'));
+  pages.push(...CITY_PAGES); // /pharma-machinery-supplier/<city>
   for (const s of SOLUTIONS) {
     if (!pages.some((p) => p.path === `/solutions/${s.slug}`)) pages.push({ path: `/solutions/${s.slug}`, title: s.title, description: s.intro });
   }
@@ -50,6 +52,33 @@ const breadcrumbLd = (items) => ({
   '@type': 'BreadcrumbList',
   itemListElement: items.map(([name, href], i) => ({ '@type': 'ListItem', position: i + 1, name, ...(href && { item: `${SITE_URL}${href}` }) })),
 });
+
+// FAQPage (questions the admin wrote for this machine) and VideoObject (its videos),
+// only when the product has them
+const productExtrasLd = (p, url, text) => {
+  const out = [];
+  const faqs = (p.faqs || []).filter((f) => f?.q && f?.a);
+  if (faqs.length) {
+    out.push({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+    });
+  }
+  (p.videos || []).filter((v) => typeof v === 'string' && v.includes('res.cloudinary.com')).slice(0, 3).forEach((v, i) => {
+    out.push({
+      '@context': 'https://schema.org',
+      '@type': 'VideoObject',
+      name: `${p.name}${i ? ` – video ${i + 1}` : ''} in operation`,
+      description: clip(text || `${p.name} running at ${SITE_NAME}.`, 300),
+      thumbnailUrl: [v.replace(/\.\w+(\?.*)?$/, '.jpg').replace('/video/upload/', '/video/upload/so_1/')],
+      contentUrl: v.replace(/\.(webm|ogv|mov|mkv|avi)(\?.*)?$/i, '.mp4'),
+      uploadDate: new Date(p.updatedAt || p.createdAt || Date.now()).toISOString(),
+      embedUrl: url,
+    });
+  });
+  return out;
+};
 
 // Returns { title, description, canonical, image, type, noindex, notFound, jsonLd[], summary }
 export async function seoForPath(segments = []) {
@@ -100,6 +129,7 @@ export async function seoForPath(segments = []) {
           }),
         },
         breadcrumbLd(crumbs),
+        ...productExtrasLd(p, url, text),
       ],
       summary: {
         crumbs,

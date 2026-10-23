@@ -88,6 +88,9 @@ const NAV_COMPANY = [
   { label: "Careers", to: "/career" },
   { label: "Press & Media", to: "/press" },
   { label: "Customer Testimonials", to: "/testimonials" },
+  { label: "Our Factory & Installations", to: "/factory" },
+  { label: "Areas We Serve", to: "/pharma-machinery-supplier" },
+  { label: "Free Plant Setup Checklist", to: "/pharma-plant-checklist" },
 ];
 
 // Indian government registrations (PureLine Machinery Pvt. Ltd.)

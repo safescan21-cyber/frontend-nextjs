@@ -3,6 +3,8 @@
 //   downloadSpecSheet(product)   downloadComparison([p1, p2, p3])
 // (The PDF fonts have no ₹ sign, so prices read "Rs.")
 
+import { gaEvent } from './analytics';
+
 const SITE = 'https://www.foodpharmamachinery.com';
 const COMPANY = 'Food Pharma Machinery (PureLine Machinery Pvt. Ltd.), Q-37 Shivalik Nagar, Haridwar, Uttarakhand, India';
 const CONTACT = 'Phone / WhatsApp: +91 87007 92607   |   www.foodpharmamachinery.com';
@@ -120,6 +122,7 @@ export async function downloadSpecSheet(product) {
   doc.text('Prices are indicative; installation, freight and taxes are quoted separately.', 14, end + 6);
   footer(doc);
   doc.save(`${fileName(product.name)}-spec-sheet.pdf`);
+  gaEvent('file_download', { file_name: 'spec-sheet', machine: String(product.name || '').slice(0, 100) });
 }
 
 export async function downloadComparison(products) {
@@ -147,4 +150,5 @@ export async function downloadComparison(products) {
   products.forEach((p, i) => doc.text(`${p.name}: ${SITE}/shop/${p._id}`, 14, end + i * 6));
   footer(doc);
   doc.save(`machine-comparison-${new Date().toISOString().slice(0, 10)}.pdf`);
+  gaEvent('file_download', { file_name: 'machine-comparison', machines: products.length });
 }
