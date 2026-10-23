@@ -125,7 +125,7 @@ export const seoPages = {
     path: '/bulk-quote',
     title: 'Bulk Order & Quote Request',
     description:
-      'Request a bulk quote for pharma and food processing machinery, spares and load cells. Volume pricing, delivery across India and a reply within 1 business day.',
+      'Request a bulk quote for pharma and food processing machinery and spares. Volume pricing, delivery across India and a reply within 1 business day.',
   },
   testimonials: {
     path: '/testimonials',
