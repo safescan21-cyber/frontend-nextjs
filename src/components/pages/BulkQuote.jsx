@@ -5,6 +5,7 @@ import { Link, useSearchParams } from '../../shell/router';
 import { useSelector } from 'react-redux';
 import { Plus, Trash2, ShoppingCart, CheckCircle, Loader2, FileText, MessageCircle, Clock, BadgePercent, Truck } from 'lucide-react';
 import getBaseURL from '../../utlis/baseURL';
+import { getLeadOrigin } from '../../utlis/leadOrigin';
 import { selectCartItems } from '../store/cartSlice';
 import Seo from '../Seo';
 import { seoPages } from './seoPages';
@@ -82,7 +83,7 @@ const BulkQuote = () => {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ ...form, items: filled.map((it) => ({ ...it, quantity: Number(it.quantity) })), source }),
+        body: JSON.stringify({ ...form, items: filled.map((it) => ({ ...it, quantity: Number(it.quantity) })), source, origin: getLeadOrigin() }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || 'Could not send your request. Please try again.');

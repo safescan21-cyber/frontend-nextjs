@@ -11,6 +11,7 @@ import { CheckCircle, Loader2, Zap } from 'lucide-react';
 import getBaseURL from '../../utlis/baseURL';
 import { whatsappLink } from '../../utlis/contact';
 import { useLocale } from '../../i18n/LocaleContext';
+import { getLeadOrigin } from '../../utlis/leadOrigin';
 
 const field = 'mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200';
 
@@ -42,7 +43,7 @@ export default function QuickQuote({ id, machine = '', machines = [], productId 
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token && { Authorization: `Bearer ${token}` }) },
         credentials: 'include',
-        body: JSON.stringify({ ...form, productId }),
+        body: JSON.stringify({ ...form, productId, origin: getLeadOrigin() }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || t('Could not send your request. Please try WhatsApp.'));
