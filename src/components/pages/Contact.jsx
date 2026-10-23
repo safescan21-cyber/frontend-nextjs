@@ -1,3 +1,4 @@
+'use client';
 import { formTool } from '../webmcp/webmcpTools';
 import { useState } from "react";
 import axios from "axios";

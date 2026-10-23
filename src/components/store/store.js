@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import cartReducer, { replaceCart } from './cartSlice';
+import cartReducer from './cartSlice';
 import authReducer from './authSlice';
 import authApi from './authApi';
 import productsApi from './products/productsApi';
@@ -23,8 +23,11 @@ const trackCartMiddleware = () => (next) => (action) => {
 // The cart is kept on this device so it survives reloads and is shared with
 // other open windows (pharma API pages open in a new window). Prices in it are
 // only for display: the server prices every order from the database.
-const CART_KEY = 'cart_v1';
-const readSavedCart = (raw) => {
+// The saved cart and login are read after the page has loaded (SessionRestore.jsx):
+// the server renders every page logged out with an empty cart, and the first
+// render in the browser has to match it.
+export const CART_KEY = 'cart_v1';
+export const readSavedCart = (raw) => {
   try {
     const list = JSON.parse(raw ?? (typeof window !== 'undefined' ? localStorage.getItem(CART_KEY) : null) ?? '[]');
     return Array.isArray(list)
@@ -35,8 +38,8 @@ const readSavedCart = (raw) => {
   }
 };
 
-export const store = configureStore({
-  preloadedState: { cart: { products: readSavedCart() } },
+// One store per browser tab, and one per request on the server (SiteShell.jsx)
+export const makeStore = () => configureStore({
   reducer: {
     cart: cartReducer,
     auth: authReducer,
@@ -66,17 +69,13 @@ export const store = configureStore({
   devTools: process.env.NODE_ENV !== 'production',
 });
 
-if (typeof window !== 'undefined') {
+// Saves the cart on every change, once it has been restored (see SessionRestore.jsx)
+export const saveCartOnChange = (store) => {
   let savedCart = store.getState().cart.products;
-  store.subscribe(() => {
+  return store.subscribe(() => {
     const products = store.getState().cart.products;
     if (products === savedCart) return;
     savedCart = products;
     try { localStorage.setItem(CART_KEY, JSON.stringify(products)); } catch { /* storage full or blocked */ }
   });
-  window.addEventListener('storage', (e) => {
-    if (e.key === CART_KEY) store.dispatch(replaceCart(readSavedCart(e.newValue ?? '[]')));
-  });
-}
-
-export default store;
+};

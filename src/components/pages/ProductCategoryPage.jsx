@@ -1,3 +1,4 @@
+'use client';
 // src/pages/ProductCategoryPage.jsx
 import { useLocale } from '../../i18n/LocaleContext';
 import { useParams, Link } from "react-router-dom";

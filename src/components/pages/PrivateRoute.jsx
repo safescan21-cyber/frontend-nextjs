@@ -3,8 +3,11 @@ import { useSelector } from 'react-redux';
 import { isLoggingOut } from '../useSiteLogout';
 
 const PrivateRoute = ({ role }) => {
-  const { user } = useSelector((state) => state.auth ?? {});
+  const { user, ready } = useSelector((state) => state.auth ?? {});
   const location = useLocation();
+
+  // The saved login is read just after the page loads (shell/SessionRestore.jsx)
+  if (!ready) return null;
 
   // Not logged in at all → send to login, remember where they wanted to go
   if (!user) {

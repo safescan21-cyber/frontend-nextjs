@@ -17,6 +17,13 @@ export const DEFAULT_LOCALE = { lang: 'en-IN', hreflang: 'en-in', label: 'India 
 
 export const LOCALE_CODES = Object.keys(LOCALES);
 
+// Next.js serves every page from app/[locale]/…; addresses without a country folder
+// are passed to it as this internal folder (see proxy.js). Never shown to visitors.
+export const DEFAULT_SEGMENT = '_in';
+
+// [locale] route value -> locale code ('' for India); null when it is not a site version
+export const localeFromSegment = (segment) => (segment === DEFAULT_SEGMENT ? '' : Object.hasOwn(LOCALES, segment) ? segment : null);
+
 export const localeInfo = (code) => (code && LOCALES[code]) || DEFAULT_LOCALE;
 
 // '/fr/shop/123' -> { locale: 'fr', path: '/shop/123' };  '/shop' -> { locale: '', path: '/shop' }

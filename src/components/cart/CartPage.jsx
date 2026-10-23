@@ -26,12 +26,13 @@ const CartPage = () => {
   // ── 🔐 Login guard: same source of truth as the rest of the app (Redux auth.user) ──
   const authUser = useSelector((state) => state.auth?.user);
   const isLoggedIn = !!authUser;
+  const authReady = useSelector((state) => state.auth?.ready); // saved login read (SessionRestore.jsx)
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (authReady && !isLoggedIn) {
       navigate('/login', { state: { from: '/cart' } });
     }
-  }, [isLoggedIn, navigate]);
+  }, [authReady, isLoggedIn, navigate]);
 
   const [couponCode, setCouponCode] = useState('');
   const [discount, setDiscount] = useState(0);

@@ -1,21 +1,11 @@
-import './App.css';
 import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import MobileActionButtons from './components/MobileActionButtons';
 const Register = lazy(() => import('./components/Register'));
-import Home from './components/Home';
 const CategoryPage = lazy(() => import('./components/pages/CategoryPage'));
-const Searchpage = lazy(() => import('./components/pages/Searchpage'));
-import ShopePage from './components/pages/ShopePage';
-import Contact from './components/pages/Contact';
 const Login = lazy(() => import('../src/components/pages/Login'));
 const CartPage = lazy(() => import('./components/cart/CartPage'));
 const TrackOrder = lazy(() => import('./components/pages/TrackOrder'));
 const CheckoutPage = lazy(() => import('./components/cart/CheckoutPage'));
-import SingleProduct from './components/shop/ProductDetails/SingleProduct';
 const ForgotPassword = lazy(() => import('./components/password/ForgotPassword'));
 const ResetPassword = lazy(() => import('./components/password/ResetPassword'));
 import PrivateRoute from './components/pages/PrivateRoute';
@@ -38,8 +28,6 @@ const Projects = lazy(() => import("../src/components/pages/Projects"));
 const AddJob = lazy(() => import('./components/pages/dashboard/admin/jobs/AddJob'));
 const ManageJobs = lazy(() => import('./components/pages/dashboard/admin/jobs/ManageJobs'));
 const CareerPage = lazy(() => import('./components/pages/dashboard/admin/jobs/CareerPage'));
-import CookieConsent from './components/pages/CookieConsent';
-import ProductCategoryPage from "./components/pages/ProductCategoryPage";
 
 const VisitorAnalytics = lazy(() => import('./components/pages/dashboard/admin/VisitorAnalytics'));
 const CustomerInsights = lazy(() => import('./components/pages/dashboard/admin/insights/CustomerInsights'));
@@ -48,13 +36,7 @@ const ManageOffers = lazy(() => import('./components/pages/dashboard/admin/offer
 const ManageReviews = lazy(() => import('./components/pages/dashboard/admin/reviews/ManageReviews'));
 const AdminHeroSlides = lazy(() => import('../src/components/pages/dashboard/admin/AdminHeroSlides'));
 const PressManagement = lazy(() => import('../src/components/pages/PressManagement'));
-const PublicPressList = lazy(() => import('../src/components/pages/PublicPressList'));
-const PublicPressDetail = lazy(() => import('../src/components/pages/PublicPressDetail'));
-import About from './components/pages/About';
-import LiveChat from './components/pages/LiveChat'
 
-import ProductsPage from './components/pages/ProductCategoryPage';
-import RouteSeo from './components/seo/RouteSeo';
 import NotFound from './components/seo/NotFound';
 const PrivacyPolicy = lazy(() => import('./components/seo/PrivacyPolicy'));
 const BulkQuote = lazy(() => import('./components/pages/BulkQuote'));
@@ -66,7 +48,7 @@ const PharmaApiForm = lazy(() => import('./components/pages/dashboard/admin/phar
 const TestimonialsPage = lazy(() => import('./components/testimonials/TestimonialsPage'));
 const ManageTestimonials = lazy(() => import('./components/pages/dashboard/admin/testimonials/ManageTestimonials'));
 const ManageBulkQuotes = lazy(() => import('./components/pages/dashboard/admin/quotes/ManageBulkQuotes'));
-import { SolutionsHub, SolutionPage, ResourcePage } from './components/seo/SolutionPages';
+import { ResourcePage } from './components/seo/SolutionPages';
 
 const Wishlist = () => (
   <div className="p-8 text-slate-200">
@@ -75,27 +57,6 @@ const Wishlist = () => (
   </div>
 );
 
-// Global toast look: dark theme to match the site, readable on mobile
-const toastOptions = {
-  duration: 3500,
-  style: {
-    background: '#1e293b',
-    color: '#e2e8f0',
-    border: '1px solid #334155',
-    borderRadius: '12px',
-    fontSize: '14px',
-    maxWidth: '90vw',
-  },
-  success: {
-    duration: 3000,
-    iconTheme: { primary: '#fbbf24', secondary: '#1e293b' },
-  },
-  error: {
-    duration: 5000,
-    iconTheme: { primary: '#f87171', secondary: '#1e293b' },
-  },
-};
-
 // Shown while a page's code is downloading
 const PageLoader = () => (
   <div className="flex min-h-[60vh] items-center justify-center pt-24" role="status" aria-label="Loading">
@@ -103,28 +64,16 @@ const PageLoader = () => (
   </div>
 );
 
+// Pages that are not Next.js pages yet. The site header, footer and providers come
+// from shell/SiteShell.jsx; home, shop, products, solutions, press, about, contact and
+// search have their own folders under app/[locale].
 function App() {
   return (
-    <div className="app-shell flex flex-col min-h-screen">
-      <Toaster position="top-right" reverseOrder={false} gutter={8} toastOptions={toastOptions} />
-      <Navbar />
-      <RouteSeo />
-
-      <main id="main-content" className="flex-1">
-        <Suspense fallback={<PageLoader />}>
-        <Routes>
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
           {/* ── Public top‑level routes ── */}
-          <Route path="/" element={<Home />} />
-         <Route path="/press" element={<PublicPressList />} />
-          <Route path="/press/:id" element={<PublicPressDetail />} />
-          <Route path="/about" element={<About />} />
-
           <Route path="/register" element={<Register />} />
           <Route path="/categories/:categoriesName" element={<CategoryPage />} />
-          <Route path="/search" element={<Searchpage />} />
-          <Route path="/shop" element={<ShopePage />} />
-          <Route path="/shop/:id" element={<SingleProduct />} />
-          <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/track-order" element={<TrackOrder />} />
@@ -134,15 +83,8 @@ function App() {
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/career" element={<CareerPage />} />
-          
 
-          {/* ✅ Products overview + category page (before wildcards) */}
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/products/:category" element={<ProductCategoryPage />} />
-
-          {/* Solutions & resources */}
-          <Route path="/solutions" element={<SolutionsHub />} />
-          <Route path="/solutions/:slug" element={<SolutionPage />} />
+          {/* Resources */}
           <Route path="/resources/:slug" element={<ResourcePage />} />
 
           {/* ── Dashboard (protected) ── */}
@@ -192,14 +134,8 @@ function App() {
 
           {/* Anything else */}
           <Route path="*" element={<NotFound />} />
-        </Routes>
-        </Suspense>
-      </main>
-      <MobileActionButtons />
-      <Footer />
-      <CookieConsent />
-      <LiveChat />
-    </div>
+      </Routes>
+    </Suspense>
   );
 }
 

@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -6,11 +7,13 @@ import { Calendar, Image, Video, FileText } from 'lucide-react';
 // Add one more "../" for each extra folder level.
 import getBaseUrl from '../../utlis/baseURL';
 
-const PublicPressList = () => {
-  const [presses, setPresses] = useState([]);
-  const [loading, setLoading] = useState(true);
+// initial: the first page as the server fetched it ({ data, pagination }, app/[locale]/press)
+const PublicPressList = ({ initial }) => {
+  const first = Array.isArray(initial?.data) ? initial : null;
+  const [presses, setPresses] = useState(first?.data || []);
+  const [loading, setLoading] = useState(!first);
   const [error, setError] = useState('');
-  const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0 });
+  const [pagination, setPagination] = useState(first?.pagination || { page: 1, limit: 10, total: first?.data.length || 0 });
 
   const fetchPress = async (page = 1) => {
     setLoading(true);
@@ -35,8 +38,8 @@ const PublicPressList = () => {
   };
 
   useEffect(() => {
-    fetchPress();
-  }, []);
+    if (!first) fetchPress();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const MediaTypeIcon = ({ type }) => {
     switch (type) {

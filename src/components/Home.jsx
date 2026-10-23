@@ -1,3 +1,4 @@
+'use client';
 import { useLocale } from '../i18n/LocaleContext';
 import { sizedImage } from '../utlis/imageUrl';
 import { slideSrcSet, orderedSlides } from './heroSlidesData';

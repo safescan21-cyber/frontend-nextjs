@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -7,20 +8,23 @@ import { Calendar, User, ArrowLeft, FileText } from 'lucide-react';
 import getBaseUrl from '../../utlis/baseURL';
 import Seo from '../Seo';
 
-const PublicPressDetail = () => {
+// A real press release is an object with a title
+const asPress = (data) => (data && typeof data === 'object' && data.title ? data : null);
+
+// initial: the article as the server fetched it (app/[locale]/press/[id])
+const PublicPressDetail = ({ initial }) => {
   const { id } = useParams();
-  const [press, setPress] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [press, setPress] = useState(() => asPress(initial));
+  const [loading, setLoading] = useState(!asPress(initial));
 
   useEffect(() => {
+    if (asPress(initial)?._id === id) return;
     const load = async () => {
       try {
         const res = await axios.get(`${getBaseUrl()}/api/press/${id}`, {
           withCredentials: true,
         });
-        const data = res.data?.data;
-        // A real press release is an object with a title
-        setPress(data && typeof data === 'object' && data.title ? data : null);
+        setPress(asPress(res.data?.data));
       } catch (err) {
         console.error(err);
         setPress(null);
@@ -29,7 +33,7 @@ const PublicPressDetail = () => {
       }
     };
     load();
-  }, [id]);
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) return <div className="p-6 pt-8 text-center">Loading...</div>;
   if (!press) {

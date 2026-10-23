@@ -4,7 +4,7 @@ export default function SeoSummary({ summary }) {
   if (!summary) return null;
   const { crumbs, heading, image, lines = [], list = [], links = [] } = summary;
   return (
-    <main style={{ maxWidth: 960, margin: '0 auto', padding: '110px 16px 40px', fontFamily: 'system-ui, sans-serif', color: '#1f2937', lineHeight: 1.6 }}>
+    <div style={{ maxWidth: 960, margin: '0 auto', padding: '110px 16px 40px', fontFamily: 'system-ui, sans-serif', color: '#1f2937', lineHeight: 1.6 }}>
       {crumbs && (
         <nav aria-label="Breadcrumb" style={{ fontSize: 14, color: '#6b7280' }}>
           {crumbs.map(([name, href], i) => (
@@ -40,6 +40,6 @@ export default function SeoSummary({ summary }) {
           ))}
         </p>
       )}
-    </main>
+    </div>
   );
 }

@@ -84,7 +84,7 @@ const CheckoutPage = () => {
   // ── 🔐 Login guard: same source of truth as the rest of the app (Redux auth.user) ──
   const sessionUser = useSelector((state) => state.auth?.user);
   const isLoggedIn = !!sessionUser;
-  const authLoading = false;
+  const authLoading = !useSelector((state) => state.auth?.ready); // saved login not read yet
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);

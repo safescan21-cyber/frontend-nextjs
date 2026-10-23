@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useLocale } from '../i18n/LocaleContext';
 import { localePath, alternateUrls } from '../i18n/locales';
@@ -55,6 +56,11 @@ const Seo = ({
   // Country versions (/fr, /ja…): translated title/description when we have them,
   // their own address as canonical, and links to every language version
   const { locale, info } = useLocale();
+  // The server already sends these tags (Next.js metadata, app/pageMeta.jsx); writing
+  // them only after the page has loaded keeps them out of the server HTML twice
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
   const cleanPath = new URL(buildUrl(path)).pathname;
   const translated = seoText(locale, cleanPath);
   if (translated) {

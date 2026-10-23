@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowRight, CheckCircle, MessageCircle, FileText, ChevronRight } from 'lucide-react';

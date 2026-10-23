@@ -1,3 +1,4 @@
+'use client';
 import LocalPrice from '../../../i18n/LocalPrice';
 import { useLocale } from '../../../i18n/LocaleContext';
 import { formTool } from '../../webmcp/webmcpTools';
@@ -114,7 +115,7 @@ const SingleProduct = () => {
   const [activeTab, setActiveTab] = useState('description');
   const [addedToCart, setAddedToCart] = useState(false);
   // ❤️ like, remembered on this device and recorded for Customer Insights
-  const [wishlist, setWishlist] = useState(() => getLikedProducts().has(id));
+  const [wishlist, setWishlist] = useState(false); // read from this device after load (below)
   useEffect(() => { setWishlist(getLikedProducts().has(id)); }, [id]);
   const toggleLike = () => {
     const next = !wishlist;
@@ -125,7 +126,10 @@ const SingleProduct = () => {
 
   // review form
   const [showReviewForm, setShowReviewForm] = useState(false);
-  const [userName, setUserName] = useState(() => localStorage.getItem('reviewerName') || '');
+  const [userName, setUserName] = useState('');
+  useEffect(() => {
+    try { setUserName(localStorage.getItem('reviewerName') || ''); } catch { /* storage blocked */ }
+  }, []);
   const [newComment, setNewComment] = useState('');
   const [newRating, setNewRating] = useState(5);
   const [newCommentImages, setNewCommentImages] = useState([]);

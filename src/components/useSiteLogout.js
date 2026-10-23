@@ -26,7 +26,7 @@ export default function useSiteLogout() {
       navigate('/', { replace: true });
       dispatch(logout());
       dispatch(clearCart());
-      setTimeout(() => { loggingOut = false; }, 2000);
+      setTimeout(() => { loggingOut = false; }, 10000); // Next.js may take a moment to show the home page
       toast.success('Logged out successfully');
     } catch (err) {
       console.error('Logout failed:', err);

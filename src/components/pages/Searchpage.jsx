@@ -1,3 +1,4 @@
+'use client';
 // pages/SearchPage.jsx
 import { formTool } from '../webmcp/webmcpTools';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
@@ -8,13 +9,21 @@ import {
   Clock, TrendingUp, Grid, List, ChevronRight, AlertCircle
 } from 'lucide-react';
 import { useFetchAllProductsQuery } from '../store/products/productsApi';
+import { rankProducts, rankApis, categoryLabel } from '../../utlis/productSearch';
+import { sizedImage } from '../../utlis/imageUrl';
+import getBaseURL from '../../utlis/baseURL';
 
 // ─── Config ────────────────────────────────────────────────────────────────
-const CATEGORY_META = {
-  'load-cells':      { label: 'Load Cells',     emoji: '⚖️' },
-  'controllers':     { label: 'Controllers',     emoji: '🖥️' },
-  'weighing-scales': { label: 'Weighing Scales', emoji: '📦' },
+// Same request as the shop page, so both share one cached product list
+// (also fetched on the server, app/[locale]/search/page.jsx)
+const API_PARAMS = { page: 1, limit: 1000 };
+
+const CATEGORY_EMOJI = {
+  'tablet-press': '💊', 'capsule-filling': '💊', 'blister-packaging': '📦', packaging: '📦', 'liquid-filling': '🧴',
+  'tube-filling': '🧴', granulation: '⚙️', coating: '🎨', mixing: '🌀', drying: '🔥', 'lab-equipment': '🔬',
+  sterilization: '🧪', 'water-system': '💧', hvac: '❄️', spares: '🔩', 'food-processing': '🍲',
 };
+const catMeta = (slug) => ({ label: categoryLabel(slug), emoji: CATEGORY_EMOJI[slug] || '🏭' });
 
 const SORT_OPTIONS = [
   { label: 'Most Relevant',     value: 'relevant'   },
@@ -23,7 +32,7 @@ const SORT_OPTIONS = [
   { label: 'Top Rated',         value: 'rating'     },
   { label: 'Most Reviews',      value: 'reviews'    },
 ];
-const POPULAR_SEARCHES = ['Load Cell', 'Scale', 'Controller', 'Wireless', 'Crane', 'Waterproof', 'PID'];
+const POPULAR_SEARCHES = ['Tablet Press', 'Capsule Filling', 'Blister Packing', 'Liquid Filling', 'Granulation', 'Coating', 'Autoclave', 'Spares'];
 
 // ─── Placeholder image (fallback) ──────────────────────────────────────────
 const PLACEHOLDER_IMAGE =
@@ -38,28 +47,44 @@ const StarRating = ({ rating }) => (
   </div>
 );
 
+// stock is a number of units: none in stock means the machine is built to order
 const StockBadge = ({ stock }) => {
+  const label = Number(stock) > 0 ? 'In Stock' : 'Made to Order';
   const map = {
     'In Stock':      'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-    'Low Stock':     'bg-amber-500/20  text-amber-400  border-amber-500/30',
     'Made to Order': 'bg-blue-500/20   text-blue-400   border-blue-500/30',
   };
   return (
-    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${map[stock] || 'bg-slate-700 text-slate-400'}`}>
-      {stock}
+    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${map[label]}`}>
+      {label}
     </span>
   );
 };
 
+const inr = (n) => `₹${Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+const Price = ({ product, big }) => (
+  Number(product.price) > 0 ? (
+    <>
+      <div className={`${big ? 'text-lg' : 'text-base'} font-bold text-amber-400`}>{inr(product.price)}</div>
+      {Number(product.oldPrice) > Number(product.price) && <div className="text-xs text-slate-400 line-through">{inr(product.oldPrice)}</div>}
+    </>
+  ) : (
+    <div className="text-sm font-semibold text-amber-400">Price on request</div>
+  )
+);
+
 const discountPct = (price, oldPrice) =>
-  oldPrice ? Math.round(((oldPrice - price) / oldPrice) * 100) : null;
+  Number(oldPrice) > Number(price) && Number(price) > 0 ? Math.round(((oldPrice - price) / oldPrice) * 100) : null;
+
+// Descriptions are written in the admin's rich-text editor
+const plainText = (html) => String(html || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 
 // ─── Product Card ──────────────────────────────────────────────────────────
 const ProductCard = ({ product, view }) => {
   const pct = discountPct(product.price, product.oldPrice);
   const productLink = `/shop/${product._id}`;
   // ✅ Use `images` (same as ShopPage)
-  const [imgSrc, setImgSrc] = useState(product.images?.[0] || PLACEHOLDER_IMAGE);
+  const [imgSrc, setImgSrc] = useState(sizedImage(product.images?.[0], 480) || PLACEHOLDER_IMAGE);
 
   const handleImageError = () => setImgSrc(PLACEHOLDER_IMAGE);
 
@@ -85,15 +110,14 @@ const ProductCard = ({ product, view }) => {
               <Link to={productLink} className="hover:text-amber-400 transition-colors">
                 <h3 className="font-semibold text-slate-100 group-hover:text-amber-400 transition-colors text-sm leading-snug">{product.name}</h3>
               </Link>
-              <p className="text-[10px] text-slate-500 mt-0.5 capitalize">{CATEGORY_META[product.category]?.label || product.category} · {product.color}</p>
+              <p className="text-[10px] text-slate-400 mt-0.5">{catMeta(product.category).label}</p>
             </div>
             <div className="text-right flex-shrink-0">
-              <div className="text-lg font-bold text-amber-400">₹{product.price.toFixed(2)}</div>
-              {product.oldPrice && <div className="text-xs text-slate-500 line-through">₹{product.oldPrice.toFixed(2)}</div>}
+              <Price product={product} big />
               <div className="mt-1"><StockBadge stock={product.stock} /></div>
             </div>
           </div>
-          <p className="text-xs text-slate-400 line-clamp-1">{product.description}</p>
+          <p className="text-xs text-slate-400 line-clamp-1">{plainText(product.description)}</p>
           <div className="flex items-center justify-between mt-auto pt-1">
             <div className="flex items-center gap-1.5">
               <StarRating rating={product.rating} />
@@ -129,19 +153,18 @@ const ProductCard = ({ product, view }) => {
         <div className="absolute bottom-2 left-2"><StockBadge stock={product.stock} /></div>
       </div>
       <div className="p-3.5 flex flex-col flex-1">
-        <p className="text-[10px] text-slate-500 capitalize mb-1">
-          {CATEGORY_META[product.category]?.emoji} {CATEGORY_META[product.category]?.label || product.category} · <span className="capitalize">{product.color}</span>
+        <p className="text-[10px] text-slate-400 mb-1">
+          {catMeta(product.category).emoji} {catMeta(product.category).label}
         </p>
         <h3 className="font-semibold text-slate-100 group-hover:text-amber-400 transition-colors text-sm leading-snug line-clamp-2 mb-1.5">{product.name}</h3>
-        <p className="text-xs text-slate-400 line-clamp-2 mb-3 flex-1">{product.description}</p>
+        <p className="text-xs text-slate-400 line-clamp-2 mb-3 flex-1">{plainText(product.description)}</p>
         <div className="flex items-center gap-1.5 mb-3">
           <StarRating rating={product.rating} />
           <span className="text-xs text-slate-500">({product.reviews || 0})</span>
         </div>
         <div className="flex items-end justify-between">
           <div>
-            <div className="text-base font-bold text-amber-400">₹{product.price.toFixed(2)}</div>
-            {product.oldPrice && <div className="text-[10px] text-slate-500 line-through">₹{product.oldPrice.toFixed(2)}</div>}
+            <Price product={product} />
           </div>
           <span className="text-xs bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-900 font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1">
             View <ArrowRight className="w-3 h-3" />
@@ -157,26 +180,40 @@ const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [inputValue,       setInputValue]      = useState('');
-  const [activeQuery,      setActiveQuery]      = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All Categories');
-  const [sortBy,           setSortBy]           = useState('relevant');
+  // Start from the address (/search?q=…&cat=…&sort=…), so the server renders the results too
+  const [initial] = useState(() => {
+    const params = new URLSearchParams(location.search);
+    return { q: params.get('q') || '', cat: params.get('cat') || 'All Categories', sort: params.get('sort') || 'relevant' };
+  });
+  const [inputValue,       setInputValue]      = useState(initial.q);
+  const [activeQuery,      setActiveQuery]      = useState(initial.q);
+  const [selectedCategory, setSelectedCategory] = useState(initial.cat);
+  const [sortBy,           setSortBy]           = useState(initial.sort);
   const [view,             setView]             = useState('grid');
   const [categoryOpen,     setCategoryOpen]     = useState(false);
   const [sortOpen,         setSortOpen]         = useState(false);
-  const [hasSearched,      setHasSearched]      = useState(false);
+  const [hasSearched,      setHasSearched]      = useState(Boolean(initial.q || initial.cat !== 'All Categories'));
 
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const suggestionRef = useRef(null);
   const inputRef = useRef(null);
 
-  const categoryParam = selectedCategory !== 'All Categories' ? selectedCategory : undefined;
-  const { data, isLoading, error } = useFetchAllProductsQuery({
-    category: categoryParam,
-    limit: 100,
-  });
+  const { data, isLoading, error } = useFetchAllProductsQuery(API_PARAMS);
   const products = data?.products || [];
+
+  // Pharma APIs (active pharmaceutical ingredients) matching the words, shown above the machines
+  const [apis, setApis] = useState([]);
+  useEffect(() => {
+    const q = activeQuery.trim();
+    if (!q) { setApis([]); return undefined; }
+    let live = true;
+    fetch(`${getBaseURL()}/api/pharma-apis?limit=100`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (live) setApis(rankApis(Array.isArray(d?.items) ? d.items : [], q).slice(0, 6)); })
+      .catch(() => { if (live) setApis([]); });
+    return () => { live = false; };
+  }, [activeQuery]);
 
   // Sync from URL
   useEffect(() => {
@@ -211,13 +248,7 @@ const SearchPage = () => {
       return;
     }
 
-    const q = query.toLowerCase().trim();
-    const matchedProducts = products.filter(p =>
-      p.name?.toLowerCase().includes(q) ||
-      p.category?.toLowerCase().includes(q) ||
-      p.color?.toLowerCase().includes(q) ||
-      p.description?.toLowerCase().includes(q)
-    );
+    const matchedProducts = rankProducts(products, query);
 
     const productSuggestions = matchedProducts.map(p => ({
       type: 'product',
@@ -226,7 +257,7 @@ const SearchPage = () => {
       category: p.category,
       color: p.color,
       // ✅ Use `images` same as ShopPage
-      image: p.images?.[0] || PLACEHOLDER_IMAGE,
+      image: sizedImage(p.images?.[0], 80) || PLACEHOLDER_IMAGE,
     }));
 
     const categorySet = new Set();
@@ -234,7 +265,7 @@ const SearchPage = () => {
     matchedProducts.forEach(p => {
       if (p.category && !categorySet.has(p.category)) {
         categorySet.add(p.category);
-        const meta = CATEGORY_META[p.category] || { label: p.category, emoji: '📦' };
+        const meta = catMeta(p.category);
         categorySuggestions.push({
           type: 'category',
           label: meta.label,
@@ -244,20 +275,7 @@ const SearchPage = () => {
       }
     });
 
-    const colorSet = new Set();
-    const colorSuggestions = [];
-    matchedProducts.forEach(p => {
-      if (p.color && !colorSet.has(p.color)) {
-        colorSet.add(p.color);
-        colorSuggestions.push({
-          type: 'color',
-          label: p.color,
-          value: p.color,
-        });
-      }
-    });
-
-    const combined = [...productSuggestions, ...categorySuggestions, ...colorSuggestions];
+    const combined = [...productSuggestions.slice(0, 7), ...categorySuggestions.slice(0, 3)];
     setSuggestions(combined.slice(0, 10));
     setShowSuggestions(combined.length > 0);
   }, [products]);
@@ -275,10 +293,14 @@ const SearchPage = () => {
     if (suggestion.type === 'product') {
       searchTerm = suggestion.label;
     } else if (suggestion.type === 'category') {
-      searchTerm = suggestion.label;
+      // the whole category, not the category name as search words
+      setInputValue('');
+      setActiveQuery('');
       setSelectedCategory(suggestion.value);
-    } else if (suggestion.type === 'color') {
-      searchTerm = suggestion.label;
+      setHasSearched(true);
+      setShowSuggestions(false);
+      updateURL('', suggestion.value, sortBy);
+      return;
     }
     setInputValue(searchTerm);
     setActiveQuery(searchTerm);
@@ -287,17 +309,11 @@ const SearchPage = () => {
     updateURL(searchTerm, selectedCategory, sortBy);
   };
 
+  // Every word can be in any order, singular or plural ("tablet presses" = "press tablet");
+  // best matches first, or the closest ones when nothing matches every word
   const searchProductsLocally = (query, sort) => {
-    let results = [...products];
-    if (query && query.trim()) {
-      const q = query.toLowerCase().trim();
-      results = results.filter(p =>
-        p.name?.toLowerCase().includes(q) ||
-        p.category?.toLowerCase().includes(q) ||
-        p.description?.toLowerCase().includes(q) ||
-        p.color?.toLowerCase().includes(q)
-      );
-    }
+    let results = selectedCategory !== 'All Categories' ? products.filter(p => p.category === selectedCategory) : [...products];
+    if (query && query.trim()) results = rankProducts(results, query);
     switch (sort) {
       case 'price_asc':  results.sort((a, b) => (a.price || 0) - (b.price || 0)); break;
       case 'price_desc': results.sort((a, b) => (b.price || 0) - (a.price || 0)); break;
@@ -315,7 +331,8 @@ const SearchPage = () => {
     if (q)   params.set('q', q);
     if (cat && cat !== 'All Categories') params.set('cat', cat);
     if (sort && sort !== 'relevant')     params.set('sort', sort);
-    navigate(`/Search?${params.toString()}`, { replace: true });
+    const qs = params.toString();
+    navigate(qs ? `/search?${qs}` : '/search', { replace: true });
   };
 
   const handleSubmit = (e) => {
@@ -354,7 +371,7 @@ const SearchPage = () => {
     setSortBy('relevant');
     setHasSearched(false);
     setShowSuggestions(false);
-    navigate('/Search');
+    navigate('/search', { replace: true });
     setTimeout(() => inputRef.current?.focus(), 50);
   };
 
@@ -363,7 +380,7 @@ const SearchPage = () => {
     setActiveQuery('');
     setHasSearched(false);
     setShowSuggestions(false);
-    navigate('/Search');
+    navigate('/search', { replace: true });
     setTimeout(() => inputRef.current?.focus(), 50);
   };
 
@@ -380,7 +397,7 @@ const SearchPage = () => {
 
   const currentSortLabel = SORT_OPTIONS.find(o => o.value === sortBy)?.label || 'Most Relevant';
   const featuredProducts = products.filter(p => p.tag);
-  const categoriesFromData = ['All Categories', ...new Set(products.map(p => p.category).filter(Boolean))];
+  const categoriesFromData = ['All Categories', ...[...new Set(products.map(p => p.category).filter(Boolean))].sort()];
   const displayCategories = products.length > 0 ? categoriesFromData : ['All Categories'];
 
   const hasActiveFilters = activeQuery || selectedCategory !== 'All Categories';
@@ -409,7 +426,7 @@ const SearchPage = () => {
                   value={inputValue}
                   onChange={e => setInputValue(e.target.value)}
                   onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
-                  placeholder="Search by name, category, color…"
+                  placeholder="Search machines and APIs, e.g. tablet press"
                   autoFocus
                   className="w-full pl-12 pr-10 py-3.5 rounded-xl bg-slate-900/70 border border-slate-600 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all duration-300 text-sm"
                 />
@@ -424,6 +441,7 @@ const SearchPage = () => {
                     {suggestions.map((item, idx) => (
                       <button
                         key={idx}
+                        type="button"
                         onClick={() => handleSuggestionClick(item)}
                         className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-slate-700/60 transition-colors border-b border-slate-700/30 last:border-0"
                       >
@@ -439,7 +457,7 @@ const SearchPage = () => {
                               <span className="text-sm text-slate-200">{item.label}</span>
                               <span className="text-xs text-slate-500 ml-2">product</span>
                               {item.category && (
-                                <span className="text-xs text-slate-500 ml-1">· {CATEGORY_META[item.category]?.label || item.category}</span>
+                                <span className="text-xs text-slate-400 ml-1">· {catMeta(item.category).label}</span>
                               )}
                             </div>
                           </>
@@ -448,12 +466,6 @@ const SearchPage = () => {
                           <>
                             <span className="text-xl">{item.emoji}</span>
                             <span className="text-sm text-slate-200">Category: {item.label}</span>
-                          </>
-                        )}
-                        {item.type === 'color' && (
-                          <>
-                            <span className="w-4 h-4 rounded-full border border-slate-600" style={{ backgroundColor: item.value }} />
-                            <span className="text-sm text-slate-200">Color: {item.label}</span>
                           </>
                         )}
                       </button>
@@ -488,7 +500,7 @@ const SearchPage = () => {
                 className="flex items-center gap-2 text-sm md:text-base font-medium text-slate-200 hover:text-amber-400 border-2 border-slate-700 hover:border-amber-500/50 rounded-xl px-3 py-2 md:px-5 md:py-3 bg-slate-900/60 transition-all duration-200 shadow-sm hover:shadow-md">
                 <Filter className="w-4 h-4 md:w-5 md:h-5" />
                 <span className="max-w-[120px] md:max-w-[180px] truncate">
-                  {selectedCategory === 'All Categories' ? 'All Categories' : (CATEGORY_META[selectedCategory]?.label || selectedCategory)}
+                  {selectedCategory === 'All Categories' ? 'All Categories' : catMeta(selectedCategory).label}
                 </span>
                 <ChevronDown className={`w-3 h-3 md:w-4 md:h-4 transition-transform duration-200 ${categoryOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -497,7 +509,7 @@ const SearchPage = () => {
                   {displayCategories.map(cat => (
                     <button key={cat} onClick={() => handleCategoryChange(cat)}
                       className={`w-full text-left px-4 py-2.5 md:px-5 md:py-3 text-sm transition-colors ${selectedCategory === cat ? 'text-amber-400 bg-amber-500/10 font-semibold' : 'text-slate-300 hover:bg-slate-700/60 hover:text-amber-400'}`}>
-                      {cat === 'All Categories' ? 'All Categories' : `${CATEGORY_META[cat]?.emoji || '📦'} ${CATEGORY_META[cat]?.label || cat}`}
+                      {cat === 'All Categories' ? 'All Categories' : `${catMeta(cat).emoji} ${catMeta(cat).label}`}
                     </button>
                   ))}
                 </div>
@@ -562,7 +574,7 @@ const SearchPage = () => {
             )}
             {selectedCategory !== 'All Categories' && (
               <span className="flex items-center gap-1.5 text-xs bg-blue-500/10 border border-blue-500/30 text-blue-400 rounded-full px-3 py-1">
-                <Tag className="w-3 h-3" /> {CATEGORY_META[selectedCategory]?.label || selectedCategory}
+                <Tag className="w-3 h-3" /> {catMeta(selectedCategory).label}
                 <button onClick={() => handleCategoryChange('All Categories')}><X className="w-3 h-3 ml-1 hover:text-blue-200" /></button>
               </span>
             )}
@@ -587,11 +599,29 @@ const SearchPage = () => {
           </div>
         )}
 
+        {!isLoading && !error && hasSearched && apis.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-sm font-semibold text-slate-200 mb-3">Pharma APIs</h2>
+            <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              {apis.map(a => (
+                <Link key={a._id} to={`/pharma-api/${a.slug}`} className="block rounded-xl border border-slate-700/50 bg-slate-800/60 p-4 hover:border-amber-500/40">
+                  <div className="font-semibold text-slate-100 text-sm">{a.name}</div>
+                  <div className="text-xs text-slate-400 mt-1">{[a.casNumber && `CAS ${a.casNumber}`, a.category].filter(Boolean).join(' · ')}</div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
         {!isLoading && !error && hasSearched && (
           filteredResults.length > 0 ? (
             <div className={`grid gap-4 ${view === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'}`}>
               {filteredResults.map(p => <ProductCard key={p._id} product={p} view={view} />)}
             </div>
+          ) : apis.length > 0 ? (
+            <p className="text-sm text-slate-400">
+              No machines match. <Link to="/shop" className="text-amber-400 hover:text-amber-300">View all machines</Link>
+            </p>
           ) : (
             <div className="text-center py-20 bg-slate-800/30 rounded-2xl border border-slate-700/30">
               <div className="w-20 h-20 bg-slate-700/50 rounded-2xl flex items-center justify-center mx-auto mb-5">
@@ -599,7 +629,7 @@ const SearchPage = () => {
               </div>
               <h3 className="text-xl font-semibold text-white mb-2">No products found</h3>
               <p className="text-slate-400 text-sm mb-6 max-w-sm mx-auto">
-                No results for <span className="text-amber-400">"{activeQuery}"</span>. Try a different keyword.
+                {activeQuery ? <>No results for <span className="text-amber-400">"{activeQuery}"</span>. </> : 'Nothing in this category yet. '}Try a different keyword, or ask us: we build machines to order.
               </p>
               <div className="flex flex-wrap justify-center gap-2 mb-6">
                 {POPULAR_SEARCHES.map(term => (
@@ -625,7 +655,7 @@ const SearchPage = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
               {displayCategories.filter(c => c !== 'All Categories').map(cat => {
                 const count = products.filter(p => p.category === cat).length;
-                const meta = CATEGORY_META[cat] || { label: cat, emoji: '📦' };
+                const meta = catMeta(cat);
                 return (
                   <button key={cat} onClick={() => handleCategoryChange(cat)}
                     className="group flex items-center gap-4 p-5 bg-slate-800/50 hover:bg-slate-700/60 border border-slate-700/40 hover:border-amber-500/40 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/5 text-left">
