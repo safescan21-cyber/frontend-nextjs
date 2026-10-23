@@ -8,8 +8,9 @@ import { seoPages } from '../components/pages/seoPages';
 import { SOLUTIONS, RESOURCES } from '../components/seo/solutionsData';
 import { PRODUCT_DATA } from '../components/pages/productCategoryData';
 import { SITE_URL, SITE_NAME } from '../components/seo/organization';
+import { brandTitle } from '../i18n/seoText';
 
-export const DEFAULT_TITLE = `${SITE_NAME} | Industrial Pharma & Food Equipment Marketplace`;
+export const DEFAULT_TITLE = `${SITE_NAME} | Pharma & Food Processing Machinery`;
 export const DEFAULT_DESCRIPTION = seoPages.home.description;
 export const DEFAULT_IMAGE = `${SITE_URL}/og-image.png`;
 
@@ -18,7 +19,7 @@ const API = (process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_
   .replace(/\/$/, '');
 const DEMO_MATCH = /\/demo-products\//; // demo products (Backend/scripts/seed-demo-products.js) stay out of Google
 
-const fullTitle = (t) => (!t ? DEFAULT_TITLE : t.toLowerCase().includes(SITE_NAME.toLowerCase()) ? t : `${t} | ${SITE_NAME}`);
+const fullTitle = (t) => (!t ? DEFAULT_TITLE : brandTitle(t)); // brand only when the title still fits
 const plain = (html) => String(html || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 const clip = (s, n) => (s.length > n ? `${s.slice(0, n - 1).replace(/\s+\S*$/, '')}…` : s);
 const isId = (id) => /^[a-f0-9]{24}$/i.test(id || '');

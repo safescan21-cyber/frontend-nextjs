@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useLocale } from '../i18n/LocaleContext';
 import { localePath, alternateUrls } from '../i18n/locales';
-import { seoText } from '../i18n/seoText';
+import { localizedText, brandTitle, fitDescription } from '../i18n/seoText';
 
 const SITE_URL = 'https://www.foodpharmamachinery.com';
 const SITE_NAME = 'Food Pharma Machinery';
-const DEFAULT_TITLE = `${SITE_NAME} | Industrial Pharma & Food Equipment Marketplace`;
+const DEFAULT_TITLE = `${SITE_NAME} | Pharma & Food Processing Machinery`; // as seo/pageSeo.js
 const DEFAULT_IMAGE = `${SITE_URL}/og-image.png`;
 const DEFAULT_DESCRIPTION =
   'Industrial pharma and food processing equipment: load cells, weighing scales, tablet presses, capsule fillers, packaging lines and genuine spares.';
@@ -62,19 +62,10 @@ const Seo = ({
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
   const cleanPath = new URL(buildUrl(path)).pathname;
-  const translated = seoText(locale, cleanPath);
-  if (translated) {
-    title = translated.title;
-    description = translated.description;
-  }
-  const cleanTitle = cleanText(title, 70);
-  const fullTitle = !cleanTitle
-    ? DEFAULT_TITLE
-    : cleanTitle.toLowerCase().includes(SITE_NAME.toLowerCase())
-      ? cleanTitle
-      : `${cleanTitle} | ${SITE_NAME}`;
-
-  const metaDescription = cleanText(description || DEFAULT_DESCRIPTION, 160) || DEFAULT_DESCRIPTION;
+  // Same rules as the server (i18n/seoText.js), so these tags match the server's
+  const text = localizedText(locale, cleanPath, cleanText(title, 200), cleanText(description, 1000));
+  const fullTitle = text.title ? brandTitle(text.title) : DEFAULT_TITLE;
+  const metaDescription = fitDescription(text.description || DEFAULT_DESCRIPTION);
   const url = buildUrl(localePath(locale, cleanPath));
   const languages = noindex ? null : alternateUrls(SITE_URL, cleanPath);
   const ogImage = absoluteImage(image);

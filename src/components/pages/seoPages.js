@@ -135,13 +135,13 @@ export const seoPages = {
   },
   pharmaApi: {
     path: '/pharma-api',
-    title: 'Pharma APIs – Active Pharmaceutical Ingredients & Bulk Drugs',
+    title: 'Pharma APIs – Active Ingredients & Bulk Drugs',
     description:
       'Active pharmaceutical ingredients (APIs) and bulk drugs in IP, BP, USP and EP grades: chemical name, CAS number, composition, COA and MSDS. Send an enquiry for price and availability.',
   },
   costCalculator: {
     path: '/project-cost-calculator',
-    title: 'Pharma Project Cost Calculator – Plant & Machine Cost Estimate',
+    title: 'Pharma Plant & Machinery Cost Calculator',
     description:
       'Free pharma plant cost calculator for tablets, capsules, softgels, liquids, ointments, vials, ampoules, lyophilized products, eye drops and IV fluids: machine cost, power load, transformer & DG size, utilities, HVAC and total project cost.',
   },

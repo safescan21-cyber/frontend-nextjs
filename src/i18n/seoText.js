@@ -3,7 +3,7 @@
 // talk about India. Used by the server (page.jsx) and the browser (components/Seo.jsx).
 
 const fr = {
-  '/': ['Food Pharma Machinery | Machines pharmaceutiques et agroalimentaires', 'Machines de transformation pharmaceutique et alimentaire fabriquées en Inde : presses à comprimés, remplisseuses de gélules, lignes de blistérisation et de remplissage, mélangeurs, équipements de laboratoire et pièces détachées. Export vers la France et l’Europe.'],
+  '/': ['Food Pharma Machinery | Machines pharma et agroalimentaires', 'Machines pharmaceutiques et agroalimentaires fabriquées en Inde : presses à comprimés, gélules, blisters, remplissage et mélangeurs. Export vers la France.'],
   '/shop': ['Boutique de machines pharmaceutiques et agroalimentaires', 'Achetez presses à comprimés, remplisseuses de gélules, blistéreuses, remplisseuses de liquides et de tubes, mélangeurs et balances de laboratoire. Conception cGMP, pièces et assistance.'],
   '/about': ['À propos de nous', 'Food Pharma Machinery, par PureLine Machinery Pvt. Ltd. (Haridwar, Inde), fournit presses à comprimés, remplisseuses de gélules et lignes de conditionnement aux industries pharmaceutique et alimentaire.'],
   '/products': ['Machines pharmaceutiques et agroalimentaires', 'Découvrez presses à comprimés, remplisseuses de gélules, lignes de blistérisation et de remplissage, mélangeurs, salles blanches et équipements de laboratoire CQ.'],
@@ -117,13 +117,13 @@ const ko = {
 };
 
 const enUs = {
-  '/': ['Food Pharma Machinery | Pharma & Food Processing Equipment, Shipped to the USA', 'Pharma and food processing machinery made in India and exported to the USA: tablet presses, capsule fillers, blister and liquid filling lines, mixers, lab equipment and spares.'],
-  '/bulk-quote': ['Bulk Order & Quote Request', 'Request a bulk quote for pharma and food processing machinery and spares. Volume pricing, export shipping to the USA and a reply within 1 business day.'],
+  '/': ['Food Pharma Machinery | Pharma & Food Machinery for the USA', 'Pharma and food processing machinery made in India and exported to the USA: tablet presses, capsule fillers, blister and liquid filling lines, mixers, lab equipment and spares.'],
+  '/bulk-quote': ['Bulk Order & Quote Request – USA', 'Request a bulk quote for pharma and food processing machinery and spares. Volume pricing, export shipping to the USA and a reply within 1 business day.'],
 };
 
 const enGb = {
-  '/': ['Food Pharma Machinery | Pharma & Food Processing Equipment, Shipped to the UK', 'Pharma and food processing machinery made in India and exported to the UK: tablet presses, capsule fillers, blister and liquid filling lines, mixers, lab equipment and spares.'],
-  '/bulk-quote': ['Bulk Order & Quote Request', 'Request a bulk quote for pharma and food processing machinery and spares. Volume pricing, export shipping to the UK and a reply within 1 business day.'],
+  '/': ['Food Pharma Machinery | Pharma & Food Machinery for the UK', 'Pharma and food processing machinery made in India and exported to the UK: tablet presses, capsule fillers, blister and liquid filling lines, mixers, lab equipment and spares.'],
+  '/bulk-quote': ['Bulk Order & Quote Request – UK', 'Request a bulk quote for pharma and food processing machinery and spares. Volume pricing, export shipping to the UK and a reply within 1 business day.'],
 };
 
 const ur = {
@@ -170,4 +170,48 @@ export const SEO_TEXT = { fr, ja, ko, ur, 'en-us': enUs, 'en-gb': enGb };
 export const seoText = (locale, path) => {
   const row = locale && SEO_TEXT[locale]?.[path];
   return row ? { title: row[0], description: row[1] } : null;
+};
+
+// ── Length and wording rules shared by the server (seo/localizeSeo.js) and the
+// browser (components/Seo.jsx), so both always write the same tags ──
+const BRAND = 'Food Pharma Machinery';
+const MAX_TITLE = 65; // about what Google shows
+const MAX_DESCRIPTION = 160;
+
+// 'Contact Us' -> 'Contact Us | Food Pharma Machinery', but only when that still fits
+export const brandTitle = (title) => {
+  if (!title) return title;
+  if (title.toLowerCase().includes(BRAND.toLowerCase())) return title;
+  const full = `${title} | ${BRAND}`;
+  return full.length <= MAX_TITLE ? full : title;
+};
+
+// Fit a description to `max` characters: end at a full sentence when one fits,
+// otherwise at a word, with "…" (or a full stop when more text follows it)
+export const fitDescription = (text, max = MAX_DESCRIPTION, end = '…') => {
+  const s = String(text || '').replace(/\s+/g, ' ').trim();
+  if (s.length <= max) return s;
+  const cut = s.slice(0, max);
+  const sentence = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('。'), cut.lastIndexOf('۔ '));
+  if (sentence > max * 0.6) return cut.slice(0, sentence + 1);
+  const words = cut.slice(0, max - 1).replace(/[\s,;:–-]+\S*$/, '').replace(/[\s,;:–-]+(and|or|with|for|the|of|to|in)$/i, '');
+  return words + end;
+};
+
+// The US and UK versions are in English like the India site: pages without their own
+// text above still get a title and description of their own (not copies)
+const REGION = { 'en-us': ['USA', ' Exported to the USA.'], 'en-gb': ['UK', ' Exported to the UK.'] };
+
+// Title (without the brand) and description of a page in a country version
+export const localizedText = (locale, path, title, description) => {
+  const own = seoText(locale, path);
+  if (own) return { title: own.title, description: fitDescription(own.description) };
+  const region = REGION[locale];
+  if (region && title) {
+    return {
+      title: `${title} – ${region[0]}`,
+      description: description ? fitDescription(description, MAX_DESCRIPTION - region[1].length, '.') + region[1] : description,
+    };
+  }
+  return { title, description: description && fitDescription(description) };
 };

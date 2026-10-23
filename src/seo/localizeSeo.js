@@ -3,9 +3,9 @@
 // version, and summary links that stay inside the same country folder.
 import { SITE_URL, SITE_NAME } from '../components/seo/organization';
 import { localePath, alternateUrls } from '../i18n/locales';
-import { seoText } from '../i18n/seoText';
+import { seoText, localizedText, brandTitle, fitDescription } from '../i18n/seoText';
 
-const withSiteName = (t) => (t.toLowerCase().includes(SITE_NAME.toLowerCase()) ? t : `${t} | ${SITE_NAME}`);
+const BRAND_SUFFIX = ` | ${SITE_NAME}`;
 
 export function localizeSeo(seo, locale, path) {
   if (!seo || seo.notFound) return seo;
@@ -13,13 +13,14 @@ export function localizeSeo(seo, locale, path) {
 
   // Every indexable page lists all its language versions (India version included)
   if (seo.canonical && !seo.noindex) out.alternates = alternateUrls(SITE_URL, path);
+  if (seo.description) out.description = fitDescription(seo.description);
   if (!locale) return out;
 
+  // Translated text, or for the US/UK versions their own variant of the English text
   const t = seoText(locale, path);
-  if (t) {
-    out.title = withSiteName(t.title);
-    out.description = t.description;
-  }
+  const text = localizedText(locale, path, seo.title?.endsWith(BRAND_SUFFIX) ? seo.title.slice(0, -BRAND_SUFFIX.length) : seo.title, seo.description);
+  if (text.title) out.title = brandTitle(text.title);
+  if (text.description) out.description = text.description;
   if (seo.canonical) out.canonical = `${SITE_URL}${localePath(locale, path)}`;
 
   if (seo.summary) {

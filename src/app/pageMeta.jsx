@@ -6,7 +6,6 @@ import { notFound } from 'next/navigation';
 import { seoForPath, DEFAULT_IMAGE } from '../seo/pageSeo';
 import { localizeSeo } from '../seo/localizeSeo';
 import { localeFromSegment, localeInfo } from '../i18n/locales';
-import { organizationNode, websiteNode } from '../components/seo/organization';
 
 // [locale] value -> locale code ('' = India); unknown folders are a 404
 export const pageLocale = (segment) => {
@@ -63,12 +62,8 @@ const jsonLd = (data, key) => (
   />
 );
 
-// Organization + WebSite on every page, plus the page's own (Product, Breadcrumb…)
+// The page's own structured data (Product, BreadcrumbList…). Organization, WebSite and
+// the site navigation are written once per page by the header (components/Navbar.jsx).
 export function PageJsonLd({ seo }) {
-  return (
-    <>
-      {jsonLd({ '@context': 'https://schema.org', '@graph': [organizationNode, websiteNode] }, 'graph')}
-      {(seo?.jsonLd || []).map((d, i) => jsonLd(d, i))}
-    </>
-  );
+  return <>{(seo?.jsonLd || []).map((d, i) => jsonLd(d, i))}</>;
 }
