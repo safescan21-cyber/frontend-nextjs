@@ -11,7 +11,7 @@ export default async function Page({ params }) {
   const seo = await getSeo(locale, ['resources', slug]);
   if (seo.notFound) notFound();
   return (
-    <SitePage seo={seo} path="/resources/:slug">
+    <SitePage seo={seo}>
       <ResourcePage />
     </SitePage>
   );

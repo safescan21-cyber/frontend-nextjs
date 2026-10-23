@@ -1,8 +1,8 @@
 'use client';
-// Everything around the page content, shared by every page: Redux store, React Router
-// (on top of the Next.js router), language, header, footer, chat, cookie banner and
-// toasts. Rendered by app/[locale]/layout.jsx, so it stays mounted while visitors move
-// between pages and is part of the server-rendered HTML.
+// Everything around the page content, shared by every page: Redux store, language,
+// header, footer, chat, cookie banner and toasts. Rendered by app/[locale]/layout.jsx,
+// so it stays mounted while visitors move between pages and is part of the
+// server-rendered HTML.
 import '../App.css';
 import { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
@@ -10,7 +10,6 @@ import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'react-hot-toast';
 
 import { makeStore } from '../components/store/store';
-import NextRouterBridge from './NextRouterBridge';
 import SessionRestore from './SessionRestore';
 import { LocaleProvider } from '../i18n/LocaleContext';
 import ScrollToTop from '../components/pages/Scrolltotop';
@@ -59,26 +58,24 @@ export default function SiteShell({ locale = '', children }) {
   return (
     <Provider store={store}>
       <HelmetProvider>
-        <NextRouterBridge locale={locale}>
-          <LocaleProvider locale={locale}>
-            <SessionRestore />
-            <ScrollToTop />
-            <PageViewTracker />
-            <div className="app-shell flex flex-col min-h-screen">
-              <Toaster position="top-right" reverseOrder={false} gutter={8} toastOptions={toastOptions} />
-              <Navbar />
-              <RouteSeo />
-              <main id="main-content" className="flex-1">
-                {children}
-              </main>
-              <MobileActionButtons />
-              <Footer />
-              <CookieConsent />
-              <LiveChat />
-            </div>
-            <WebMcpTools />
-          </LocaleProvider>
-        </NextRouterBridge>
+        <LocaleProvider locale={locale}>
+          <SessionRestore />
+          <ScrollToTop />
+          <PageViewTracker />
+          <div className="app-shell flex flex-col min-h-screen">
+            <Toaster position="top-right" reverseOrder={false} gutter={8} toastOptions={toastOptions} />
+            <Navbar />
+            <RouteSeo />
+            <main id="main-content" className="flex-1">
+              {children}
+            </main>
+            <MobileActionButtons />
+            <Footer />
+            <CookieConsent />
+            <LiveChat />
+          </div>
+          <WebMcpTools />
+        </LocaleProvider>
       </HelmetProvider>
     </Provider>
   );

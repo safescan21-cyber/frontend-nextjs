@@ -1,7 +1,7 @@
 import Toggle from '../ui/Toggle';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from '../../shell/router';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
 import { selectCartItems, selectCartTotalPrice, clearCart } from '../store/cartSlice';

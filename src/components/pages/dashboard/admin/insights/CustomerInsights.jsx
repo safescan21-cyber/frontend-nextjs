@@ -1,6 +1,6 @@
 import DangerConfirm from '../../../../ui/DangerConfirm';
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '../../../../../shell/router';
 import { Users, Eye, Heart, ShoppingCart, UserCheck, X, Loader2, RefreshCw, Info, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import getBaseURL from '../../../../../utlis/baseURL';

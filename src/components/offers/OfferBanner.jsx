@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '../../shell/router';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { Copy, Check, Clock, Sparkles, EyeOff, Pencil, Loader2 } from 'lucide-react';

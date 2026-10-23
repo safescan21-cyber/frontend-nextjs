@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useGetMyOrdersQuery, useGetOrdersByEmailQuery } from '../../../store/orderApi';
-import { Link } from 'react-router-dom';
+import { Link } from '../../../../shell/router';
 import getBaseURL from '../../../../utlis/baseURL';
 import toast from 'react-hot-toast';
 

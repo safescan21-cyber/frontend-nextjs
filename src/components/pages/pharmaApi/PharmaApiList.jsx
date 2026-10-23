@@ -3,7 +3,7 @@ import LocalPrice from '../../../i18n/LocalPrice';
 import { useLocale } from '../../../i18n/LocaleContext';
 import { formTool } from '../../webmcp/webmcpTools';
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from '../../../shell/router';
 import { FlaskConical, Search, ExternalLink, FileText, Loader2, X } from 'lucide-react';
 import CatalogSwitch from './CatalogSwitch';
 import { apiBase, fetchJson, prettyFormula } from './pharmaApiShared';

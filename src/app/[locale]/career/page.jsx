@@ -10,7 +10,7 @@ export default async function Page({ params }) {
   const { locale } = await params;
   const [seo, jobs] = await Promise.all([getSeo(locale, ['career']), jobList()]);
   return (
-    <SitePage seo={seo} path="/career" data={[jobs]}>
+    <SitePage seo={seo} data={[jobs]}>
       <CareerPage />
     </SitePage>
   );

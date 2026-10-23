@@ -2,7 +2,7 @@ import LocalPrice from '../../i18n/LocalPrice';
 import { useLocale } from '../../i18n/LocaleContext';
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from '../../shell/router';
 import toast from 'react-hot-toast';
 import {
   selectCartItems,

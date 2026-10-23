@@ -8,7 +8,7 @@ export const generateMetadata = seoMetadata(() => ['project-cost-calculator']);
 export default async function Page({ params }) {
   const { locale } = await params;
   return (
-    <SitePage seo={await getSeo(locale, ['project-cost-calculator'])} path="/project-cost-calculator">
+    <SitePage seo={await getSeo(locale, ['project-cost-calculator'])}>
       <ProjectCostCalculator />
     </SitePage>
   );

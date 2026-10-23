@@ -1,7 +1,7 @@
 // Log out from anywhere (header dropdown, admin side menu): ends the server session,
 // clears the saved user and cart, goes home.
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '../shell/router';
 import toast from 'react-hot-toast';
 import { useLogoutUserMutation } from './store/authApi';
 import { logout } from './store/authSlice';

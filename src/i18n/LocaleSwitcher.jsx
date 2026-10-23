@@ -1,7 +1,7 @@
 'use client';
 // Country / language picker. Switching loads the same page in the other version
 // (/shop -> /fr/shop), so the server sends that version's title, text and hreflang.
-import { useLocation } from 'react-router-dom';
+import { useLocation } from '../shell/router';
 import { Globe } from 'lucide-react';
 import { useLocale } from './LocaleContext';
 import { LOCALES, DEFAULT_LOCALE, localePath } from './locales';

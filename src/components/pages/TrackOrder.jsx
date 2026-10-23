@@ -1,7 +1,7 @@
 'use client';
 import { formTool } from '../webmcp/webmcpTools';
 import React, { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from '../../shell/router';
 import { Search, Package, CheckCircle, Truck, Home, XCircle, ExternalLink, Loader2 } from 'lucide-react';
 import getBaseURL from '../../utlis/baseURL';
 import Seo from '../Seo';

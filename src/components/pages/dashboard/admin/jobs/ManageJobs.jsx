@@ -1,7 +1,7 @@
 import React from 'react';
 import { useGetJobsQuery, useDeleteJobMutation } from '../../admin/jobs/jobsApi';
 import { formatDate } from '../../../../../utlis/formatDate';
-import { Link } from 'react-router-dom';
+import { Link } from '../../../../../shell/router';
 import toast from 'react-hot-toast';
 
 const ManageJobs = () => {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from '../../shell/router';
 import { useLoginUserMutation, useGoogleLoginMutation, useLazyGetProfileQuery } from '../store/authApi';
 import { setUser } from '../store/authSlice';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';

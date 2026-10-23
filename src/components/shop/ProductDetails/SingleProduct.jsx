@@ -3,7 +3,7 @@ import LocalPrice from '../../../i18n/LocalPrice';
 import { useLocale } from '../../../i18n/LocaleContext';
 import { formTool } from '../../webmcp/webmcpTools';
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from '../../../shell/router';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   useFetchProductByIdQuery,

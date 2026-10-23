@@ -6,7 +6,7 @@
 // Navbar.jsx).
 //   <DashboardShell kind="admin">{page}</DashboardShell>   (app/[locale]/dashboard/layout.jsx)
 import { useEffect, useState } from 'react';
-import { NavLink, Link, useLocation } from 'react-router-dom';
+import { NavLink, Link, useLocation } from '../../../shell/router';
 import { useSelector } from 'react-redux';
 import { LogOut, PanelLeftClose, PanelLeftOpen, X, Menu, ExternalLink, ShieldCheck, UserRound, Loader2 } from 'lucide-react';
 import { ADMIN_NAV, USER_NAV } from './dashboardNav';

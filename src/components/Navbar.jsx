@@ -4,7 +4,7 @@ import { formTool } from './webmcp/webmcpTools';
 import useSiteLogout from './useSiteLogout';
 import { ADMIN_LINKS, USER_LINKS } from './pages/dashboard/dashboardNav';
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from '../shell/router';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Menu, X, ChevronDown, Package,

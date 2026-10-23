@@ -1,6 +1,6 @@
 import { useLocale } from '../../i18n/LocaleContext';
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '../../shell/router';
 import { Quote, Star, BadgeCheck, MessageSquarePlus } from 'lucide-react';
 import getBaseURL from '../../utlis/baseURL';
 

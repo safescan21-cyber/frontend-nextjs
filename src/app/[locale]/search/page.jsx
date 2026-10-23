@@ -14,7 +14,7 @@ export default async function Page({ params }) {
   const { locale } = await params;
   const [seo, products] = await Promise.all([getSeo(locale, ['search']), productList()]);
   return (
-    <SitePage seo={seo} path="/search" data={[products]}>
+    <SitePage seo={seo} data={[products]}>
       <Searchpage />
     </SitePage>
   );

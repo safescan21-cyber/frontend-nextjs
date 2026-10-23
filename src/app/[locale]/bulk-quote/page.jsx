@@ -8,7 +8,7 @@ export const generateMetadata = seoMetadata(() => ['bulk-quote']);
 export default async function Page({ params }) {
   const { locale } = await params;
   return (
-    <SitePage seo={await getSeo(locale, ['bulk-quote'])} path="/bulk-quote">
+    <SitePage seo={await getSeo(locale, ['bulk-quote'])}>
       <BulkQuote />
     </SitePage>
   );

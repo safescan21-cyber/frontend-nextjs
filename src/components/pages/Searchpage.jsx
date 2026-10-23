@@ -1,7 +1,7 @@
 'use client';
 // pages/SearchPage.jsx
 import { formTool } from '../webmcp/webmcpTools';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from '../../shell/router';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Search, X, Filter, ChevronDown,

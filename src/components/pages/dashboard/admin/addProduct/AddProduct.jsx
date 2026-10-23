@@ -2,7 +2,7 @@ import Toggle from '../../../../ui/Toggle';
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '../../../../../shell/router';
 import { CheckCircle, AlertCircle, Plus, X } from 'lucide-react';
 import TextInput from './TextInput';
 import SelectInput from './SelectInput';

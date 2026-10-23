@@ -13,7 +13,7 @@ export default async function Page({ params }) {
   if (seo.notFound) notFound();
   const res = await getJson(`/api/pharma-apis/${encodeURIComponent(slug)}`);
   return (
-    <SitePage seo={seo} path="/pharma-api/:slug">
+    <SitePage seo={seo}>
       <PharmaApiDetail initial={res?.item} />
     </SitePage>
   );

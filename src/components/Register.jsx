@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from '../shell/router';
 import { useRegisterUserMutation } from '../components/store/authApi';
 import { CheckCircle, User, Mail, Lock, AlertCircle, Sparkles, X } from 'lucide-react';
 

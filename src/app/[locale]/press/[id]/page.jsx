@@ -13,7 +13,7 @@ export default async function Page({ params }) {
   if (seo.notFound) notFound();
   const res = await getJson(`/api/press/${id}`);
   return (
-    <SitePage seo={seo} path="/press/:id">
+    <SitePage seo={seo}>
       <PublicPressDetail initial={res?.data} />
     </SitePage>
   );

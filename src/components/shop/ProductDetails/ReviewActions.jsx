@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from '../../../shell/router';
 import toast from 'react-hot-toast';
 import { ThumbsUp, ThumbsDown, MessageCircle, Send, Loader2 } from 'lucide-react';
 import { useReactToReviewMutation, useAddReviewCommentMutation } from '../../store/review/reviewApi';

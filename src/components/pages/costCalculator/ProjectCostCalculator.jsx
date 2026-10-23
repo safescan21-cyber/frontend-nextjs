@@ -1,7 +1,7 @@
 'use client';
 import Toggle from '../../ui/Toggle';
 import React, { useMemo, useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from '../../../shell/router';
 import {
   Calculator, Pill, Package, Droplets, Beaker, Syringe, Factory, ShieldCheck, Clock,
   Printer, MessageCircle, FileText, RotateCcw, ChevronDown, Info, Ruler, Wrench,

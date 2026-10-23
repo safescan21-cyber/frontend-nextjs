@@ -1,6 +1,6 @@
 import { useLocale } from '../../../i18n/LocaleContext';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '../../../shell/router';
 import { Factory, FlaskConical } from 'lucide-react';
 
 // Switch between the two catalogues: machinery (/shop) and pharma APIs (/pharma-api)

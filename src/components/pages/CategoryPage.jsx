@@ -1,7 +1,7 @@
 'use client';
 // CategoryPage.jsx
 import React, { useState, useEffect } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useParams, Link, useNavigate } from '../../shell/router';
 
 const CategoryPage = () => {
   const { categoriesName } = useParams()

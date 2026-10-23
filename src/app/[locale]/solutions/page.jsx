@@ -8,7 +8,7 @@ export const generateMetadata = seoMetadata(() => ['solutions']);
 export default async function Page({ params }) {
   const { locale } = await params;
   return (
-    <SitePage seo={await getSeo(locale, ['solutions'])} path="/solutions">
+    <SitePage seo={await getSeo(locale, ['solutions'])}>
       <SolutionsHub />
     </SitePage>
   );

@@ -12,7 +12,7 @@ export default async function Page({ params }) {
   const seo = await getSeo(locale, ['shop', id]);
   if (seo.notFound) notFound(); // not a product id, or no such product
   return (
-    <SitePage seo={seo} path="/shop/:id" data={await productDetail(id)}>
+    <SitePage seo={seo} data={await productDetail(id)}>
       <SingleProduct />
     </SitePage>
   );

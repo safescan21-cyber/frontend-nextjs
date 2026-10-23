@@ -1,10 +1,10 @@
 // PharmaMachineFooter.jsx
-// Requirements: react-router-dom, tailwindcss, axios
+// Requirements: tailwindcss, axios
 // Add to tailwind.config.js => fontFamily: { barlow: ['"Barlow"','sans-serif'], barlowC: ['"Barlow Condensed"','sans-serif'] }
 
 import { useLocale } from '../i18n/LocaleContext';
 import { formTool } from './webmcp/webmcpTools';
-import { Link } from "react-router-dom";
+import { Link } from '../shell/router';
 import { useFetchAllProductsQuery } from "../components/store/products/productsApi"; // ✅ adjust path
 import { useState, useEffect } from "react";
 import axios from "axios";

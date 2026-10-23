@@ -11,7 +11,7 @@ export default async function Page({ params }) {
   const seo = await getSeo(locale, ['products', category]);
   if (seo.notFound) notFound();
   return (
-    <SitePage seo={seo} path="/products/:category">
+    <SitePage seo={seo}>
       <ProductCategoryPage />
     </SitePage>
   );

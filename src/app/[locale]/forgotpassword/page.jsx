@@ -1,6 +1,5 @@
 // /forgotpassword: account / cart page, drawn in the browser (shell/BrowserPages.jsx)
 import { ForgotPasswordPage } from '../../../shell/BrowserPages';
-import RoutePage from '../../../shell/RoutePage';
 
 export const metadata = {
   title: { absolute: 'Forgot password | Food Pharma Machinery' },
@@ -8,9 +7,5 @@ export const metadata = {
 };
 
 export default function Page() {
-  return (
-    <RoutePage path="/forgotpassword">
-      <ForgotPasswordPage />
-    </RoutePage>
-  );
+  return <ForgotPasswordPage />;
 }

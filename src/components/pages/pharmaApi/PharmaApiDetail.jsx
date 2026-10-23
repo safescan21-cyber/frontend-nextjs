@@ -2,7 +2,7 @@
 import LocalPrice from '../../../i18n/LocalPrice';
 import { useLocale } from '../../../i18n/LocaleContext';
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from '../../../shell/router';
 import { useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
 import { FlaskConical, FileText, MessageCircle, Printer, Loader2, ChevronRight, Atom, ShoppingCart, Zap, Minus, Plus } from 'lucide-react';

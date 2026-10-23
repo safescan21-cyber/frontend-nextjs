@@ -1,7 +1,7 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { useGetReviewsByUserIdQuery } from '../../../store/review/reviewApi';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '../../../../shell/router';
 
 const UserReviews = () => {
     const {user} = useSelector((state) => state.auth);

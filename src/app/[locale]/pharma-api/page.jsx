@@ -23,7 +23,7 @@ export default async function Page({ params, searchParams }) {
   ]);
   const initial = Array.isArray(data?.items) ? { data, ...(Array.isArray(categories) && { categories }) } : undefined;
   return (
-    <SitePage seo={seo} path="/pharma-api">
+    <SitePage seo={seo}>
       <PharmaApiList initial={initial} />
     </SitePage>
   );

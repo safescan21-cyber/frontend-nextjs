@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from '../shell/router';
 import { track } from '../utlis/track';
 import { gaPageView } from '../utlis/analytics';
 

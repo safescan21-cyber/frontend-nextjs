@@ -1,6 +1,6 @@
 import { useLocale } from '../i18n/LocaleContext';
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '../shell/router';
 import { useSelector } from 'react-redux';
 import UserAvatar from './UserAvatar';
 

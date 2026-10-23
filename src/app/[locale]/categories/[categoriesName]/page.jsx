@@ -4,12 +4,12 @@ import CategoryPage from '../../../../components/pages/CategoryPage';
 import SitePage from '../../../SitePage';
 import { getSeo, seoMetadata } from '../../../pageMeta';
 
-export const generateMetadata = seoMetadata((p) => ['categories', p.name]);
+export const generateMetadata = seoMetadata((p) => ['categories', p.categoriesName]);
 
 export default async function Page({ params }) {
-  const { locale, name } = await params;
+  const { locale, categoriesName } = await params;
   return (
-    <SitePage seo={await getSeo(locale, ['categories', name])} path="/categories/:categoriesName">
+    <SitePage seo={await getSeo(locale, ['categories', categoriesName])}>
       <CategoryPage />
     </SitePage>
   );

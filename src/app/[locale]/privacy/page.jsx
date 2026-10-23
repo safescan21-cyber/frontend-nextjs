@@ -8,7 +8,7 @@ export const generateMetadata = seoMetadata(() => ['privacy']);
 export default async function Page({ params }) {
   const { locale } = await params;
   return (
-    <SitePage seo={await getSeo(locale, ['privacy'])} path="/privacy">
+    <SitePage seo={await getSeo(locale, ['privacy'])}>
       <PrivacyPolicy />
     </SitePage>
   );

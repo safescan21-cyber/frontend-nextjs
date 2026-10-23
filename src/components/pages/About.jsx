@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '../../shell/router';
 import {
   Shield, Users, Clock, Zap, CheckCircle, TrendingUp, Eye,
   Settings, HeartHandshake, Package, Wrench, FileText,

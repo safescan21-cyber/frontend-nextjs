@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '../../shell/router';
 import Seo from '../Seo';
 
 const EMAIL = 'safescan21@gmail.com';

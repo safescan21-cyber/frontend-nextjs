@@ -1,6 +1,6 @@
 import Toggle from '../../../../ui/Toggle';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '../../../../../shell/router';
 import toast from 'react-hot-toast';
 import { FlaskConical, Plus, Pencil, Trash2, ExternalLink, Search, Loader2, FileText } from 'lucide-react';
 import { apiBase, fetchJson } from '../../../pharmaApi/pharmaApiShared';

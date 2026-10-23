@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '../../../../../shell/router';
 import toast from 'react-hot-toast';
 import { Search, ThumbsUp, ThumbsDown, MessageCircle, Ban, CheckCircle, Star, Loader2 } from 'lucide-react';
 import {

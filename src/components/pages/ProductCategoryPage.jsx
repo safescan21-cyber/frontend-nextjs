@@ -1,7 +1,7 @@
 'use client';
 // src/pages/ProductCategoryPage.jsx
 import { useLocale } from '../../i18n/LocaleContext';
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link } from '../../shell/router';
 import Seo from "../Seo";
 import { seoPages } from "./seoPages";
 import NotFound from "../seo/NotFound";

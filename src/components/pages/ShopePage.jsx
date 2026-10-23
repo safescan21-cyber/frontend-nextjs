@@ -4,7 +4,7 @@ import { useLocale } from '../../i18n/LocaleContext';
 import { sizedImage } from '../../utlis/imageUrl';
 import React, { useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from '../../shell/router';
 import { addToCart, removeFromCart, selectCartItems } from '../store/cartSlice';
 import { useFetchAllProductsQuery } from '../store/products/productsApi';
 import toast from 'react-hot-toast';

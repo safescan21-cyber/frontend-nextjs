@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from '../../shell/router';
 import { ArrowRight, CheckCircle, MessageCircle, FileText, ChevronRight } from 'lucide-react';
 import Seo from '../Seo';
 import { seoPages } from '../pages/seoPages';

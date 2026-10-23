@@ -1,6 +1,6 @@
 import React from 'react'
 import { useGetOrderByIdQuery } from '../../../store/orderApi';
-import { useParams } from 'react-router-dom';
+import { useParams } from '../../../../shell/router';
 import TimelineStep from '../../../../components/TimelineStep';
 
 const OrderDetails = () => {

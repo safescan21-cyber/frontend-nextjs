@@ -10,7 +10,7 @@ export default async function Page({ params }) {
   const { locale } = await params;
   const [seo, initial] = await Promise.all([getSeo(locale, ['press']), getJson('/api/press?active=true&page=1&limit=10')]);
   return (
-    <SitePage seo={seo} path="/press">
+    <SitePage seo={seo}>
       <PublicPressList initial={initial} />
     </SitePage>
   );

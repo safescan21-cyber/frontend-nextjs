@@ -1,7 +1,7 @@
 'use client';
 // Around every /dashboard page: logged-in users only, admin pages for admins only,
 // and the customer or admin side menu (DashboardShell.jsx).
-import { useLocation } from 'react-router-dom';
+import { useLocation } from './router';
 import PrivateRoute from '../components/pages/PrivateRoute';
 import DashboardShell from '../components/pages/dashboard/DashboardShell';
 

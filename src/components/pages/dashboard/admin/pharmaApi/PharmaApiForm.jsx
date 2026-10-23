@@ -1,6 +1,6 @@
 import Toggle from '../../../../ui/Toggle';
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from '../../../../../shell/router';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { FlaskConical, Plus, X, Loader2, ArrowLeft, ImagePlus } from 'lucide-react';

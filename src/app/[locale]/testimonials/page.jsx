@@ -10,7 +10,7 @@ export default async function Page({ params }) {
   const { locale } = await params;
   const [seo, res] = await Promise.all([getSeo(locale, ['testimonials']), getJson('/api/testimonials?limit=100')]);
   return (
-    <SitePage seo={seo} path="/testimonials">
+    <SitePage seo={seo}>
       <TestimonialsPage initial={Array.isArray(res?.items) ? res.items : undefined} />
     </SitePage>
   );

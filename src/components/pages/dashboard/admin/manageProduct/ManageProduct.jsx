@@ -1,6 +1,6 @@
 import Toggle from '../../../../ui/Toggle';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '../../../../../shell/router';
 import { useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
 import { Package, Plus, Pencil, Trash2, ExternalLink, EyeOff, MessageSquareQuote, Search, Loader2 } from 'lucide-react';

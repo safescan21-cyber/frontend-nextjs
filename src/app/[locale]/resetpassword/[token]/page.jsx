@@ -1,6 +1,5 @@
 // /resetpassword/:token: account / cart page, drawn in the browser (shell/BrowserPages.jsx)
 import { ResetPasswordPage } from '../../../../shell/BrowserPages';
-import RoutePage from '../../../../shell/RoutePage';
 
 export const metadata = {
   title: { absolute: 'Reset password | Food Pharma Machinery' },
@@ -8,9 +7,5 @@ export const metadata = {
 };
 
 export default function Page() {
-  return (
-    <RoutePage path="/resetpassword/:token">
-      <ResetPasswordPage />
-    </RoutePage>
-  );
+  return <ResetPasswordPage />;
 }

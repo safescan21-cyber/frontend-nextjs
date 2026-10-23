@@ -1,6 +1,6 @@
 import Toggle from '../../../../ui/Toggle';
 import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from '../../../../../shell/router';
 import { useFetchProductByIdQuery, useUpdateProductMutation } from '../../../../store/products/productsApi';
 import { useSelector } from 'react-redux';
 import TextInput from '../addProduct/TextInput';

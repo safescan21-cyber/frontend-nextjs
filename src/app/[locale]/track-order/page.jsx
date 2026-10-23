@@ -8,7 +8,7 @@ export const generateMetadata = seoMetadata(() => ['track-order']);
 export default async function Page({ params }) {
   const { locale } = await params;
   return (
-    <SitePage seo={await getSeo(locale, ['track-order'])} path="/track-order">
+    <SitePage seo={await getSeo(locale, ['track-order'])}>
       <TrackOrder />
     </SitePage>
   );
