@@ -43,7 +43,7 @@ chmod 600 .next/standalone/.env.production.local
 if pm2 describe foodpharma-staging >/dev/null 2>&1; then
   pm2 restart foodpharma-staging
 else
-  pm2 start /var/www/frontend-next/ecosystem.staging.cjs
+  pm2 start /var/www/frontend-next/ecosystem.staging.config.cjs
   pm2 save
 fi
 
