@@ -1,3 +1,4 @@
+'use client';
 import React, { useState } from 'react';
 import { useGetJobsQuery } from '../jobs/jobsApi';       // adjust import path
 import { formatDate } from '../../../../../utlis/formatDate';

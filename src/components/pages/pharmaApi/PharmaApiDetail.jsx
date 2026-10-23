@@ -1,3 +1,4 @@
+'use client';
 import LocalPrice from '../../../i18n/LocalPrice';
 import { useLocale } from '../../../i18n/LocaleContext';
 import React, { useEffect, useState } from 'react';
@@ -14,22 +15,24 @@ import { apiBase, fetchJson, IDENTITY_FIELDS, GRADE_NAMES, prettyFormula } from 
 const WHATSAPP = '918700792607';
 
 // One API (/pharma-api/:slug): chemical identity, composition, specs, documents and enquiry
-const PharmaApiDetail = () => {
+// initial: the API as the server fetched it (app/[locale]/pharma-api/[slug])
+const PharmaApiDetail = ({ initial }) => {
   const { t } = useLocale();
   const { slug } = useParams();
-  const [item, setItem] = useState(null);
-  const [state, setState] = useState('loading'); // loading | ready | missing | error
+  const [item, setItem] = useState(initial || null);
+  const [state, setState] = useState(initial ? 'ready' : 'loading'); // loading | ready | missing | error
   const [image, setImage] = useState(0);
-  const [qty, setQty] = useState(1);
+  const [qty, setQty] = useState(initial?.minOrderQty || 1);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (initial && (initial.slug === slug || initial._id === slug) && item === initial) return;
     setState('loading');
     fetchJson(`${apiBase()}/${encodeURIComponent(slug)}`)
       .then((d) => { setItem(d.item); setState('ready'); setImage(0); setQty(d.item.minOrderQty || 1); })
       .catch((e) => setState(e.status === 404 ? 'missing' : 'error'));
-  }, [slug]);
+  }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (state === 'loading') return <div className="flex min-h-[50vh] items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-blue-600" /></div>;
   if (state === 'missing') return <NotFound />;
@@ -51,7 +54,7 @@ const PharmaApiDetail = () => {
   const onAdd = () => { addLine(); toast.success(`${safeQty} ${item.unit} of ${item.name} added to cart`); };
   const onBuy = () => { addLine(); navigate('/checkout'); };
   const enquiry = `/bulk-quote?product=${encodeURIComponent(item.name)}&source=pharma-api`;
-  const waText = `Hello, I'd like a quote for ${item.name}${item.casNumber ? ` (CAS ${item.casNumber})` : ''}${item.grades?.length ? `, grade ${item.grades.join('/')}` : ''}.\nQuantity: \n${typeof window !== 'undefined' ? window.location.href : ''}`;
+  const waText = `Hello, I'd like a quote for ${item.name}${item.casNumber ? ` (CAS ${item.casNumber})` : ''}${item.grades?.length ? `, grade ${item.grades.join('/')}` : ''}.\nQuantity: \nhttps://www.foodpharmamachinery.com/pharma-api/${item.slug}`;
   const description = [item.name, item.chemicalName && `(${item.chemicalName})`, item.casNumber && `CAS ${item.casNumber}`, item.grades?.length && `${item.grades.join(', ')} grade`, item.category].filter(Boolean).join(' · ');
 
   return (

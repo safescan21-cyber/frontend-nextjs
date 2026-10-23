@@ -1,14 +1,8 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
-const Register = lazy(() => import('./components/Register'));
 const CategoryPage = lazy(() => import('./components/pages/CategoryPage'));
-const Login = lazy(() => import('../src/components/pages/Login'));
-const CartPage = lazy(() => import('./components/cart/CartPage'));
-const TrackOrder = lazy(() => import('./components/pages/TrackOrder'));
-const CheckoutPage = lazy(() => import('./components/cart/CheckoutPage'));
-const ForgotPassword = lazy(() => import('./components/password/ForgotPassword'));
-const ResetPassword = lazy(() => import('./components/password/ResetPassword'));
 import PrivateRoute from './components/pages/PrivateRoute';
+import PageLoader from './shell/PageLoader';
 
 const UserDMain = lazy(() => import('./components/pages/dashboard/user/dashboard/UserDMain'));
 const UserOrders = lazy(() => import('./components/pages/dashboard/user/UserOrders'));
@@ -24,10 +18,8 @@ const ManageProduct = lazy(() => import('./components/pages/dashboard/admin/mana
 const UpdateProduct = lazy(() => import('./components/pages/dashboard/admin/manageProduct/UpdateProduct'));
 const ManageUser = lazy(() => import('./components/pages/dashboard/admin/users/ManageUser'));
 const ManageOrders = lazy(() => import('./components/pages/dashboard/admin/manageOrders/ManageOrders'));
-const Projects = lazy(() => import("../src/components/pages/Projects"));
 const AddJob = lazy(() => import('./components/pages/dashboard/admin/jobs/AddJob'));
 const ManageJobs = lazy(() => import('./components/pages/dashboard/admin/jobs/ManageJobs'));
-const CareerPage = lazy(() => import('./components/pages/dashboard/admin/jobs/CareerPage'));
 
 const VisitorAnalytics = lazy(() => import('./components/pages/dashboard/admin/VisitorAnalytics'));
 const CustomerInsights = lazy(() => import('./components/pages/dashboard/admin/insights/CustomerInsights'));
@@ -38,14 +30,9 @@ const AdminHeroSlides = lazy(() => import('../src/components/pages/dashboard/adm
 const PressManagement = lazy(() => import('../src/components/pages/PressManagement'));
 
 import NotFound from './components/seo/NotFound';
-const PrivacyPolicy = lazy(() => import('./components/seo/PrivacyPolicy'));
-const BulkQuote = lazy(() => import('./components/pages/BulkQuote'));
 const ProjectCostCalculator = lazy(() => import('./components/pages/costCalculator/ProjectCostCalculator'));
-const PharmaApiList = lazy(() => import('./components/pages/pharmaApi/PharmaApiList'));
-const PharmaApiDetail = lazy(() => import('./components/pages/pharmaApi/PharmaApiDetail'));
 const ManagePharmaApis = lazy(() => import('./components/pages/dashboard/admin/pharmaApi/ManagePharmaApis'));
 const PharmaApiForm = lazy(() => import('./components/pages/dashboard/admin/pharmaApi/PharmaApiForm'));
-const TestimonialsPage = lazy(() => import('./components/testimonials/TestimonialsPage'));
 const ManageTestimonials = lazy(() => import('./components/pages/dashboard/admin/testimonials/ManageTestimonials'));
 const ManageBulkQuotes = lazy(() => import('./components/pages/dashboard/admin/quotes/ManageBulkQuotes'));
 import { ResourcePage } from './components/seo/SolutionPages';
@@ -57,32 +44,17 @@ const Wishlist = () => (
   </div>
 );
 
-// Shown while a page's code is downloading
-const PageLoader = () => (
-  <div className="flex min-h-[60vh] items-center justify-center pt-24" role="status" aria-label="Loading">
-    <span className="h-10 w-10 animate-spin rounded-full border-4 border-amber-400 border-t-transparent" />
-  </div>
-);
-
-// Pages that are not Next.js pages yet. The site header, footer and providers come
-// from shell/SiteShell.jsx; home, shop, products, solutions, press, about, contact and
-// search have their own folders under app/[locale].
+// Pages that are not Next.js pages yet: the dashboards, wishlist, resource pages, the
+// project cost calculator and old /categories/ addresses. The site header, footer and
+// providers come from shell/SiteShell.jsx; every other page has its own folder under
+// app/[locale].
 function App() {
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
           {/* ── Public top‑level routes ── */}
-          <Route path="/register" element={<Register />} />
           <Route path="/categories/:categoriesName" element={<CategoryPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/track-order" element={<TrackOrder />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/forgotpassword" element={<ForgotPassword />} />
-          <Route path="/resetpassword/:token" element={<ResetPassword />} />
           <Route path="/wishlist" element={<Wishlist />} />
-          <Route path="/projects" element={<Projects />} />
-          <Route path="/career" element={<CareerPage />} />
 
           {/* Resources */}
           <Route path="/resources/:slug" element={<ResourcePage />} />
@@ -125,12 +97,7 @@ function App() {
             </Route>
           </Route>
 
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/bulk-quote" element={<BulkQuote />} />
           <Route path="/project-cost-calculator" element={<ProjectCostCalculator />} />
-          <Route path="/pharma-api" element={<PharmaApiList />} />
-          <Route path="/pharma-api/:slug" element={<PharmaApiDetail />} />
-          <Route path="/testimonials" element={<TestimonialsPage />} />
 
           {/* Anything else */}
           <Route path="*" element={<NotFound />} />

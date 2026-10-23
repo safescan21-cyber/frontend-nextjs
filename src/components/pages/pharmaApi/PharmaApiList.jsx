@@ -1,7 +1,8 @@
+'use client';
 import LocalPrice from '../../../i18n/LocalPrice';
 import { useLocale } from '../../../i18n/LocaleContext';
 import { formTool } from '../../webmcp/webmcpTools';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { FlaskConical, Search, ExternalLink, FileText, Loader2, X } from 'lucide-react';
 import CatalogSwitch from './CatalogSwitch';
@@ -11,21 +12,28 @@ const PAGE_SIZE = 24;
 
 // Public catalogue of Active Pharmaceutical Ingredients (/pharma-api).
 // Each API opens on its own page in a new window (chemical name, composition, documents).
-const PharmaApiList = () => {
+// initial: { data, categories } the server fetched for the address it rendered
+// (app/[locale]/pharma-api), so the first view needs no request from the browser
+const PharmaApiList = ({ initial }) => {
   const { t } = useLocale();
   const [params, setParams] = useSearchParams();
   const q = params.get('q') || '';
   const category = params.get('category') || '';
   const page = Math.max(1, parseInt(params.get('page'), 10) || 1);
   const [draft, setDraft] = useState(q);
-  const [data, setData] = useState({ items: [], total: 0, pages: 1 });
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(initial?.data || { items: [], total: 0, pages: 1 });
+  const [categories, setCategories] = useState(initial?.categories || []);
+  const [loading, setLoading] = useState(!initial?.data);
   const [error, setError] = useState('');
+  const serverKey = useRef(initial?.data ? `${q}|${category}|${page}` : null);
 
   useEffect(() => { setDraft(q); }, [q]);
-  useEffect(() => { fetchJson(`${apiBase()}/categories`).then(setCategories).catch(() => {}); }, []);
   useEffect(() => {
+    if (!initial?.categories) fetchJson(`${apiBase()}/categories`).then(setCategories).catch(() => {});
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (serverKey.current === `${q}|${category}|${page}`) { serverKey.current = null; return; } // already have it
+    serverKey.current = null;
     setLoading(true);
     const qs = new URLSearchParams({ page: String(page), limit: String(PAGE_SIZE) });
     if (q) qs.set('q', q);

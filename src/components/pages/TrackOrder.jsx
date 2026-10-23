@@ -1,3 +1,4 @@
+'use client';
 import { formTool } from '../webmcp/webmcpTools';
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';

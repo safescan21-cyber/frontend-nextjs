@@ -8,8 +8,9 @@ import { useStore } from 'react-redux';
 import productsApi from '../components/store/products/productsApi';
 import { heroApi } from '../components/store/heroApi';
 import { reviewApi } from '../components/store/review/reviewApi';
+import { jobsApi } from '../components/pages/dashboard/admin/jobs/jobsApi';
 
-const APIS = { products: productsApi, hero: heroApi, reviews: reviewApi };
+const APIS = { products: productsApi, hero: heroApi, reviews: reviewApi, jobs: jobsApi };
 
 export default function Seed({ entries = [], children }) {
   const store = useStore();

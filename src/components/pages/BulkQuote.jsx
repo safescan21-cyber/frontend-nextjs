@@ -1,5 +1,6 @@
+'use client';
 import { formTool } from '../webmcp/webmcpTools';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Plus, Trash2, ShoppingCart, CheckCircle, Loader2, FileText, MessageCircle, Clock, BadgePercent, Truck } from 'lucide-react';
@@ -30,6 +31,10 @@ const BulkQuote = () => {
   const [items, setItems] = useState(() =>
     initialProduct ? [{ ...emptyItem(), name: initialProduct.slice(0, 200), productId: params.get('id') || '', quantity: 10 }] : [emptyItem()]
   );
+  // The saved login is read just after the page loads: fill in name and email then
+  useEffect(() => {
+    if (user) setForm((f) => ({ ...f, name: f.name || user.username || '', email: f.email || user.email || '' }));
+  }, [user]);
   const [form, setForm] = useState({
     name: user?.username || '',
     company: '',

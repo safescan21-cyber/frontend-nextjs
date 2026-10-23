@@ -1,3 +1,4 @@
+'use client';
 import { formTool } from '../webmcp/webmcpTools';
 import React, { useEffect, useState } from 'react';
 import { Star, Send, CheckCircle, Loader2, MessageSquareQuote } from 'lucide-react';
@@ -8,15 +9,19 @@ const EMPTY = { name: '', role: '', company: '', city: '', email: '', rating: 5,
 const input = 'mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none';
 
 // /testimonials: every approved testimonial + a form for customers to share theirs
-const TestimonialsPage = () => {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+// initial: the approved testimonials the server fetched (app/[locale]/testimonials)
+const TestimonialsPage = ({ initial }) => {
+  const [items, setItems] = useState(initial || []);
+  const [loading, setLoading] = useState(!initial);
   const [form, setForm] = useState(EMPTY);
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState('');
   const [error, setError] = useState('');
 
-  useEffect(() => { fetchTestimonials(100).then(setItems).catch(() => {}).finally(() => setLoading(false)); }, []);
+  useEffect(() => {
+    if (initial) return;
+    fetchTestimonials(100).then(setItems).catch(() => {}).finally(() => setLoading(false));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (typeof window !== 'undefined' && window.location.hash === '#share') setTimeout(() => document.getElementById('share')?.scrollIntoView({ behavior: 'smooth' }), 300);
   }, []);

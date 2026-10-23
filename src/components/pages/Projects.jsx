@@ -1,3 +1,4 @@
+'use client';
 import { useState, useEffect } from "react";
 
 // Static project/case-study data — sectors we supply material & equipment to.

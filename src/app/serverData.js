@@ -57,3 +57,9 @@ export const heroSlides = async () => {
   }
   return { api: 'hero', endpoint: 'getHeroSlides', arg: undefined, value: slides };
 };
+
+// jobsApi.getJobs with the career page's starting filters (CareerPage.jsx)
+export const jobList = async () => {
+  const arg = { department: 'all', type: 'all' };
+  return { api: 'jobs', endpoint: 'getJobs', arg, value: await getJson(`/api/jobs/?${new URLSearchParams(arg)}`) };
+};
