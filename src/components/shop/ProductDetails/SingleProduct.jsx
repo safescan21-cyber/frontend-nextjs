@@ -595,6 +595,24 @@ const SingleProduct = () => {
                 {specs.map((s) => <SpecBadge key={s.label} {...s} />)}
               </div>
 
+              {Array.isArray(product.fitsModels) && product.fitsModels.length > 0 && (
+                <p className="text-sm text-gray-700">
+                  <span className="font-semibold">{t('Fits machine models')}:</span>{' '}
+                  {product.fitsModels.map((m, i) => (
+                    <span key={m}>{i > 0 && ', '}<Link to={`/spares?model=${encodeURIComponent(m)}`} className="text-blue-600 hover:underline">{m}</Link></span>
+                  ))}
+                </p>
+              )}
+              {product.category !== 'spares' && (
+                <p className="text-sm">
+                  <Link to="/spares" className="font-semibold text-blue-600 hover:underline">{t('Spare parts')}</Link>
+                  {' · '}
+                  <Link to="/amc" className="font-semibold text-blue-600 hover:underline">{t('Maintenance contract (AMC)')}</Link>
+                  {' · '}
+                  <Link to="/service-request" className="font-semibold text-blue-600 hover:underline">{t('Service request')}</Link>
+                </p>
+              )}
+
               {/* Compare with other machines, or take the spec sheet to the team */}
               <div className="flex flex-wrap gap-2">
                 <CompareButton id={product._id} />

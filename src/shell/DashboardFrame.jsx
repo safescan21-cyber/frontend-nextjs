@@ -6,7 +6,7 @@ import PrivateRoute from '../components/pages/PrivateRoute';
 import DashboardShell from '../components/pages/dashboard/DashboardShell';
 
 // /dashboard, /dashboard/orders… are the customer's pages; everything else is admin
-const CUSTOMER_PAGES = new Set(['', 'orders', 'payments', 'profile', 'reviews']);
+const CUSTOMER_PAGES = new Set(['', 'orders', 'payments', 'profile', 'reviews', 'service']);
 
 export default function DashboardFrame({ children }) {
   const { pathname } = useLocation(); // without the country folder

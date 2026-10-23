@@ -2,7 +2,7 @@
 // (DashboardShell.jsx) and the profile dropdown in the header (Navbar.jsx).
 import {
   LayoutDashboard, Package, Truck, PlusCircle, FileText, Users, TrendingUp, BarChart3,
-  FlaskConical, MessageSquare, CreditCard, Image, Newspaper, Star, ClipboardList, User, ShoppingBag,
+  FlaskConical, MessageSquare, CreditCard, Image, Newspaper, Star, ClipboardList, User, ShoppingBag, Wrench, ShieldCheck,
 } from 'lucide-react';
 
 export const ADMIN_NAV = [
@@ -20,6 +20,8 @@ export const ADMIN_NAV = [
   { group: 'Sales', items: [
     { label: 'All Orders', path: '/dashboard/manage-orders', icon: Truck },
     { label: 'Bulk Quotes', path: '/dashboard/bulk-quotes', icon: ClipboardList },
+    { label: 'Service Requests', path: '/dashboard/service-requests', icon: Wrench },
+    { label: 'AMC Plans', path: '/dashboard/amc-plans', icon: ShieldCheck },
     { label: 'Discount Offers', path: '/dashboard/offers', icon: CreditCard },
     { label: 'Users', path: '/dashboard/users', icon: Users },
   ] },
@@ -41,6 +43,7 @@ export const USER_NAV = [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { label: 'Orders', path: '/dashboard/orders', icon: ShoppingBag },
     { label: 'Payments', path: '/dashboard/payments', icon: CreditCard },
+    { label: 'Service requests', path: '/dashboard/service', icon: Wrench },
     { label: 'Reviews', path: '/dashboard/reviews', icon: MessageSquare },
     { label: 'Profile', path: '/dashboard/profile', icon: User },
   ] },

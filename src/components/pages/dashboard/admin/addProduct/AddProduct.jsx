@@ -228,6 +228,7 @@ const AddProduct = () => {
     stock: '',
     readyToDispatch: false,
     description: '',
+    fitsModels: '', // spare parts: machine models, comma separated
   });
   const [images, setImages] = useState([]);
   const [specifications, setSpecifications] = useState([]);
@@ -447,6 +448,7 @@ const AddProduct = () => {
         stock: '',
         readyToDispatch: false,
         description: '',
+        fitsModels: '',
         active: true,
         sellOnline: true,
       });
@@ -596,6 +598,13 @@ const AddProduct = () => {
           onChange={handleChange}
         />
 
+        <TextInput
+          label="Fits machine models (spare parts, comma separated)"
+          name="fitsModels"
+          placeholder="ZP-35D, NJP-1200"
+          value={product.fitsModels}
+          onChange={handleChange}
+        />
         <TextInput
           label="Stock Quantity"
           name="stock"

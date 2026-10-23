@@ -38,7 +38,8 @@ const UpdateProduct = () => {
         color: '',
         price: '',
         description: '',
-        image: ''
+        image: '',
+        fitsModels: '' // spare parts: machine models, comma separated
     })
 
     const {data: productData, isLoading: isProductLoading, error: fetchError, refetch} = useFetchProductByIdQuery(id);
@@ -60,7 +61,8 @@ const UpdateProduct = () => {
                 color: color || '',
                 price: price || '',
                 description: description || '',
-                image: imageURL || ''
+                image: imageURL || '',
+                fitsModels: (productData.product?.fitsModels || []).join(', ')
             })
             setDocuments(productData.product?.documents || [])
             setFlags({ active: productData.product?.active !== false, sellOnline: productData.product?.sellOnline !== false })
@@ -130,6 +132,13 @@ const UpdateProduct = () => {
                     value={product.color}
                     onChange={handleChange}
                     options={colors}
+                />
+                <TextInput
+                    label="Fits machine models (spare parts, comma separated)"
+                    name="fitsModels"
+                    placeholder="ZP-35D, NJP-1200"
+                    value={product.fitsModels}
+                    onChange={handleChange}
                 />
                 <TextInput
                     label="Price"

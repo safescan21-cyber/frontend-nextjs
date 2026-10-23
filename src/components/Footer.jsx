@@ -78,8 +78,9 @@ const NAV_SERVICES = [
   { label: "Custom Machine Design", to: "/contact" },
   { label: "Validation & Compliance", to: "/solutions/compliance" },
   { label: "Installation & Commissioning", to: "/solutions/turnkey" },
-  { label: "Technical Support", to: "/contact" },
-  { label: "After-Sales Service", to: "/contact" },
+  { label: "Service Request", to: "/service-request" },
+  { label: "AMC (Annual Maintenance)", to: "/amc" },
+  { label: "Spare Parts", to: "/spares" },
 ];
 
 const NAV_COMPANY = [

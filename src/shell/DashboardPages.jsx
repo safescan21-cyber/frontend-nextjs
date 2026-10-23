@@ -31,4 +31,7 @@ export const ManageOffers = browserOnly(() => import('../components/pages/dashbo
 export const ManageReviews = browserOnly(() => import('../components/pages/dashboard/admin/reviews/ManageReviews'));
 export const ManageBulkQuotes = browserOnly(() => import('../components/pages/dashboard/admin/quotes/ManageBulkQuotes'));
 export const AdminHeroSlides = browserOnly(() => import('../components/pages/dashboard/admin/AdminHeroSlides'));
+export const UserServiceRequests = browserOnly(() => import('../components/pages/dashboard/user/UserServiceRequests'));
+export const ManageServiceRequests = browserOnly(() => import('../components/pages/dashboard/admin/service/ManageServiceRequests'));
+export const ManageAmcPlans = browserOnly(() => import('../components/pages/dashboard/admin/service/ManageAmcPlans'));
 export const PressManagement = browserOnly(() => import('../components/pages/PressManagement'));

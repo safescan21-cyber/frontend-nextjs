@@ -145,6 +145,24 @@ export const seoPages = {
     description:
       'Free pharma plant cost calculator for tablets, capsules, softgels, liquids, ointments, vials, ampoules, lyophilized products, eye drops and IV fluids: machine cost, power load, transformer & DG size, utilities, HVAC and total project cost.',
   },
+  spares: {
+    path: '/spares',
+    title: 'Spare Parts by Machine Model',
+    description:
+      'Spare parts for tablet presses, capsule fillers, blister and liquid filling machines: punches, dies, seals and change parts. Pick your machine model or ask for any part.',
+  },
+  amc: {
+    path: '/amc',
+    title: 'Annual Maintenance Contract (AMC) for Pharma Machines',
+    description:
+      'AMC plans for pharma and food processing machines: planned preventive maintenance visits and priority breakdown support. Request a plan for your machines.',
+  },
+  serviceRequest: {
+    path: '/service-request',
+    title: 'Service Request – Machine Repair & Support',
+    description:
+      'Report a breakdown or book a service visit for your tablet press, capsule filler or packaging machine. Our service team calls you back, urgent cases first.',
+  },
   privacy: {
     path: '/privacy',
     title: 'Privacy Policy',
