@@ -4,13 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 const WHATSAPP_NUMBER = "918700792607"; // +91 87007 92607
 const WHATSAPP_DEFAULT_MSG = "Hi! I'm interested in your pharmaceutical machinery.";
 
-const COMPANY_SYSTEM = `You are "Nova", a smart, warm, and helpful support assistant for Food Pharma Machinery (PureLine Machinery Pvt. Ltd., Haridwar) – a B2B provider of pharmaceutical machinery.
-Our services: tablet presses, capsule fillers, blister packaging, liquid filling, sterile processing, and turnkey pharma plants.
-Rules:
-- Keep replies to 2–3 sentences. Be conversational and human.
-- Never invent specific prices. Say pricing is project-based; invite them to fill the contact form or jump on WhatsApp.
-- If asked to connect to WhatsApp, tell them to click the green WhatsApp button in the chat.
-- Be helpful, knowledgeable, and never salesy.`;
+// The assistant's instructions and the AI key live on the server (app/api/chat/route.js)
 
 const QUICK_REPLIES = [
   { icon: "💊", text: "What machines do you offer?" },
@@ -215,88 +209,19 @@ function LiveChat() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [msgs, loading]);
 
-  // ─── AI Call with Fallback ──────────────────────────────────
-  const callAI = async (messages, system = COMPANY_SYSTEM) => {
-    // ── 1. Try DeepSeek (primary) ──
-    const deepseekKey = process.env.NEXT_PUBLIC_DEEPSEEK_API_KEY;
-    if (deepseekKey) {
-      try {
-        const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${deepseekKey}`,
-          },
-          body: JSON.stringify({
-            model: "deepseek-chat",
-            messages: [
-              { role: "system", content: system },
-              ...messages,
-            ],
-            max_tokens: 1000,
-            temperature: 0.7,
-          }),
-        });
-        const data = await res.json();
-        if (data.choices && data.choices[0]?.message?.content) {
-          return data.choices[0].message.content;
-        }
-        console.warn("DeepSeek returned no content:", data);
-      } catch (err) {
-        console.warn("DeepSeek error:", err.message);
-      }
-    } else {
-      console.warn("No DeepSeek API key found. Using OpenRouter fallback.");
-    }
-
-    // ── 2. Fallback: OpenRouter (free) ──
-    const openRouterKey = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY;
-    if (!openRouterKey) {
-      console.error("No OpenRouter API key either. Please set VITE_OPENROUTER_API_KEY.");
+  // ─── AI reply (server side: app/api/chat/route.js keeps the key) ──
+  const callAI = async (messages) => {
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages }),
+      });
+      const data = await res.json().catch(() => null);
+      return res.ok ? data?.reply || null : null;
+    } catch {
       return null;
     }
-
-    const freeModels = [
-      "meta-llama/llama-3.2-3b-instruct",
-      "mistralai/mistral-7b-instruct",
-      "microsoft/phi-3-mini-4k-instruct",
-    ];
-
-    for (const model of freeModels) {
-      try {
-        console.log(`Trying OpenRouter model: ${model}`);
-        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${openRouterKey}`,
-            "HTTP-Referer": window.location.origin,
-            "X-Title": "Food Pharma Machinery Chat",
-          },
-          body: JSON.stringify({
-            model: model,
-            messages: [
-              { role: "system", content: system },
-              ...messages,
-            ],
-            max_tokens: 1000,
-            temperature: 0.7,
-          }),
-        });
-        const data = await res.json();
-        if (data.choices && data.choices[0]?.message?.content) {
-          console.log(`✅ OpenRouter success with ${model}`);
-          return data.choices[0].message.content;
-        } else {
-          console.warn(`OpenRouter model ${model} failed:`, data);
-        }
-      } catch (err) {
-        console.warn(`OpenRouter model ${model} error:`, err.message);
-      }
-    }
-
-    console.error("All AI providers failed.");
-    return null;
   };
 
   // ─── Send message ──────────────────────────────────────────────
