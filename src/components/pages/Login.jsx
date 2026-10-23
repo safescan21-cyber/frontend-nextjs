@@ -7,6 +7,7 @@ import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from './firebase';
 import { Mail, Lock, LogIn, Eye, EyeOff, Sparkles, CheckCircle, KeyRound } from 'lucide-react';
 import EmailOtpLogin from './EmailOtpLogin';
+import AdminTwoStep from './AdminTwoStep';
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -31,6 +32,7 @@ const Login = () => {
   const [welcomeMessage, setWelcomeMessage] = useState('');
   const [googleSubmitting, setGoogleSubmitting] = useState(false);
   const [useOtp, setUseOtp] = useState(false);
+  const [twoStep, setTwoStep] = useState(null); // { challenge, email } while an admin enters the emailed code
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -81,6 +83,10 @@ const Login = () => {
       }
 
       const loginResponse = await googleLogin({ idToken }).unwrap();
+      if (loginResponse?.twoStep) {
+        setTwoStep({ challenge: loginResponse.challenge, email: loginResponse.email });
+        return;
+      }
 
       // Save token for cross-subdomain API auth
       if (loginResponse?.token) {
@@ -111,6 +117,11 @@ const Login = () => {
     try {
       const trimmedEmail = email.trim().toLowerCase();
       const loginResponse = await loginUser({ email: trimmedEmail, password }).unwrap();
+      if (loginResponse?.twoStep) {
+        setPassword('');
+        setTwoStep({ challenge: loginResponse.challenge, email: loginResponse.email });
+        return;
+      }
 
       // ✅ Save token for cross-subdomain API auth
       if (loginResponse?.token) {
@@ -204,6 +215,21 @@ const Login = () => {
             </div>
           )}
 
+          {twoStep ? (
+            <AdminTwoStep
+              challenge={twoStep.challenge}
+              email={twoStep.email}
+              onBack={() => setTwoStep(null)}
+              onSuccess={(user) => {
+                try {
+                  finishLogin(user, 'email');
+                } catch (err) {
+                  setMessage(err.message || 'Login failed. Please try again.');
+                  setTimeout(() => setMessage(''), 4000);
+                }
+              }}
+            />
+          ) : (<>
           {/* Google Button */}
           <button
             type="button"
@@ -332,6 +358,7 @@ const Login = () => {
               </form>
             </>
           )}
+          </>)}
 
           <p className="mt-6 text-center text-gray-600">
             Don't have an account?{' '}
