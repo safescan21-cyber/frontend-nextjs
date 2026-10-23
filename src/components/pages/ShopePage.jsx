@@ -12,6 +12,7 @@ import Seo from '../Seo';
 import ShareProduct from '../shop/ShareProduct';
 import CatalogSwitch from './pharmaApi/CatalogSwitch';
 import { rankProducts } from '../../utlis/productSearch';
+import CompareButton from '../compare/CompareButton';
 
 
 // Empty boxes = no limit, so expensive machines are never hidden by default
@@ -424,6 +425,7 @@ const ShopPage = ({ embedded = false }) => {
                         className="relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 group"
                       >
                         <ShareProduct product={product} className="absolute left-2 top-2 z-10" />
+                        <CompareButton id={product._id} compact className="absolute right-2 top-[9.5rem] z-10" />
                         <Link to={`/shop/${product._id}`}>
                           <div className="relative overflow-hidden bg-gray-100 h-48">
                             <img

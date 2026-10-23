@@ -16,6 +16,9 @@ import {
 import ReviewActions from './ReviewActions';
 import ShareProduct from '../ShareProduct';
 import ProductDocuments from './ProductDocuments';
+import QuickQuote from '../../quote/QuickQuote';
+import CompareButton from '../../compare/CompareButton';
+import { downloadSpecSheet } from '../../../utlis/specSheet';
 import Seo from '../../Seo';
 import { track, getLikedProducts, setProductLiked } from '../../../utlis/track';
 import { addToCart, selectCartItems } from '../../store/cartSlice';
@@ -127,6 +130,7 @@ const SingleProduct = () => {
   // review form
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [userName, setUserName] = useState('');
+  const [sheetBusy, setSheetBusy] = useState(false);
   useEffect(() => {
     try { setUserName(localStorage.getItem('reviewerName') || ''); } catch { /* storage blocked */ }
   }, []);
@@ -591,6 +595,22 @@ const SingleProduct = () => {
                 {specs.map((s) => <SpecBadge key={s.label} {...s} />)}
               </div>
 
+              {/* Compare with other machines, or take the spec sheet to the team */}
+              <div className="flex flex-wrap gap-2">
+                <CompareButton id={product._id} />
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setSheetBusy(true);
+                    try { await downloadSpecSheet(product); } catch { toast.error(t('Could not create the PDF. Please try again.')); } finally { setSheetBusy(false); }
+                  }}
+                  disabled={sheetBusy}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-orange-400 disabled:opacity-60"
+                >
+                  {sheetBusy ? '…' : '📄'} {t('Download spec sheet (PDF)')}
+                </button>
+              </div>
+
               {product.color && (
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-semibold text-gray-700">{t("Color:")}</span>
@@ -702,6 +722,8 @@ const SingleProduct = () => {
                 {t("Need 5+ units or a custom spec? Request a bulk quote →")}
               </Link>
               </>)}
+
+              <QuickQuote id="quick-quote" machine={product.name} productId={product._id} className="scroll-mt-32" />
 
               <div className="grid grid-cols-3 gap-2 pt-2 border-t border-gray-100">
                 {[

@@ -21,6 +21,7 @@ import CookieConsent from '../components/pages/CookieConsent';
 import LiveChat from '../components/pages/LiveChat';
 import RouteSeo from '../components/seo/RouteSeo';
 import WebMcpTools from '../components/webmcp/WebMcpTools';
+import CompareBar from '../components/compare/CompareBar';
 import { dedupeHead } from './headTags';
 
 // Global toast look: dark theme to match the site, readable on mobile
@@ -69,6 +70,7 @@ export default function SiteShell({ locale = '', children }) {
             <main id="main-content" className="flex-1">
               {children}
             </main>
+            <CompareBar />
             <MobileActionButtons />
             <Footer />
             <CookieConsent />

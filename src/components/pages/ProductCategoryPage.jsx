@@ -6,6 +6,7 @@ import Seo from "../Seo";
 import { seoPages } from "./seoPages";
 import NotFound from "../seo/NotFound";
 import { PRODUCT_DATA } from "./productCategoryData";
+import QuickQuote from "../quote/QuickQuote";
 
 /* ─── Helper: WhatsApp link generator ───────────────────── */
 const getWhatsAppLink = (productName) => {
@@ -172,6 +173,9 @@ export default function ProductCategoryPage() {
               </div>
             </div>
           ))}
+        </div>
+        <div className="mx-auto mt-10 max-w-2xl">
+          <QuickQuote id="quick-quote" machines={data.products.map((p) => p.name)} />
         </div>
       </section>
     </div>
