@@ -10,6 +10,7 @@ import { PRODUCT_DATA } from '../components/pages/productCategoryData';
 import { SITE_URL, SITE_NAME } from '../components/seo/organization';
 import { brandTitle } from '../i18n/seoText';
 import { CITY_PAGES } from '../components/seo/cityHubs';
+import { PHARMA_MACHINERY_PAGE, pharmaMachineryFaqs, realMachines } from '../components/seo/pharmaMachinery';
 
 export const DEFAULT_TITLE = `${SITE_NAME} | Pharma & Food Processing Machinery`;
 export const DEFAULT_DESCRIPTION = seoPages.home.description;
@@ -26,10 +27,10 @@ const clip = (s, n) => (s.length > n ? `${s.slice(0, n - 1).replace(/\s+\S*$/, '
 const isId = (id) => /^[a-f0-9]{24}$/i.test(id || '');
 
 // Public, indexable pages (same list scripts/prerender-meta.mjs used)
-const EXISTING_ROUTES = new Set(['/', '/shop', '/about', '/products', '/career', '/press', '/track-order', '/contact', '/projects', '/solutions', '/privacy', '/bulk-quote', '/project-cost-calculator', '/pharma-api', '/testimonials', '/spares', '/amc', '/service-request', '/factory', '/pharma-machinery-supplier', '/pharma-plant-checklist']);
+const EXISTING_ROUTES = new Set(['/', '/shop', '/about', '/products', '/career', '/press', '/track-order', '/contact', '/projects', '/solutions', '/privacy', '/bulk-quote', '/project-cost-calculator', '/pharma-api', '/testimonials', '/spares', '/amc', '/service-request', '/factory', '/pharma-machinery', '/pharma-machinery-supplier', '/pharma-plant-checklist']);
 export const STATIC_PAGES = (() => {
   const pages = Object.values(seoPages).filter((p) => EXISTING_ROUTES.has(p.path) || p.path.startsWith('/solutions/'));
-  pages.push(...CITY_PAGES); // /pharma-machinery-supplier/<city>
+  pages.push(PHARMA_MACHINERY_PAGE, ...CITY_PAGES); // /pharma-machinery, /pharma-machinery-supplier/<city>
   for (const s of SOLUTIONS) {
     if (!pages.some((p) => p.path === `/solutions/${s.slug}`)) pages.push({ path: `/solutions/${s.slug}`, title: s.title, description: s.intro });
   }
@@ -246,6 +247,42 @@ export async function seoForPath(segments = []) {
         lines: [page.description],
         list: items.map((t) => `“${clip(plain(t.quote), 400)}” — ${[t.name, t.role, t.company, t.city].filter(Boolean).join(', ')}`),
         links: [['/shop', 'Shop machinery'], ['/pharma-api', 'Pharma APIs'], ['/contact', 'Contact']],
+      },
+    };
+  }
+
+  // ── /pharma-machinery: FAQs and the machines with prices, as on the page ──
+  if (path === PHARMA_MACHINERY_PAGE.path) {
+    const { data } = await getJson('/api/products/?category=&color=&minPrice=0&maxPrice=&page=1&limit=1000');
+    const products = realMachines(data?.products);
+    const faqs = pharmaMachineryFaqs(products);
+    const crumbs = [['Home', '/'], ['Pharma machinery', null]];
+    return {
+      title: fullTitle(PHARMA_MACHINERY_PAGE.title),
+      description: PHARMA_MACHINERY_PAGE.description,
+      canonical: `${SITE_URL}${path}`,
+      jsonLd: [
+        breadcrumbLd(crumbs),
+        {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+        },
+        ...(products.length
+          ? [{
+              '@context': 'https://schema.org',
+              '@type': 'ItemList',
+              name: 'Pharma machines',
+              itemListElement: products.map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE_URL}/shop/${p._id}`, name: p.name })),
+            }]
+          : []),
+      ],
+      summary: {
+        crumbs,
+        heading: PHARMA_MACHINERY_PAGE.title,
+        lines: [PHARMA_MACHINERY_PAGE.description],
+        list: products.map((p) => [p.name, Number(p.price) > 0 && `Rs. ${Number(p.price).toLocaleString('en-IN')}`].filter(Boolean).join(' – ')),
+        links: [['/shop', 'Shop machinery'], ['/products', 'Machine categories'], ['/bulk-quote', 'Request a quote']],
       },
     };
   }

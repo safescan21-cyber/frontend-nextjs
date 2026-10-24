@@ -62,7 +62,7 @@ export default function CityPage({ hub, installations = [] }) {
           )}
 
           <p className="mt-8 text-sm text-slate-600">
-            <Link to="/spares" className="font-semibold text-blue-600 hover:underline">Spare parts</Link> · <Link to="/amc" className="font-semibold text-blue-600 hover:underline">AMC</Link> · <Link to="/service-request" className="font-semibold text-blue-600 hover:underline">Service request</Link> · <Link to="/factory" className="font-semibold text-blue-600 hover:underline">Our factory</Link> · <Link to="/project-cost-calculator" className="font-semibold text-blue-600 hover:underline">Plant cost calculator</Link>
+            <Link to="/pharma-machinery" className="font-semibold text-blue-600 hover:underline">All pharma machinery</Link> · <Link to="/spares" className="font-semibold text-blue-600 hover:underline">Spare parts</Link> · <Link to="/amc" className="font-semibold text-blue-600 hover:underline">AMC</Link> · <Link to="/service-request" className="font-semibold text-blue-600 hover:underline">Service request</Link> · <Link to="/factory" className="font-semibold text-blue-600 hover:underline">Our factory</Link> · <Link to="/project-cost-calculator" className="font-semibold text-blue-600 hover:underline">Plant cost calculator</Link>
           </p>
         </div>
 
