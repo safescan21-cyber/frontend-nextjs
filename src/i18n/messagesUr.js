@@ -491,5 +491,6 @@ export const UR = {
   'Prices are indicative; installation, freight and taxes are quoted separately.': 'قیمتیں تخمینی ہیں؛ تنصیب، کرایہ اور ٹیکس کا کوٹیشن الگ دیا جاتا ہے۔',
   'Phone / WhatsApp': 'فون / واٹس ایپ',
   'page {i}/{n}': 'صفحہ {i}/{n}',
+  'Model number': 'ماڈل نمبر',
   'Machine details are in English.': 'مشین کی تفصیلات انگریزی میں ہیں۔',
 };

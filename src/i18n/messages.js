@@ -498,6 +498,7 @@ const ROWS = {
   'Prices are indicative; installation, freight and taxes are quoted separately.': ['Prix indicatifs ; l’installation, le transport et les taxes sont chiffrés séparément.', '価格は目安です。据付、運賃、税金は別途お見積りします。', '가격은 참고용이며 설치, 운송비 및 세금은 별도로 견적됩니다.'],
   'Phone / WhatsApp': ['Téléphone / WhatsApp', '電話 / WhatsApp', '전화 / WhatsApp'],
   'page {i}/{n}': ['page {i}/{n}', '{i}/{n} ページ', '{i}/{n} 페이지'],
+  'Model number': ['Numéro de modèle', '型番', '모델 번호'],
   'Machine details are in English.': ['Les détails de la machine sont en anglais.', '機械の詳細は英語で記載しています。', '기계 세부 정보는 영어로 제공됩니다.'],
 };
 

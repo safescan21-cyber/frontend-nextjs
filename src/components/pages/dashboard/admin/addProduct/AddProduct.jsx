@@ -229,6 +229,7 @@ const AddProduct = () => {
     stock: '',
     readyToDispatch: false,
     description: '',
+    modelNumber: '', // e.g. ZP-35D: goes into the serial numbers of sold machines
     fitsModels: '', // spare parts: machine models, comma separated
   });
   const [images, setImages] = useState([]);
@@ -451,6 +452,7 @@ const AddProduct = () => {
         stock: '',
         readyToDispatch: false,
         description: '',
+        modelNumber: '',
         fitsModels: '',
         active: true,
         sellOnline: true,
@@ -601,6 +603,13 @@ const AddProduct = () => {
           onChange={handleChange}
         />
 
+        <TextInput
+          label="Model number (used in the serial numbers when sold)"
+          name="modelNumber"
+          placeholder="ZP-35D"
+          value={product.modelNumber}
+          onChange={handleChange}
+        />
         <TextInput
           label="Fits machine models (spare parts, comma separated)"
           name="fitsModels"
