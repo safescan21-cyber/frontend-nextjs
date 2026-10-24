@@ -19,6 +19,7 @@ import toast from 'react-hot-toast';
 import UserAvatar from "./UserAvatar";
 import ThemeToggle from "./ThemeToggle";
 import { API_CATEGORIES } from './pages/pharmaApi/pharmaApiShared';
+import getBaseURL from '../utlis/baseURL';
 import { organizationNode, websiteNode } from './seo/organization';
 import PharmaLogoAsset from "../assets/pharmamachinehub-logo-v2_2.svg";
 // Next.js gives image imports as { src, width, height }
@@ -230,6 +231,24 @@ const Navbar = () => {
     limit: 1000,
   });
   const allProducts = apiData?.products || [];
+
+  // Pharma API categories with at least one visible API (they follow what the admin adds
+  // or deletes); usual order first, any new category after
+  const [apiCategories, setApiCategories] = useState([]);
+  useEffect(() => {
+    let live = true;
+    fetch(`${getBaseURL()}/api/pharma-apis/categories`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((rows) => {
+        if (!live || !Array.isArray(rows)) return;
+        const rank = (c) => (API_CATEGORIES.includes(c) ? API_CATEGORIES.indexOf(c) : API_CATEGORIES.length);
+        setApiCategories(rows.filter((r) => r?.category && r.count > 0).map((r) => r.category).sort((a, b) => rank(a) - rank(b)));
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, []);
 
   const [isOpen, setIsOpen] = useState(false);
   const [productsDropdown, setProductsDropdown] = useState(false);
@@ -581,8 +600,9 @@ const Navbar = () => {
                       <p className="flex items-center gap-2 text-sm font-semibold text-slate-200"><FlaskConical className="w-4 h-4 text-amber-400" aria-hidden="true" />{t("Active Pharmaceutical Ingredients")}</p>
                       <p className="mt-0.5 text-xs text-slate-400">{t("Bulk drugs in IP, BP, USP and EP grades with COA and MSDS")}</p>
                     </div>
+                    {apiCategories.length > 0 && (
                     <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1 p-2 max-h-[360px] overflow-y-auto custom-scrollbar">
-                      {API_CATEGORIES.map((c) => (
+                      {apiCategories.map((c) => (
                         <li key={c}>
                           <Link
                             to={`/pharma-api?category=${encodeURIComponent(c)}`}
@@ -594,6 +614,7 @@ const Navbar = () => {
                         </li>
                       ))}
                     </ul>
+                    )}
                     <div className="border-t border-slate-700 mt-1 pt-3 px-4 flex justify-between items-center gap-2">
                       <Link to="/bulk-quote?product=Pharma%20API&source=pharma-api" onClick={handleLinkClick} className="text-xs text-slate-400 hover:text-amber-400">{t("Can't find an API? Send an enquiry")}</Link>
                       <Link to="/pharma-api" onClick={handleLinkClick} className="text-xs text-amber-400 hover:text-amber-300">{t("View all APIs →")}</Link>
@@ -1088,7 +1109,7 @@ const Navbar = () => {
                           {t("All APIs →")}
                         </Link>
                       </li>
-                      {API_CATEGORIES.map((c) => (
+                      {apiCategories.map((c) => (
                         <li key={c}>
                           <Link
                             to={`/pharma-api?category=${encodeURIComponent(c)}`}
