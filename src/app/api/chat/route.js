@@ -1,17 +1,15 @@
 // /api/chat — replies for the site's chat assistant (components/pages/LiveChat.jsx).
-// The DeepSeek key stays on the server (DEEPSEEK_API_KEY, never NEXT_PUBLIC_…), and so
-// does the assistant's instructions: the browser only sends the conversation. To keep
-// the key from being used as a free AI service, only short chats from this site are
-// accepted, a limited number per visitor.
-// Optional fallback when DeepSeek fails: OPENROUTER_API_KEY (free models).
+// The assistant's instructions stay on the server: the browser only sends the conversation.
+// Only short chats from this site are accepted, a limited number per visitor.
 //
 // Every question first looks up real facts (machines, prices, FAQs, company details) in
-// knowledge.js; the AI may only use those for specifics. Order of AI services:
-//   1. our own model, when LLM_BASE_URL (+ LLM_MODEL, optional LLM_API_KEY) is set —
-//      any OpenAI-compatible server, e.g. Ollama: LLM_BASE_URL=https://<host>/v1
-//   2. DeepSeek (DEEPSEEK_API_KEY)   3. OpenRouter (OPENROUTER_API_KEY)
-//   4. none answering: the best matching fact is sent as the reply
-import { findFacts, factsBlock, replyFromFacts, checkReply, isOffTopic, logMissedQuestion, quoteOffer } from './knowledge';
+// knowledge.js; the model may only use those for specifics. Who answers:
+//   1. greetings / thanks: answered at once, no model needed
+//   2. our own model (trained in llm-training/, served by llama.cpp on this server at
+//      LLM_BASE_URL, e.g. http://127.0.0.1:8090/v1, LLM_MODEL=foodpharma); every reply is
+//      checked (unknown prices -> facts answer; wrong phone numbers / links fixed)
+//   3. model slow or down: the best matching fact is sent as the reply
+import { findFacts, factsBlock, replyFromFacts, checkReply, isOffTopic, isSmallTalk, logMissedQuestion, quoteOffer } from './knowledge';
 
 const SYSTEM = `You are "Nova", a smart, warm, and helpful support assistant for Food Pharma Machinery (PureLine Machinery Pvt. Ltd., Haridwar) – a B2B provider of pharmaceutical machinery.
 Our services: pharma and food processing machines (tablet presses, capsule fillers, blister packaging, liquid and powder filling, sterile processing), spares, AMC and turnkey plants.
@@ -50,12 +48,13 @@ const cleanMessages = (list) => {
   return out.length && out[out.length - 1].role === 'user' ? out : null;
 };
 
-const ask = async (url, key, model, messages, extraHeaders = {}) => {
+// Our model runs on the server's processor: short answers, and a generous time limit
+const ask = async (url, key, model, messages) => {
   const res = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...(key && { Authorization: `Bearer ${key}` }), ...extraHeaders },
-    body: JSON.stringify({ model, messages, max_tokens: 500, temperature: 0.4 }),
-    signal: AbortSignal.timeout(25000),
+    headers: { 'Content-Type': 'application/json', ...(key && { Authorization: `Bearer ${key}` }) },
+    body: JSON.stringify({ model, messages, max_tokens: 200, temperature: 0.3 }),
+    signal: AbortSignal.timeout(45000),
   });
   const data = await res.json().catch(() => null);
   return data?.choices?.[0]?.message?.content || null;
@@ -91,10 +90,11 @@ export async function POST(request) {
   const best = facts[0]?.score || 0;
   if (best < 2.5 && !/^\s*(hi|hello|hey|namaste|thanks|thank you|ok|okay)\b/i.test(latest)) logMissedQuestion(latest);
 
-  // Not about us (jokes, homework…): the standard answer, no AI needed
+  // Greetings / thanks: at once. Not about us (jokes, homework…): the standard answer.
+  if (isSmallTalk(latest)) return Response.json({ reply: replyFromFacts(facts, latest), source: 'facts' });
   if (isOffTopic(facts, asked)) return Response.json({ reply: replyFromFacts([], asked), source: 'facts' });
   // Every AI reply is checked: unknown prices -> answer from the facts; wrong phone/links fixed
-  const checked = (reply) => (reply ? checkReply(reply, facts) || replyFromFacts(facts, asked) : null);
+  const checked = (reply) => (reply ? checkReply(reply, facts) || replyFromFacts(facts, latest) : null);
 
   try {
     if (process.env.LLM_BASE_URL) {
@@ -102,22 +102,9 @@ export async function POST(request) {
       const reply = await ask(`${base}/chat/completions`, process.env.LLM_API_KEY, process.env.LLM_MODEL || 'foodpharma', prompt).catch(() => null);
       if (reply) return Response.json({ reply: checked(reply), source: 'own', quote });
     }
-    if (process.env.DEEPSEEK_API_KEY) {
-      const reply = await ask('https://api.deepseek.com/v1/chat/completions', process.env.DEEPSEEK_API_KEY, 'deepseek-chat', prompt).catch(() => null);
-      if (reply) return Response.json({ reply: checked(reply), source: 'deepseek', quote });
-    }
-    if (process.env.OPENROUTER_API_KEY) {
-      for (const model of ['meta-llama/llama-3.2-3b-instruct', 'mistralai/mistral-7b-instruct', 'microsoft/phi-3-mini-4k-instruct']) {
-        const reply = await ask('https://openrouter.ai/api/v1/chat/completions', process.env.OPENROUTER_API_KEY, model, prompt, {
-          'HTTP-Referer': 'https://www.foodpharmamachinery.com',
-          'X-Title': 'Food Pharma Machinery Chat',
-        }).catch(() => null);
-        if (reply) return Response.json({ reply: checked(reply), source: 'openrouter', quote });
-      }
-    }
   } catch {
     /* answered below */
   }
-  // No AI service answered: reply with the best matching fact
-  return Response.json({ reply: replyFromFacts(facts, asked), source: 'facts', quote });
+  // Model slow or down: reply with the best matching fact
+  return Response.json({ reply: replyFromFacts(facts, latest), source: 'facts', quote });
 }

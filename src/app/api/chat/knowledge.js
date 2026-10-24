@@ -28,16 +28,19 @@ const COMPANY = [
   { title: 'Service request for a machine problem or breakdown', text: 'Raise a service request with the machine model, serial number and a short description of the problem (photos help). If the machine has stopped, also message us on WhatsApp.', url: `${SITE}/service-request` },
   { title: 'Spare parts', text: 'Find spare parts by machine model on the spares page, or send the model and serial number and we will quote.', url: `${SITE}/spares` },
   { title: 'AMC annual maintenance contract', text: 'Annual maintenance contracts with planned preventive visits and priority breakdown support.', url: `${SITE}/amc` },
+  { title: 'Delivery time, lead time and dispatch', text: 'Delivery time depends on the machine and the order: machines in stock are ready to dispatch, others are made to order. The delivery time is confirmed in your quotation.', url: `${SITE}/bulk-quote` },
   { title: 'Track an order', text: 'Track an order with the order number on the track order page; logged-in customers also see their orders in their account.', url: `${SITE}/track-order` },
 ];
 
 // Words that say nothing about the topic
-const STOP = new Set('a an the and or of to for in on at by with from is are was be do does did can could would should will i you we our your my me us it this that these those what which who how when why please hi hello hey need want looking about any some have has there their them they get give tell show know more much many also just than then so if not no yes ok thanks thank sir madam'.split(' '));
+const STOP = new Set('a an the and or of to for in on at by with from is are was be do does did can could would should will i you we our your my me us it this that these those what which who how when why please hi hello hey need want looking about any some have has there their them they get give tell show know more much many also just than then so if not no yes ok thanks thank sir madam time long days'.split(' '));
 // Same meaning, one word (so "cost" finds "price")
-const SAME = { cost: 'price', rate: 'price', rates: 'price', pricing: 'price', prices: 'price', quote: 'quotation', quotes: 'quotation', masala: 'spice', spices: 'spice', filler: 'filling', fill: 'filling', fillers: 'filling', packing: 'pack', packaging: 'pack', packer: 'pack', capsules: 'capsule', tablets: 'tablet', machines: 'machine', machinery: 'machine', equipment: 'machine', location: 'address', located: 'address', where: 'address', repair: 'service', breakdown: 'service', problem: 'service', noise: 'service', fault: 'service', amc: 'maintenance', whatsapp: 'contact', phone: 'contact', call: 'contact', number: 'contact', deliver: 'delivery', shipping: 'delivery', dispatch: 'delivery', export: 'delivery' };
+const SAME = { cost: 'price', rate: 'price', rates: 'price', pricing: 'price', prices: 'price', quote: 'quotation', quotes: 'quotation', masala: 'spice', spices: 'spice', filler: 'filling', fill: 'filling', fillers: 'filling', packing: 'pack', packaging: 'pack', packer: 'pack', capsules: 'capsule', tablets: 'tablet', machines: 'machine', machinery: 'machine', equipment: 'machine', location: 'address', located: 'address', where: 'address', repair: 'service', breakdown: 'service', problem: 'service', noise: 'service', fault: 'service', amc: 'maintenance', whatsapp: 'contact', phone: 'contact', call: 'contact', number: 'contact', deliver: 'delivery', shipping: 'delivery', dispatch: 'delivery', export: 'delivery', lead: 'delivery' };
+// Plural to singular: presses -> press, batteries -> battery, machines -> machine
+const singular = (w) => (w.length <= 3 ? w : w.endsWith('sses') ? w.slice(0, -2) : w.endsWith('ies') ? `${w.slice(0, -3)}y` : w.endsWith('s') && !w.endsWith('ss') && !w.endsWith('us') ? w.slice(0, -1) : w);
 const words = (s) => String(s || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9\s-]/g, ' ').split(/[\s-]+/)
   .filter((w) => w.length > 1 && !STOP.has(w))
-  .map((w) => SAME[w] || (w.length > 4 && w.endsWith('s') ? w.slice(0, -1) : w));
+  .map((w) => SAME[w] || singular(w));
 
 // ── Building the facts ──
 const staticFacts = () => {
@@ -136,15 +139,17 @@ export const findFacts = async (question, limit = 6) => {
   return idx.facts
     .map((f) => {
       let score = 0;
+      let hits = 0; // how many of the question's words this fact contains
       for (const w of q) {
         const tf = f.tf.get(w);
         if (!tf) continue;
+        hits++;
         const idf = Math.log(1 + (idx.n - idx.df.get(w) + 0.5) / (idx.df.get(w) + 0.5));
         score += idf * ((tf * (k1 + 1)) / (tf + k1 * (1 - b + (b * f.len) / idx.avgLen)));
       }
       // The admin's own answers win over automatic facts that match about as well
       if (f.admin) score *= 1.3;
-      return { title: f.title, text: f.text, url: f.url, answer: f.answer, product: f.product, score };
+      return { title: f.title, text: f.text, url: f.url, answer: f.answer, product: f.product, score, cover: hits / q.length };
     })
     .filter((f) => f.score > 0)
     .sort((x, y) => y.score - x.score)
@@ -211,16 +216,35 @@ export const checkReply = (reply, facts) => {
 };
 
 // A reply without any AI (when no AI service answers): the best fact, if it fits well enough
+const GREETING = /^\s*(hi+|hello|hey|hii|namaste|namaskar|good (morning|afternoon|evening)|hola)\b[\s!.,]*$/i;
+const THANKS = /^\s*(thanks?|thank you|thx|ok(ay)?|great|nice|cool)\b[\s!.,]*$/i;
+// First sentences up to about n characters
+const sentences = (text, n = 300) => {
+  const parts = String(text).match(/[^.!?]+[.!?]+(\s|$)/g) || [String(text)];
+  let out = '';
+  for (const p of parts) {
+    if (out && (out + p).length > n) break;
+    out += p;
+  }
+  return clip(out.trim(), n + 40);
+};
+
+export const isSmallTalk = (q) => GREETING.test(q) || THANKS.test(q);
+
 export const replyFromFacts = (facts, question = '') => {
+  if (GREETING.test(question)) return "Hello! 👋 I'm Nova from Food Pharma Machinery. Ask me about our machines, prices, an instant quotation, spare parts or service – how can I help?";
+  if (THANKS.test(question)) return "You're welcome! If you need anything else – a machine, a quotation or service – just ask, or tap the green WhatsApp button to talk to our team.";
   const best = facts[0];
   const asksPrice = words(question).includes('price');
-  if (!best || best.score < 2.5) {
-    return 'I want to give you the right answer, so please message our team on WhatsApp (click the green WhatsApp button) or call +91 87007 92607. You can also ask for a quotation on any machine page.';
+  // A fact only counts as the answer when it matches enough of the question
+  if (!best || best.score < 2.5 || (best.cover < 0.5 && best.score < 6)) {
+    return "I don't want to guess on that one. Our team will confirm it for you – tap the green WhatsApp button or call +91 87007 92607. You can also ask for a quotation on any machine page.";
   }
-  const body = best.answer || `${best.title.replace(/^Machine: /, '')}: ${clip(best.text, 420)}`;
+  const name = best.title.replace(/^Machine: /, '');
+  const body = best.answer ? sentences(best.answer, 320) : `${name}: ${sentences(best.text, 280)}`;
   // Price asked but the best fact has no listed price: say how to get one
   const priceNote = asksPrice && !/Listed price|Rs\. \d/.test(body)
-    ? '\n\nFor the price, share your requirement on WhatsApp or the quote form and we will send it; machines with a listed price show it on their page.'
+    ? '\n\nFor the price, share your requirement on WhatsApp or the quote form and we will send it.'
     : '';
-  return `${body}${best.url ? `\n\nMore details: ${best.url}` : ''}${priceNote}\n\nFor anything else, click the green WhatsApp button and our team will help.`;
+  return `${body}${best.url ? `\n\nDetails: ${best.url}` : ''}${priceNote}`;
 };

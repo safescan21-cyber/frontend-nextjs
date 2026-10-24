@@ -587,7 +587,7 @@ function LiveChat() {
 
           <div className="text-center py-2" style={{ background: "rgba(0,0,0,0.3)" }}>
             <p className="text-[10px] text-stone-700 font-sans tracking-wider">
-              Powered by <span className="text-stone-500">DeepSeek</span> · Enter to send
+              Nova · <span className="text-stone-500">Food Pharma Machinery AI</span> · Enter to send
             </p>
           </div>
         </div>
