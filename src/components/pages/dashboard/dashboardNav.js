@@ -2,7 +2,7 @@
 // (DashboardShell.jsx) and the profile dropdown in the header (Navbar.jsx).
 import {
   LayoutDashboard, Package, Truck, PlusCircle, FileText, Users, TrendingUp, BarChart3,
-  FlaskConical, MessageSquare, CreditCard, Image, Newspaper, Star, ClipboardList, User, ShoppingBag, Wrench, ShieldCheck, Factory, Hash,
+  FlaskConical, MessageSquare, CreditCard, Image, Newspaper, Star, ClipboardList, User, ShoppingBag, Wrench, ShieldCheck, Factory, Hash, Bot,
 } from 'lucide-react';
 
 export const ADMIN_NAV = [
@@ -29,6 +29,7 @@ export const ADMIN_NAV = [
   { group: 'Content', items: [
     { label: 'Hero Slides', path: '/dashboard/hero-slides', icon: Image },
     { label: 'Factory & Clients', path: '/dashboard/showcase', icon: Factory },
+    { label: 'Chatbot Training', path: '/dashboard/chat-training', icon: Bot },
     { label: 'Testimonials', path: '/dashboard/testimonials', icon: Star },
     { label: 'Reviews & Comments', path: '/dashboard/manage-reviews', icon: MessageSquare },
     { label: 'Press Releases', path: '/dashboard/press', icon: Newspaper },

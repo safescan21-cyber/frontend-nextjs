@@ -11,7 +11,7 @@
 //      any OpenAI-compatible server, e.g. Ollama: LLM_BASE_URL=https://<host>/v1
 //   2. DeepSeek (DEEPSEEK_API_KEY)   3. OpenRouter (OPENROUTER_API_KEY)
 //   4. none answering: the best matching fact is sent as the reply
-import { findFacts, factsBlock, replyFromFacts, checkReply, isOffTopic } from './knowledge';
+import { findFacts, factsBlock, replyFromFacts, checkReply, isOffTopic, logMissedQuestion } from './knowledge';
 
 const SYSTEM = `You are "Nova", a smart, warm, and helpful support assistant for Food Pharma Machinery (PureLine Machinery Pvt. Ltd., Haridwar) – a B2B provider of pharmaceutical machinery.
 Our services: pharma and food processing machines (tablet presses, capsule fillers, blister packaging, liquid and powder filling, sterile processing), spares, AMC and turnkey plants.
@@ -82,6 +82,11 @@ export async function POST(request) {
     { role: 'system', content: facts.length ? `FACTS from our website and database:\n${factsBlock(facts)}` : 'FACTS: nothing found for this question. Do not guess specifics; offer WhatsApp or the quote form.' },
     ...messages,
   ];
+
+  // Nothing good to answer with: put the question on the admin's list (the latest message only)
+  const latest = messages[messages.length - 1].content;
+  const best = facts[0]?.score || 0;
+  if (best < 2.5 && !/^\s*(hi|hello|hey|namaste|thanks|thank you|ok|okay)\b/i.test(latest)) logMissedQuestion(latest);
 
   // Not about us (jokes, homework…): the standard answer, no AI needed
   if (isOffTopic(facts, asked)) return Response.json({ reply: replyFromFacts([], asked), source: 'facts' });

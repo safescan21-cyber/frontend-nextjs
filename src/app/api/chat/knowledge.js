@@ -12,7 +12,7 @@ import { PRODUCT_DATA } from '../../../components/pages/productCategoryData';
 
 const SITE = 'https://www.foodpharmamachinery.com';
 const API = (process.env.NEXT_PUBLIC_BACKEND_URL || 'https://api.foodpharmamachinery.com').replace(/\/api\/?$/, '').replace(/\/$/, '');
-const REFRESH_MS = 10 * 60 * 1000;
+const REFRESH_MS = 5 * 60 * 1000; // new admin answers reach the chat within 5 minutes
 const DEMO = /\/demo-products\//;
 
 const plain = (html) => String(html || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
@@ -67,6 +67,9 @@ const getJson = async (path) => {
 
 const liveFacts = async () => {
   const out = [];
+  // Questions + answers written by the admin (Dashboard → Chatbot Training)
+  const qa = (await getJson('/api/chat-qa'))?.items || [];
+  for (const x of qa) if (x?.question && x?.answer) out.push({ title: x.question, text: x.answer, answer: x.answer, url: '', admin: true });
   const products = (await getJson('/api/products/?category=&color=&minPrice=0&maxPrice=&page=1&limit=1000'))?.products || [];
   for (const p of products) {
     if (!p?.name || p.active === false || (p.images || []).some((i) => DEMO.test(i))) continue;
@@ -139,6 +142,8 @@ export const findFacts = async (question, limit = 6) => {
         const idf = Math.log(1 + (idx.n - idx.df.get(w) + 0.5) / (idx.df.get(w) + 0.5));
         score += idf * ((tf * (k1 + 1)) / (tf + k1 * (1 - b + (b * f.len) / idx.avgLen)));
       }
+      // The admin's own answers win over automatic facts that match about as well
+      if (f.admin) score *= 1.3;
       return { title: f.title, text: f.text, url: f.url, answer: f.answer, score };
     })
     .filter((f) => f.score > 0)
@@ -148,7 +153,20 @@ export const findFacts = async (question, limit = 6) => {
 
 // Facts as a block for the AI's instructions
 export const factsBlock = (facts) =>
-  facts.map((f, i) => `[${i + 1}] ${f.title}: ${f.text} (link: ${f.url})`).join('\n');
+  facts.map((f, i) => `[${i + 1}] ${f.title}: ${f.text}${f.url ? ` (link: ${f.url})` : ''}`).join('\n');
+
+// A question with no good fact goes on the admin's list (Dashboard → Chatbot Training), so
+// someone can write the answer. Needs CHAT_LOG_KEY here and in the API's .env; never blocks the chat.
+export const logMissedQuestion = (question) => {
+  const key = process.env.CHAT_LOG_KEY;
+  if (!key || !question) return;
+  fetch(`${API}/api/chat-qa/missed`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Chat-Log-Key': key },
+    body: JSON.stringify({ question: String(question).slice(0, 300) }),
+    signal: AbortSignal.timeout(5000),
+  }).catch(() => {});
+};
 
 // ── Checks on every AI reply before a customer sees it ──
 const PHONE = '+91 87007 92607';
