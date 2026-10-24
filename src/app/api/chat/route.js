@@ -9,7 +9,7 @@
 //      LLM_BASE_URL, e.g. http://127.0.0.1:8090/v1, LLM_MODEL=foodpharma); every reply is
 //      checked (unknown prices -> facts answer; wrong phone numbers / links fixed)
 //   3. model slow or down: the best matching fact is sent as the reply
-import { findFacts, factsBlock, replyFromFacts, checkReply, isOffTopic, isSmallTalk, logMissedQuestion, quoteOffer } from './knowledge';
+import { findFacts, factsBlock, replyFromFacts, checkReply, isOffTopic, isSmallTalk, factsCoverQuestion, logMissedQuestion, quoteOffer } from './knowledge';
 
 const SYSTEM = `You are "Nova", a smart, warm, and helpful support assistant for Food Pharma Machinery (PureLine Machinery Pvt. Ltd., Haridwar) – a B2B provider of pharmaceutical machinery.
 Our services: pharma and food processing machines (tablet presses, capsule fillers, blister packaging, liquid and powder filling, sterile processing), spares, AMC and turnkey plants.
@@ -97,7 +97,8 @@ export async function POST(request) {
   const checked = (reply) => (reply ? checkReply(reply, facts) || replyFromFacts(facts, latest) : null);
 
   try {
-    if (process.env.LLM_BASE_URL) {
+    // Only when the facts really cover the question: a small model invents when it has none
+    if (process.env.LLM_BASE_URL && factsCoverQuestion(facts)) {
       const base = process.env.LLM_BASE_URL.replace(/\/$/, '');
       const reply = await ask(`${base}/chat/completions`, process.env.LLM_API_KEY, process.env.LLM_MODEL || 'foodpharma', prompt).catch(() => null);
       if (reply) return Response.json({ reply: checked(reply), source: 'own', quote });

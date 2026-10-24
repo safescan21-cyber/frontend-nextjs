@@ -184,7 +184,8 @@ export const quoteOffer = (facts, question) => {
 
 // ── Checks on every AI reply before a customer sees it ──
 const PHONE = '+91 87007 92607';
-const PHONE_RE = /(?:\+?91[\s-]?)?\b\d{5}[\s-]?\d{5}\b/g;
+// Any phone-like number (10+ digits with spaces, dashes or a + in between)
+const PHONE_RE = /\+?\(?\d[\d\s()-]{8,}\d/g;
 const MONEY_RE = /(?:₹|\brs\.?|\binr\b|\$|€)\s?\d|\d[\d,.]*\s?(?:lakh|lac|crore|million|thousand|k\b)/i;
 const SITE_URL_RE = /https?:\/\/(?:www\.)?foodpharmamachinery\.com[^\s)\]>"']*/gi;
 // A number with a technical unit: "7.5 kW", "1200 cans/hour", "15 days"…
@@ -216,7 +217,7 @@ export const checkReply = (reply, facts) => {
     if (!allowed.has(clean)) return null;
   }
   if ((reply.match(/https?:\/\/[^\s)]+/gi) || []).some((u) => !/^https?:\/\/(www\.)?foodpharmamachinery\.com|^https?:\/\/wa\.me\//i.test(u))) return null;
-  return reply.replace(PHONE_RE, (m) => (digits(m).endsWith('8700792607') ? m : PHONE));
+  return reply.replace(PHONE_RE, (m) => (digits(m).length < 10 || digits(m).endsWith('8700792607') ? m : PHONE));
 };
 
 // A reply without any AI (when no AI service answers): the best fact, if it fits well enough
@@ -232,6 +233,9 @@ const sentences = (text, n = 300) => {
   }
   return clip(out.trim(), n + 40);
 };
+
+// Facts good enough to let the model answer; otherwise the honest facts-only reply is safer
+export const factsCoverQuestion = (facts) => Boolean(facts[0] && facts[0].score >= 4 && facts[0].cover >= 0.5);
 
 export const isSmallTalk = (q) => GREETING.test(q) || THANKS.test(q);
 
