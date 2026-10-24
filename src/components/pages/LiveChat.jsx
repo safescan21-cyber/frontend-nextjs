@@ -201,6 +201,21 @@ function ChatQuote({ quote }) {
   );
 }
 
+// ─── MESSAGE TEXT ───────────────────────────────────────────────
+// Our site links and our phone number become tappable (long links wrap inside the bubble)
+const LINK_RE = /(https?:\/\/(?:www\.)?foodpharmamachinery\.com[^\s)\]]*[^\s)\].,;:!?]|\+91[\s-]?87007[\s-]?92607)/g;
+function MessageText({ text }) {
+  return text.split(LINK_RE).map((part, i) => {
+    if (i % 2 === 0) return part;
+    const isPhone = part.startsWith("+91");
+    return (
+      <a key={i} href={isPhone ? "tel:+918700792607" : part} className="break-all text-amber-300 underline underline-offset-2 hover:text-amber-200">
+        {isPhone ? part : part.replace(/^https?:\/\/(www\.)?/, "")}
+      </a>
+    );
+  });
+}
+
 // ─── MESSAGE BUBBLE ─────────────────────────────────────────────
 function Bubble({ msg, isNew }) {
   const isUser = msg.role === "user";
@@ -214,12 +229,12 @@ function Bubble({ msg, isNew }) {
           <span className="text-sm">✦</span>
         </div>
       )}
-      <div className={`max-w-[80%] px-4 py-2.5 text-sm font-sans leading-relaxed ${
+      <div className={`max-w-[80%] min-w-0 whitespace-pre-line break-words px-4 py-2.5 text-sm font-sans leading-relaxed ${
         isUser
           ? "bg-gradient-to-br from-amber-500 to-orange-500 text-white rounded-2xl rounded-br-sm shadow-lg shadow-amber-500/20"
           : "bg-stone-800/90 text-stone-200 rounded-2xl rounded-bl-sm border border-white/8 backdrop-blur-sm"
       }`}>
-        {msg.content}
+        {isUser ? msg.content : <MessageText text={msg.content} />}
         {msg.showWhatsApp && (
           <div className="mt-3">
             <WhatsAppButton aiSummary={msg.waSummary} />
