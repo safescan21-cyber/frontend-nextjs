@@ -34,6 +34,7 @@ export const AdminHeroSlides = browserOnly(() => import('../components/pages/das
 export const UserServiceRequests = browserOnly(() => import('../components/pages/dashboard/user/UserServiceRequests'));
 export const ManageServiceRequests = browserOnly(() => import('../components/pages/dashboard/admin/service/ManageServiceRequests'));
 export const ManageAmcPlans = browserOnly(() => import('../components/pages/dashboard/admin/service/ManageAmcPlans'));
+export const SeoHealth = browserOnly(() => import('../components/pages/dashboard/admin/seoHealth/SeoHealth'));
 export const ChatTraining = browserOnly(() => import('../components/pages/dashboard/admin/chatTraining/ChatTraining'));
 export const ManageSoldMachines = browserOnly(() => import('../components/pages/dashboard/admin/soldMachines/ManageSoldMachines'));
 export const ManageShowcase = browserOnly(() => import('../components/pages/dashboard/admin/showcase/ManageShowcase'));

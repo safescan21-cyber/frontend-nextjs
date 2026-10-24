@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import { BotMessageSquare } from "lucide-react";
+import getBaseURL from "../../utlis/baseURL";
+import { getLeadOrigin } from "../../utlis/leadOrigin";
+import { gaEvent } from "../../utlis/analytics";
 
 // ─── CONFIG ──────────────────────────────────────────────────────
 const WHATSAPP_NUMBER = "918700792607"; // +91 87007 92607
@@ -119,6 +122,85 @@ function WhatsAppButton({ aiSummary = "" }) {
   );
 }
 
+// ─── INSTANT QUOTATION IN THE CHAT ──────────────────────────────
+// Shown under Nova's reply when the visitor asked about the price of a machine with a listed
+// price (app/api/chat sends `quote`). Same backend as the machine page's instant quotation:
+// the price always comes from the database.
+const QUOTE_GST = 18; // % – same as Backend/src/quotes/bulkQuoteRoutes.js (INSTANT_GST)
+const rupees = (n) => `₹${Number(n || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+const chatField = "w-full rounded-lg bg-stone-900/80 border border-white/10 px-2.5 py-1.5 text-xs text-stone-100 placeholder-stone-500 focus:outline-none focus:border-amber-500/60";
+
+function ChatQuote({ quote }) {
+  const [open, setOpen] = useState(false);
+  const [qty, setQty] = useState(1);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [done, setDone] = useState(null);
+  const total = Math.round(quote.price * qty * (1 + QUOTE_GST / 100));
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setError("");
+    if (!name.trim() || !/^[+\d][\d\s-]{6,}$/.test(phone.trim())) return setError("Please enter your name and a valid phone number.");
+    setBusy(true);
+    try {
+      const res = await fetch(`${getBaseURL()}/api/bulk-quotes/instant`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ productId: quote.id, quantity: qty, name, phone, email, origin: getLeadOrigin() }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || "Could not make the quotation. Please try WhatsApp.");
+      setDone(data);
+      gaEvent("generate_lead", { form: "chat_instant_quote", machine: String(quote.name).slice(0, 100), value: data.quotation?.total, currency: "INR" });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (done) {
+    return (
+      <div className="mt-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-100">
+        <p className="font-semibold">✅ Quotation {done.quotation?.number} is ready</p>
+        <p className="mt-0.5">{qty} × {quote.name}: <strong>{rupees(done.quotation?.total)}</strong> incl. {done.quotation?.gstPercent}% GST{done.emailed ? `, also emailed to ${email}` : ""}.</p>
+        <a href={done.pdfUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block rounded-lg bg-emerald-500 px-3 py-1.5 font-semibold text-white hover:bg-emerald-400">Open quotation (PDF)</a>
+      </div>
+    );
+  }
+  if (!open) {
+    return (
+      <button type="button" onClick={() => setOpen(true)} className="mt-3 w-full rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-2 text-xs font-semibold text-white hover:from-amber-400 hover:to-orange-400">
+        📄 Get instant quotation – {quote.name}
+      </button>
+    );
+  }
+  return (
+    <form onSubmit={submit} className="mt-3 space-y-2 rounded-xl border border-amber-500/30 bg-stone-900/60 p-3">
+      <p className="text-xs font-semibold text-amber-300">Instant quotation: {quote.name}</p>
+      <div className="flex items-center justify-between text-xs text-stone-300">
+        <label className="flex items-center gap-2">Qty
+          <input type="number" min="1" max="50" value={qty} onChange={(e) => setQty(Math.min(50, Math.max(1, parseInt(e.target.value, 10) || 1)))} className={`${chatField} w-14 text-center`} />
+        </label>
+        <span>{rupees(total)} <span className="text-stone-500">incl. {QUOTE_GST}% GST</span></span>
+      </div>
+      <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name *" maxLength={100} className={chatField} />
+      <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Phone / WhatsApp *" type="tel" maxLength={30} className={chatField} />
+      <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email (to receive the PDF)" type="email" maxLength={150} className={chatField} />
+      {error && <p className="text-xs text-red-400">{error}</p>}
+      <button type="submit" disabled={busy} className="w-full rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-400 disabled:opacity-60">
+        {busy ? "Making your quotation…" : "Get my quotation (PDF)"}
+      </button>
+      <p className="text-[10px] text-stone-500">Ex-works price; freight and installation quoted separately.</p>
+    </form>
+  );
+}
+
 // ─── MESSAGE BUBBLE ─────────────────────────────────────────────
 function Bubble({ msg, isNew }) {
   const isUser = msg.role === "user";
@@ -143,6 +225,7 @@ function Bubble({ msg, isNew }) {
             <WhatsAppButton aiSummary={msg.waSummary} />
           </div>
         )}
+        {msg.quote && <ChatQuote quote={msg.quote} />}
       </div>
       {isUser && (
         <div className="w-8 h-8 rounded-full bg-stone-700 flex items-center justify-center flex-shrink-0 mb-0.5">
@@ -268,7 +351,7 @@ function LiveChat() {
         body: JSON.stringify({ messages }),
       });
       const data = await res.json().catch(() => null);
-      return res.ok ? data?.reply || null : null;
+      return res.ok && data?.reply ? data : null;
     } catch {
       return null;
     }
@@ -290,13 +373,14 @@ function LiveChat() {
     chatHistory.current = [...chatHistory.current, { role: "user", content }];
 
     try {
-      const reply = await callAI(chatHistory.current);
-      if (!reply) throw new Error("AI returned no response");
+      const answer = await callAI(chatHistory.current);
+      if (!answer) throw new Error("AI returned no response");
+      const reply = answer.reply;
 
       const wantsWA = detectWhatsApp(content) || detectWhatsApp(reply);
       const summary = chatHistory.current.slice(-3).map(m => m.content).join(" | ");
 
-      const botMsg = { role: "assistant", content: reply, isNew: true, showWhatsApp: wantsWA, waSummary: summary };
+      const botMsg = { role: "assistant", content: reply, isNew: true, showWhatsApp: wantsWA, waSummary: summary, quote: answer.quote || null };
       chatHistory.current = [...chatHistory.current, { role: "assistant", content: reply }];
 
       setMsgs(prev => [...prev, botMsg]);

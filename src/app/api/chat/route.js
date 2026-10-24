@@ -11,7 +11,7 @@
 //      any OpenAI-compatible server, e.g. Ollama: LLM_BASE_URL=https://<host>/v1
 //   2. DeepSeek (DEEPSEEK_API_KEY)   3. OpenRouter (OPENROUTER_API_KEY)
 //   4. none answering: the best matching fact is sent as the reply
-import { findFacts, factsBlock, replyFromFacts, checkReply, isOffTopic, logMissedQuestion } from './knowledge';
+import { findFacts, factsBlock, replyFromFacts, checkReply, isOffTopic, logMissedQuestion, quoteOffer } from './knowledge';
 
 const SYSTEM = `You are "Nova", a smart, warm, and helpful support assistant for Food Pharma Machinery (PureLine Machinery Pvt. Ltd., Haridwar) – a B2B provider of pharmaceutical machinery.
 Our services: pharma and food processing machines (tablet presses, capsule fillers, blister packaging, liquid and powder filling, sterile processing), spares, AMC and turnkey plants.
@@ -83,6 +83,9 @@ export async function POST(request) {
     ...messages,
   ];
 
+  // A machine with a listed price the visitor asked about: the chat shows an instant quotation form
+  const quote = quoteOffer(facts, asked);
+
   // Nothing good to answer with: put the question on the admin's list (the latest message only)
   const latest = messages[messages.length - 1].content;
   const best = facts[0]?.score || 0;
@@ -97,11 +100,11 @@ export async function POST(request) {
     if (process.env.LLM_BASE_URL) {
       const base = process.env.LLM_BASE_URL.replace(/\/$/, '');
       const reply = await ask(`${base}/chat/completions`, process.env.LLM_API_KEY, process.env.LLM_MODEL || 'foodpharma', prompt).catch(() => null);
-      if (reply) return Response.json({ reply: checked(reply), source: 'own' });
+      if (reply) return Response.json({ reply: checked(reply), source: 'own', quote });
     }
     if (process.env.DEEPSEEK_API_KEY) {
       const reply = await ask('https://api.deepseek.com/v1/chat/completions', process.env.DEEPSEEK_API_KEY, 'deepseek-chat', prompt).catch(() => null);
-      if (reply) return Response.json({ reply: checked(reply), source: 'deepseek' });
+      if (reply) return Response.json({ reply: checked(reply), source: 'deepseek', quote });
     }
     if (process.env.OPENROUTER_API_KEY) {
       for (const model of ['meta-llama/llama-3.2-3b-instruct', 'mistralai/mistral-7b-instruct', 'microsoft/phi-3-mini-4k-instruct']) {
@@ -109,12 +112,12 @@ export async function POST(request) {
           'HTTP-Referer': 'https://www.foodpharmamachinery.com',
           'X-Title': 'Food Pharma Machinery Chat',
         }).catch(() => null);
-        if (reply) return Response.json({ reply: checked(reply), source: 'openrouter' });
+        if (reply) return Response.json({ reply: checked(reply), source: 'openrouter', quote });
       }
     }
   } catch {
     /* answered below */
   }
   // No AI service answered: reply with the best matching fact
-  return Response.json({ reply: replyFromFacts(facts, asked), source: 'facts' });
+  return Response.json({ reply: replyFromFacts(facts, asked), source: 'facts', quote });
 }

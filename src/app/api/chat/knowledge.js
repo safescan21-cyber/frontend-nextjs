@@ -85,7 +85,7 @@ const liveFacts = async () => {
       specs && `Specifications: ${specs}`,
       clip(plain(p.description), 300),
     ].filter(Boolean).join('. ');
-    out.push({ title: `Machine: ${p.name}`, text: facts, url: `${SITE}/shop/${p._id}`, product: true });
+    out.push({ title: `Machine: ${p.name}`, text: facts, url: `${SITE}/shop/${p._id}`, product: { id: String(p._id), name: p.name, price: Number(p.price) > 0 ? Number(p.price) : 0 } });
   }
   const apis = (await getJson('/api/pharma-apis?limit=500'))?.items || [];
   for (const a of apis) {
@@ -144,7 +144,7 @@ export const findFacts = async (question, limit = 6) => {
       }
       // The admin's own answers win over automatic facts that match about as well
       if (f.admin) score *= 1.3;
-      return { title: f.title, text: f.text, url: f.url, answer: f.answer, score };
+      return { title: f.title, text: f.text, url: f.url, answer: f.answer, product: f.product, score };
     })
     .filter((f) => f.score > 0)
     .sort((x, y) => y.score - x.score)
@@ -166,6 +166,15 @@ export const logMissedQuestion = (question) => {
     body: JSON.stringify({ question: String(question).slice(0, 300) }),
     signal: AbortSignal.timeout(5000),
   }).catch(() => {});
+};
+
+// When the visitor asks about price / a quotation / buying and a machine with a listed price
+// is among the best facts, the chat offers an instant quotation (PDF) for it
+const QUOTE_WORDS = new Set(['price', 'quotation', 'buy', 'purchase', 'order', 'invoice', 'proforma']);
+export const quoteOffer = (facts, question) => {
+  if (!words(question).some((w) => QUOTE_WORDS.has(w))) return null;
+  const f = facts.slice(0, 3).find((x) => x.product && x.product.price > 0);
+  return f ? f.product : null;
 };
 
 // ── Checks on every AI reply before a customer sees it ──
