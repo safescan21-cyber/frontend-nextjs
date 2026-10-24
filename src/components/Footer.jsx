@@ -73,6 +73,7 @@ const NAV_PRODUCTS_FALLBACK = [
 
 const NAV_SERVICES = [
   { label: "All Pharma Machinery", to: "/pharma-machinery" },
+  { label: "All Food Machinery", to: "/food-machinery" },
   { label: "Turnkey Projects", to: "/solutions/turnkey" },
   { label: "Project Cost Calculator", to: "/project-cost-calculator" },
   { label: "Pharma APIs (bulk drugs)", to: "/pharma-api" },

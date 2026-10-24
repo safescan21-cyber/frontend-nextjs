@@ -1,18 +1,21 @@
-// /pharma-machinery: main page for "pharma machinery" searches (components/seo/pharmaMachinery.js)
-import PharmaMachineryPage from '../../../components/pages/PharmaMachineryPage';
+// /pharma-machinery: main page for "pharma machinery" searches (components/seo/machineryHubs.js)
+import MachineryHubPage from '../../../components/pages/MachineryHubPage';
+import { MACHINERY_HUBS, realMachines } from '../../../components/seo/machineryHubs';
 import SitePage from '../../SitePage';
 import { getSeo, seoMetadata } from '../../pageMeta';
 import { productList } from '../../serverData';
-import { realMachines } from '../../../components/seo/pharmaMachinery';
 
+const hub = MACHINERY_HUBS.pharma;
 export const generateMetadata = seoMetadata(() => ['pharma-machinery']);
 
 export default async function Page({ params }) {
   const { locale } = await params;
   const [seo, list] = await Promise.all([getSeo(locale, ['pharma-machinery']), productList()]);
+  // Only what the cards show, and never the demo products
+  const products = realMachines(list.value?.products, hub.categories).map(({ _id, name, category, price, images }) => ({ _id, name, category, price, images: (images || []).slice(0, 1) }));
   return (
     <SitePage seo={seo}>
-      <PharmaMachineryPage products={realMachines(list.value?.products).map(({ _id, name, category, price, images }) => ({ _id, name, category, price, images: (images || []).slice(0, 1) }))} />
+      <MachineryHubPage hub="pharma" products={products} />
     </SitePage>
   );
 }

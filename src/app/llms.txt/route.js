@@ -24,7 +24,7 @@ const getJson = async (path) => {
   }
 };
 
-const MAIN = ['/', '/pharma-machinery', '/shop', '/products', '/pharma-api', '/solutions', '/bulk-quote', '/project-cost-calculator', '/contact'];
+const MAIN = ['/', '/pharma-machinery', '/food-machinery', '/shop', '/products', '/pharma-api', '/solutions', '/bulk-quote', '/project-cost-calculator', '/contact'];
 
 export async function GET() {
   const [prod, apis] = await Promise.all([getJson('/api/products?limit=100'), getJson('/api/pharma-apis?limit=100')]);
