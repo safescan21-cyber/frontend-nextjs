@@ -353,15 +353,15 @@ function LiveChat() {
 
       {/* ─── WELCOME POPUP ──────────────────────────────────── */}
       {showWelcome && (
-        <div className="welcome-popup fixed bottom-24 left-4 sm:left-6 z-40 max-w-sm bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-2xl border border-amber-500/30 p-4 cursor-pointer hover:shadow-lg transition-all duration-200 group" onClick={handleWelcomeClick}>
+        <div className="welcome-popup fixed bottom-24 left-4 sm:left-6 z-40 max-w-[230px] lg:max-w-sm bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-2xl border border-amber-500/30 p-3 lg:p-4 cursor-pointer hover:shadow-lg transition-all duration-200 group" onClick={handleWelcomeClick}>
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/30">
-              <span className="text-lg">✦</span>
+            <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/30">
+              <span className="text-base lg:text-lg">✦</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-white font-sans">💬 Live chat</p>
-              <p className="text-sm text-stone-300 font-sans mt-0.5">How can I help you today?</p>
-              <div className="mt-2 flex items-center gap-2">
+              <p className="text-xs lg:text-sm font-bold text-white font-sans">💬 Live chat</p>
+              <p className="text-xs lg:text-sm text-stone-300 font-sans mt-0.5">How can I help you today?</p>
+              <div className="mt-1 lg:mt-2 flex items-center gap-2">
                 <span className="text-xs text-amber-400 font-sans font-semibold">Click to start</span>
                 <svg className="w-3 h-3 text-amber-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -383,9 +383,9 @@ function LiveChat() {
 
       {/* ─── FLOATING ACTION BUTTON ───────────────────────── */}
       <button
-        onClick={() => { touched.current = true; setOpen(o => !o); }}
+        onClick={() => { touched.current = true; setShowWelcome(false); cancelPendingSound(); setOpen(o => !o); }}
         aria-label="Chat with Nova, our AI assistant"
-        className={`fixed bottom-[84px] lg:bottom-6 right-6 z-50 w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 ${open ? "bg-stone-700 hover:bg-stone-600" : "bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 fab-pulse"}`}
+        className={`fixed bottom-[84px] lg:bottom-6 right-4 lg:right-6 z-50 w-12 h-12 lg:w-16 lg:h-16 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 ${open ? "bg-stone-700 hover:bg-stone-600" : "bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 fab-pulse"}`}
       >
         <div className="relative">
           {open ? (
@@ -393,7 +393,7 @@ function LiveChat() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
             </svg>
           ) : (
-            <BotMessageSquare className="w-7 h-7 text-white drop-shadow" strokeWidth={2.2} aria-hidden="true" />
+            <BotMessageSquare className="w-6 h-6 lg:w-7 lg:h-7 text-white drop-shadow" strokeWidth={2.2} aria-hidden="true" />
           )}
           {!open && unread > 0 && (
             <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] font-bold font-sans flex items-center justify-center shadow-lg">
@@ -405,14 +405,14 @@ function LiveChat() {
 
       {/* ─── CHAT PANEL ────────────────────────────────────── */}
       {open && (
-        <div className="chat-panel fixed bottom-[164px] lg:bottom-28 right-4 sm:right-6 z-50 flex flex-col rounded-3xl shadow-[0_32px_80px_rgba(0,0,0,0.6)] border border-white/10 overflow-hidden"
-          style={{ width: "min(380px, calc(100vw - 2rem))", maxHeight: "calc(100vh - 140px)", background: "linear-gradient(160deg,#141210 0%,#0e0c0a 100%)" }}>
+        <div className="chat-panel fixed bottom-[140px] lg:bottom-28 right-4 sm:right-6 z-50 flex flex-col rounded-3xl shadow-[0_32px_80px_rgba(0,0,0,0.6)] border border-white/10 overflow-hidden"
+          style={{ width: "min(380px, calc(100vw - 2rem))", maxHeight: "min(calc(100vh - 190px), 520px)", background: "linear-gradient(160deg,#141210 0%,#0e0c0a 100%)" }}>
           {/* Header */}
-          <div className="relative px-5 py-4 flex items-center gap-3" style={{ background: "linear-gradient(135deg,#1c1a17 0%,#161310 100%)", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+          <div className="relative px-4 py-3 lg:px-5 lg:py-4 flex items-center gap-3" style={{ background: "linear-gradient(135deg,#1c1a17 0%,#161310 100%)", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden rounded-t-3xl pointer-events-none">
               <div className="absolute -top-6 -left-6 w-24 h-24 rounded-full bg-amber-500/10 blur-2xl" />
             </div>
-            <div className="relative w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30 flex-shrink-0">
+            <div className="relative w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30 flex-shrink-0">
               <span className="text-lg">✦</span>
               <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-[#1c1a17]" />
             </div>
