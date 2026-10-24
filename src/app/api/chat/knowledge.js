@@ -133,6 +133,8 @@ const getIndex = async () => {
 export const findFacts = async (question, limit = 6) => {
   const idx = await getIndex();
   const q = [...new Set(words(question))];
+  // Words that appear nowhere in our data (a brand, a place we never mention…): no fact can answer those
+  const unknown = q.filter((w) => !idx.df.has(w)).length;
   if (!q.length) return [];
   const k1 = 1.2;
   const b = 0.75;
@@ -149,7 +151,7 @@ export const findFacts = async (question, limit = 6) => {
       }
       // The admin's own answers win over automatic facts that match about as well
       if (f.admin) score *= 1.3;
-      return { title: f.title, text: f.text, url: f.url, answer: f.answer, product: f.product, score, cover: hits / q.length };
+      return { title: f.title, text: f.text, url: f.url, answer: f.answer, product: f.product, score, cover: hits / q.length, unknown };
     })
     .filter((f) => f.score > 0)
     .sort((x, y) => y.score - x.score)
@@ -235,7 +237,7 @@ const sentences = (text, n = 300) => {
 };
 
 // Facts good enough to let the model answer; otherwise the honest facts-only reply is safer
-export const factsCoverQuestion = (facts) => Boolean(facts[0] && facts[0].score >= 4 && facts[0].cover >= 0.5);
+export const factsCoverQuestion = (facts) => Boolean(facts[0] && facts[0].score >= 4 && facts[0].cover >= 0.5 && !facts[0].unknown);
 
 export const isSmallTalk = (q) => GREETING.test(q) || THANKS.test(q);
 
@@ -245,7 +247,7 @@ export const replyFromFacts = (facts, question = '') => {
   const best = facts[0];
   const asksPrice = words(question).includes('price');
   // A fact only counts as the answer when it matches enough of the question
-  if (!best || best.score < 2.5 || (best.cover < 0.5 && best.score < 6)) {
+  if (!best || best.unknown || best.score < 2.5 || (best.cover < 0.5 && best.score < 6)) {
     return "I don't want to guess on that one. Our team will confirm it for you – tap the green WhatsApp button or call +91 87007 92607. You can also ask for a quotation on any machine page.";
   }
   const name = best.title.replace(/^Machine: /, '');
