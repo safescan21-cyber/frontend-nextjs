@@ -187,6 +187,8 @@ const PHONE = '+91 87007 92607';
 const PHONE_RE = /(?:\+?91[\s-]?)?\b\d{5}[\s-]?\d{5}\b/g;
 const MONEY_RE = /(?:₹|\brs\.?|\binr\b|\$|€)\s?\d|\d[\d,.]*\s?(?:lakh|lac|crore|million|thousand|k\b)/i;
 const SITE_URL_RE = /https?:\/\/(?:www\.)?foodpharmamachinery\.com[^\s)\]>"']*/gi;
+// A number with a technical unit: "7.5 kW", "1200 cans/hour", "15 days"…
+const TECH_RE = /(\d[\d,.]*)\s?(?:-\s?\d[\d,.]*\s?)?(?:kw|kilowatt|hp|horse ?power|rpm|kg|tons?|tonnes?|mm|cm|metres?|meters?|litres?|liters?|ml|l\/h|lph|kva|volts?|v\b|amps?|bar|psi|°c|stations?|tablets?\/(?:h|hour|min)|capsules?\/(?:h|hour|min)|cans?\/(?:h|hour|min)|bottles?\/(?:h|hour|min)|pcs\/(?:h|hour|min)|per (?:hour|minute)|days?|weeks?|months?)\b/gi;
 const CORE_PAGES = ['/', '/shop', '/contact', '/bulk-quote', '/about', '/amc', '/spares', '/service-request', '/pharma-machinery', '/food-machinery', '/factory', '/solutions', '/pharma-api', '/track-order'];
 const digits = (s) => String(s).replace(/\D/g, '');
 
@@ -204,15 +206,17 @@ export const checkReply = (reply, facts) => {
     const knownAmounts = new Set((known.match(/\d[\d,.]{3,}/g) || []).map(digits));
     if (!/Listed price/.test(known) || !amounts.length || amounts.some((a) => !knownAmounts.has(a))) return null;
   }
-  let out = reply.replace(PHONE_RE, (m) => (digits(m).endsWith('8700792607') ? m : PHONE));
+  // Technical figures (power, speed, sizes, capacities, delivery days…) must come from the facts
+  const knownNumbers = new Set((known.match(/\d[\d,.]*/g) || []).map(digits));
+  for (const m of reply.matchAll(TECH_RE)) if (!knownNumbers.has(digits(m[1]))) return null;
+  // A link the facts don't have means the model made something up: answer from the facts
   const allowed = new Set([...facts.map((f) => f.url), ...CORE_PAGES.map((p) => `${SITE}${p === '/' ? '' : p}`)].map((u) => u.toLowerCase().replace(/\/$/, '')));
-  out = out.replace(SITE_URL_RE, (u) => {
-    const clean = u.replace(/[.,;:!?]+$/, '');
-    const tail = u.slice(clean.length);
-    if (allowed.has(clean.toLowerCase().replace(/\/$/, '').replace('://foodpharmamachinery', '://www.foodpharmamachinery'))) return u;
-    return (facts[0]?.url || `${SITE}/contact`) + tail;
-  });
-  return out;
+  for (const u of reply.match(SITE_URL_RE) || []) {
+    const clean = u.replace(/[.,;:!?]+$/, '').toLowerCase().replace(/\/$/, '').replace('://foodpharmamachinery', '://www.foodpharmamachinery');
+    if (!allowed.has(clean)) return null;
+  }
+  if ((reply.match(/https?:\/\/[^\s)]+/gi) || []).some((u) => !/^https?:\/\/(www\.)?foodpharmamachinery\.com|^https?:\/\/wa\.me\//i.test(u))) return null;
+  return reply.replace(PHONE_RE, (m) => (digits(m).endsWith('8700792607') ? m : PHONE));
 };
 
 // A reply without any AI (when no AI service answers): the best fact, if it fits well enough
