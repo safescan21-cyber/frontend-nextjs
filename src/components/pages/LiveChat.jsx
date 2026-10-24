@@ -202,7 +202,7 @@ function LiveChat() {
     if (next) playSound("message");
   };
 
-  // ── Greet once per visit, 2 seconds after arriving (not while buying or logging in):
+  // ── Greet once per visit, as soon as the page has loaded (not while buying or logging in):
   // on a computer the chat opens with Nova "typing" the greeting; on a phone a small
   // bubble shows instead (a full chat would cover the screen). Both with a chime. ──
   useEffect(() => {
@@ -231,7 +231,7 @@ function LiveChat() {
           cancelPendingSound();
         }, 12000);
       }
-    }, 2000);
+    }, 500);
     return () => clearTimeout(timer);
   }, [pathname]);
 
