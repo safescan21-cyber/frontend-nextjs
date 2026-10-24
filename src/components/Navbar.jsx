@@ -226,10 +226,16 @@ const Navbar = () => {
   const { user } = useSelector((state) => state.auth ?? {});
   const cartTotalQuantity = useSelector(selectCartTotalQuantity);
 
-  const { data: apiData, isLoading: productsLoading } = useFetchAllProductsQuery({
+  const { data: apiData, isLoading: productsQueryLoading } = useFetchAllProductsQuery({
     page: 1,
     limit: 1000,
   });
+  // The server draws the header before the page's product data is in the store, so its HTML
+  // says "Loading". The browser's first render must say the same (or React reports a
+  // hydration error and redraws the page); the product menus fill in right after.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => { setHydrated(true); }, []);
+  const productsLoading = productsQueryLoading || !hydrated;
   const allProducts = apiData?.products || [];
 
   // Pharma API categories with at least one visible API (they follow what the admin adds
