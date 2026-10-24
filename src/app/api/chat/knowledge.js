@@ -7,7 +7,8 @@
 import { MACHINERY_HUBS } from '../../../components/seo/machineryHubs';
 import { CITY_HUBS } from '../../../components/seo/cityHubs';
 import { SOLUTIONS } from '../../../components/seo/solutionsData';
-import { seoPages } from '../../../components/pages/seoPages';
+// The pages that really exist (seoPages also lists old addresses that answer 404)
+import { STATIC_PAGES } from '../../../seo/pageSeo';
 import { PRODUCT_DATA } from '../../../components/pages/productCategoryData';
 
 const SITE = 'https://www.foodpharmamachinery.com';
@@ -53,7 +54,7 @@ const staticFacts = () => {
   }
   for (const s of SOLUTIONS) out.push({ title: s.title, text: `${s.intro} Machines: ${(s.machines || []).join(', ')}. ${(s.points || []).join('. ')}`, url: `${SITE}/solutions/${s.slug}` });
   for (const c of CITY_HUBS) out.push({ title: `Pharma machinery supplier in ${c.city}, ${c.state}`, text: `${c.intro} We deliver from our Haridwar factory to ${c.area}, with installation support, AMC and spares.`, url: `${SITE}/pharma-machinery-supplier/${c.slug}` });
-  for (const p of Object.values(seoPages)) {
+  for (const p of STATIC_PAGES) {
     if (p?.path && p.description && p.path !== '/') out.push({ title: p.title, text: p.description, url: `${SITE}${p.path}` });
   }
   return out;
@@ -179,7 +180,7 @@ export const logMissedQuestion = (question) => {
 // is among the best facts, the chat offers an instant quotation (PDF) for it
 const QUOTE_WORDS = new Set(['price', 'quotation', 'buy', 'purchase', 'order', 'invoice', 'proforma']);
 export const quoteOffer = (facts, question) => {
-  if (!words(question).some((w) => QUOTE_WORDS.has(w))) return null;
+  if (!/\bhow much\b/i.test(question) && !words(question).some((w) => QUOTE_WORDS.has(w))) return null;
   const f = facts.slice(0, 3).find((x) => x.product && x.product.price > 0);
   return f ? f.product : null;
 };
@@ -221,6 +222,11 @@ export const checkReply = (reply, facts) => {
   if ((reply.match(/https?:\/\/[^\s)]+/gi) || []).some((u) => !/^https?:\/\/(www\.)?foodpharmamachinery\.com|^https?:\/\/wa\.me\//i.test(u))) return null;
   return reply.replace(PHONE_RE, (m) => (digits(m).length < 10 || digits(m).endsWith('8700792607') ? m : PHONE));
 };
+
+// Asked for our number and the reply leaves it out (the small model sometimes does): say it
+const ASKS_NUMBER = /\b(phone|mobile|contact (no|number|details)|call you|whatsapp (no|number)|helpline)\b|\b(your|contact) (no|number)\b/i;
+export const withPhone = (reply, question) =>
+  !reply || !ASKS_NUMBER.test(question) || digits(reply).includes('8700792607') ? reply : `You can call or WhatsApp us on ${PHONE}, use the contact form, or click the green WhatsApp button in this chat.`;
 
 // A reply without any AI (when no AI service answers): the best fact, if it fits well enough
 const GREETING = /^\s*(hi+|hello|hey|hii|namaste|namaskar|good (morning|afternoon|evening)|hola)\b[\s!.,]*$/i;

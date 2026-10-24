@@ -9,7 +9,7 @@
 //      LLM_BASE_URL, e.g. http://127.0.0.1:8090/v1, LLM_MODEL=foodpharma); every reply is
 //      checked (unknown prices -> facts answer; wrong phone numbers / links fixed)
 //   3. model slow or down: the best matching fact is sent as the reply
-import { findFacts, factsBlock, replyFromFacts, checkReply, isOffTopic, isSmallTalk, factsCoverQuestion, logMissedQuestion, quoteOffer } from './knowledge';
+import { findFacts, factsBlock, replyFromFacts, checkReply, isOffTopic, isSmallTalk, factsCoverQuestion, logMissedQuestion, quoteOffer, withPhone } from './knowledge';
 
 const SYSTEM = `You are "Nova", a smart, warm, and helpful support assistant for Food Pharma Machinery (PureLine Machinery Pvt. Ltd., Haridwar) – a B2B provider of pharmaceutical machinery.
 Our services: pharma and food processing machines (tablet presses, capsule fillers, blister packaging, liquid and powder filling, sterile processing), spares, AMC and turnkey plants.
@@ -17,6 +17,7 @@ Rules:
 - Keep replies to 2–3 sentences. Be conversational and human.
 - Use the FACTS you are given for anything specific: prices, models, specifications, addresses, phone numbers, delivery and links. Never invent these. If the FACTS don't answer it, say our team will confirm and suggest WhatsApp or the quote form.
 - Only quote a price when it is listed in the FACTS, and say it is ex-works (GST, freight and installation extra).
+- When the FACTS list a price for the machine asked about, give it and say they can get an instant quotation (PDF) with the "Get instant quotation" button below.
 - Only use links that appear in the FACTS.
 - If asked to connect to WhatsApp, tell them to click the green WhatsApp button in the chat.
 - Be helpful, knowledgeable, and never salesy.
@@ -94,18 +95,26 @@ export async function POST(request) {
   if (isSmallTalk(latest)) return Response.json({ reply: replyFromFacts(facts, latest), source: 'facts' });
   if (isOffTopic(facts, asked)) return Response.json({ reply: replyFromFacts([], asked), source: 'facts' });
   // Every AI reply is checked: unknown prices -> answer from the facts; wrong phone/links fixed
-  const checked = (reply) => (reply ? checkReply(reply, facts) || replyFromFacts(facts, latest) : null);
+  // The chat shows the quotation form (the machine has a listed price): a reply that asks which
+  // machine or says we don't know is replaced by the machine's facts, and it names the button
+  const DODGES = /\?\s*$|don'?t have|do not have|not sure|guess|ask our team|will confirm|tick the box/i;
+  const withQuote = (reply) => {
+    if (!quote) return reply;
+    const text = DODGES.test(reply) ? replyFromFacts(facts, latest) : reply;
+    return /instant quotation/i.test(text) ? text : `${text}${text.includes('\n') ? '\n\n' : ' '}You can get an instant quotation (PDF) with the "Get instant quotation" button below.`;
+  };
+  const checked = (reply) => (reply ? withPhone(checkReply(reply, facts) || replyFromFacts(facts, latest), latest) : null);
 
   try {
     // Only when the facts really cover the question: a small model invents when it has none
     if (process.env.LLM_BASE_URL && factsCoverQuestion(facts)) {
       const base = process.env.LLM_BASE_URL.replace(/\/$/, '');
       const reply = await ask(`${base}/chat/completions`, process.env.LLM_API_KEY, process.env.LLM_MODEL || 'foodpharma', prompt).catch(() => null);
-      if (reply) return Response.json({ reply: checked(reply), source: 'own', quote });
+      if (reply) return Response.json({ reply: withQuote(checked(reply)), source: 'own', quote });
     }
   } catch {
     /* answered below */
   }
   // Model slow or down: reply with the best matching fact
-  return Response.json({ reply: replyFromFacts(facts, latest), source: 'facts', quote });
+  return Response.json({ reply: withPhone(replyFromFacts(facts, latest), latest), source: 'facts', quote });
 }
