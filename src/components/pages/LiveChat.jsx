@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { usePathname } from "next/navigation";
 
 // ─── CONFIG ──────────────────────────────────────────────────────
 const WHATSAPP_NUMBER = "918700792607"; // +91 87007 92607
@@ -19,59 +20,75 @@ const INIT_MSG = {
   isNew: false,
 };
 
-// ─── SOUND HELPER (fixed) ──────────────────────────────────────
-let audioContext = null;
+// ─── SOUNDS (made with Web Audio, no sound files) ───────────────
+// Browsers only allow sound after the visitor has clicked, tapped or typed on the page.
+// A chime asked for before that waits and plays on their first click/tap (if still wanted).
+// Visitors can switch sounds off in the chat header (remembered in this browser).
+const SOUND_OFF_KEY = "chatSoundOff";
+let audioCtx = null;
+let pendingSound = null;
 
-// Resume AudioContext on user interaction (required by browsers)
-function ensureAudioContext() {
-  if (!audioContext) {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const soundOff = () => { try { return localStorage.getItem(SOUND_OFF_KEY) === "1"; } catch { return false; } };
+const hasUserGesture = () => (typeof navigator !== "undefined" && navigator.userActivation ? navigator.userActivation.hasBeenActive : true);
+const getAudio = () => {
+  if (!audioCtx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    audioCtx = new AC();
   }
-  if (audioContext.state === "suspended") {
-    audioContext.resume().catch(() => {});
-  }
-  return audioContext;
-}
+  return audioCtx;
+};
 
-// Attach a global click listener to resume the context
-if (typeof window !== "undefined") {
-  const resumeHandler = () => {
-    ensureAudioContext();
-    document.removeEventListener("click", resumeHandler);
-    document.removeEventListener("touchstart", resumeHandler);
+// One soft sine tone with a quick fade in/out
+const tone = (ctx, freq, start, dur, vol) => {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = "sine";
+  osc.frequency.value = freq;
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  const t = ctx.currentTime + start;
+  gain.gain.setValueAtTime(0.0001, t);
+  gain.gain.exponentialRampToValueAtTime(vol, t + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  osc.start(t);
+  osc.stop(t + dur + 0.05);
+};
+
+const SOUNDS = {
+  chime: (ctx) => { tone(ctx, 784, 0, 0.35, 0.18); tone(ctx, 1175, 0.16, 0.55, 0.15); }, // two-tone "ding-dong" when the chat greets
+  message: (ctx) => { tone(ctx, 988, 0, 0.16, 0.11); tone(ctx, 1319, 0.08, 0.22, 0.09); }, // a reply from Nova
+  send: (ctx) => tone(ctx, 660, 0, 0.1, 0.06), // the visitor's message going out
+};
+
+function playSound(name, { wait = false } = {}) {
+  if (typeof window === "undefined" || soundOff()) return;
+  const play = () => {
+    try {
+      const ctx = getAudio();
+      if (!ctx) return;
+      const go = () => { try { SOUNDS[name](ctx); } catch { /* no sound: fine */ } };
+      if (ctx.state === "running") go();
+      else ctx.resume().then(go).catch(() => {});
+    } catch { /* no sound: fine */ }
   };
-  document.addEventListener("click", resumeHandler);
-  document.addEventListener("touchstart", resumeHandler);
+  if (hasUserGesture()) play();
+  else if (wait) pendingSound = play;
+}
+const cancelPendingSound = () => { pendingSound = null; };
+
+if (typeof window !== "undefined") {
+  const unlock = () => {
+    if (!pendingSound) return;
+    const p = pendingSound;
+    pendingSound = null;
+    p();
+  };
+  ["pointerdown", "keydown", "touchstart"].forEach((ev) => document.addEventListener(ev, unlock, { capture: true, passive: true }));
 }
 
-function playNotificationSound() {
-  try {
-    const ctx = ensureAudioContext();
-    if (!ctx || ctx.state !== "running") {
-      // If context isn't running yet, try to resume and play later
-      ctx?.resume().catch(() => {});
-      return;
-    }
-
-    const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
-
-    oscillator.frequency.value = 880; // A5
-    oscillator.type = "sine";
-
-    gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
-
-    oscillator.start(ctx.currentTime);
-    oscillator.stop(ctx.currentTime + 0.25);
-  } catch (err) {
-    // Silently fail – no big deal
-    console.log("Audio not supported:", err);
-  }
-}
+// Pages where the chat must not pop up by itself (buying, logging in, admin)
+const QUIET_PAGES = /^\/(?:(?:en-us|en-gb|fr|ja|ko|ur)\/)?(cart|checkout|login|register|forgotpassword|resetpassword|dashboard)(\/|$)/;
 
 // ─── WHATSAPP BUTTON ────────────────────────────────────────────
 function WhatsAppButton({ aiSummary = "" }) {
@@ -171,22 +188,51 @@ function LiveChat() {
   const chatHistory = useRef([]);
   const welcomeTimeout = useRef(null);
 
-  // ── Show welcome popup once per session (with sound) ──
+  const pathname = usePathname() || "/";
+  const [soundOn, setSoundOn] = useState(true);
+  const autoOpened = useRef(false);
+  const touched = useRef(false); // the visitor already used the chat
+
+  useEffect(() => { setSoundOn(!soundOff()); }, []);
+  const toggleSound = () => {
+    const next = !soundOn;
+    setSoundOn(next);
+    try { localStorage.setItem(SOUND_OFF_KEY, next ? "0" : "1"); } catch { /* storage blocked */ }
+    if (next) playSound("message");
+  };
+
+  // ── Greet once per visit, 6 seconds after arriving (not while buying or logging in):
+  // on a computer the chat opens with Nova "typing" the greeting; on a phone a small
+  // bubble shows instead (a full chat would cover the screen). Both with a chime. ──
   useEffect(() => {
-    const alreadyShown = sessionStorage.getItem('chatWelcomeShown');
-    if (!alreadyShown) {
-      const timer = setTimeout(() => {
+    if (QUIET_PAGES.test(pathname)) return undefined;
+    let shown = false;
+    try { shown = sessionStorage.getItem("chatWelcomeShown") === "true"; } catch { /* storage blocked */ }
+    if (shown) return undefined;
+    const timer = setTimeout(() => {
+      if (touched.current) return;
+      try { sessionStorage.setItem("chatWelcomeShown", "true"); } catch { /* storage blocked */ }
+      if (window.matchMedia("(min-width: 1024px)").matches) {
+        autoOpened.current = true;
+        setMsgs([]);
+        setLoading(true);
+        setOpen(true);
+        playSound("chime", { wait: true });
+        welcomeTimeout.current = setTimeout(() => {
+          setLoading(false);
+          setMsgs([{ ...INIT_MSG, isNew: true }]);
+        }, 1400);
+      } else {
         setShowWelcome(true);
-        sessionStorage.setItem('chatWelcomeShown', 'true');
-        // 🔔 Play sound (context might be suspended, but we have resume listeners)
-        playNotificationSound();
+        playSound("chime", { wait: true });
         welcomeTimeout.current = setTimeout(() => {
           setShowWelcome(false);
-        }, 10000);
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, []);
+          cancelPendingSound();
+        }, 12000);
+      }
+    }, 6000);
+    return () => clearTimeout(timer);
+  }, [pathname]);
 
   useEffect(() => {
     return () => {
@@ -195,6 +241,7 @@ function LiveChat() {
   }, []);
 
   const handleWelcomeClick = () => {
+    touched.current = true;
     setOpen(true);
     setShowWelcome(false);
     if (welcomeTimeout.current) clearTimeout(welcomeTimeout.current);
@@ -202,7 +249,9 @@ function LiveChat() {
 
   // ── Chat logic ──
   useEffect(() => {
-    if (open) { setUnread(0); setTimeout(() => inputRef.current?.focus(), 200); }
+    // An auto-opened chat doesn't take the keyboard focus from the page
+    if (open) { setUnread(0); if (!autoOpened.current) setTimeout(() => inputRef.current?.focus(), 200); }
+    if (!open) { autoOpened.current = false; cancelPendingSound(); }
   }, [open]);
 
   useEffect(() => {
@@ -231,6 +280,9 @@ function LiveChat() {
     setInput("");
 
     const userMsg = { role: "user", content, isNew: true };
+    touched.current = true;
+    autoOpened.current = false;
+    playSound("send");
     setMsgs(prev => [...prev, userMsg]);
     setLoading(true);
 
@@ -247,6 +299,7 @@ function LiveChat() {
       chatHistory.current = [...chatHistory.current, { role: "assistant", content: reply }];
 
       setMsgs(prev => [...prev, botMsg]);
+      playSound("message");
       if (!open) setUnread(n => n + 1);
     } catch (err) {
       console.error("AI error:", err);
@@ -329,7 +382,7 @@ function LiveChat() {
 
       {/* ─── FLOATING ACTION BUTTON ───────────────────────── */}
       <button
-        onClick={() => setOpen(o => !o)}
+        onClick={() => { touched.current = true; setOpen(o => !o); }}
         aria-label="Toggle chat"
         className={`fixed bottom-[84px] lg:bottom-6 right-6 z-50 w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 ${open ? "bg-stone-700 hover:bg-stone-600" : "bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 fab-pulse"}`}
       >
@@ -371,7 +424,19 @@ function LiveChat() {
                 Online · replies instantly
               </p>
             </div>
-            <button onClick={() => setOpen(false)} className="text-stone-500 hover:text-stone-300 transition-colors flex-shrink-0">
+            <button
+              onClick={toggleSound}
+              aria-label={soundOn ? "Turn chat sounds off" : "Turn chat sounds on"}
+              title={soundOn ? "Sounds on" : "Sounds off"}
+              className="text-stone-500 hover:text-stone-300 transition-colors flex-shrink-0"
+            >
+              {soundOn ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5L6 9H3v6h3l5 4V5zM15.5 8.5a5 5 0 010 7M18.5 5.5a9 9 0 010 13" /></svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5L6 9H3v6h3l5 4V5zM16 9l5 5M21 9l-5 5" /></svg>
+              )}
+            </button>
+            <button onClick={() => setOpen(false)} aria-label="Close chat" className="text-stone-500 hover:text-stone-300 transition-colors flex-shrink-0">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
