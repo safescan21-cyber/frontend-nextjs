@@ -10,6 +10,7 @@ import { SOLUTIONS } from '../../../components/seo/solutionsData';
 // The pages that really exist (seoPages also lists old addresses that answer 404)
 import { STATIC_PAGES } from '../../../seo/pageSeo';
 import { PRODUCT_DATA } from '../../../components/pages/productCategoryData';
+import { COMPANY_FACTS, PHONE, EMAIL } from './companyFacts';
 
 const SITE = 'https://www.foodpharmamachinery.com';
 const API = (process.env.NEXT_PUBLIC_BACKEND_URL || 'https://api.foodpharmamachinery.com').replace(/\/api\/?$/, '').replace(/\/$/, '');
@@ -21,22 +22,15 @@ const clip = (s, n) => (s.length > n ? `${s.slice(0, n - 1).replace(/\s+\S*$/, '
 const rs = (n) => `Rs. ${Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
 const label = (slug) => String(slug || '').replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
-// ── Company facts (the same details the website shows) ──
-const COMPANY = [
-  { title: 'Company and factory address', text: 'Food Pharma Machinery is the brand of PureLine Machinery Pvt. Ltd. Factory and office: Q-37 Shivalik Nagar, Haridwar, Uttarakhand, India. Machines are built and tested there before dispatch.', url: `${SITE}/about` },
-  { title: 'Contact, phone and WhatsApp', text: 'Call or WhatsApp +91 87007 92607, use the contact form, or click the green WhatsApp button in this chat.', url: `${SITE}/contact` },
-  { title: 'How to get a quotation', text: 'Use the quick quote form on any machine page or the bulk quote page, or call/WhatsApp +91 87007 92607. Share the product, the output you need and your city. Machines with a listed price also have an instant quotation (PDF) button on their page.', url: `${SITE}/bulk-quote` },
-  { title: 'Service request for a machine problem or breakdown', text: 'Raise a service request with the machine model, serial number and a short description of the problem (photos help). If the machine has stopped, also message us on WhatsApp.', url: `${SITE}/service-request` },
-  { title: 'Spare parts', text: 'Find spare parts by machine model on the spares page, or send the model and serial number and we will quote.', url: `${SITE}/spares` },
-  { title: 'AMC annual maintenance contract', text: 'Annual maintenance contracts with planned preventive visits and priority breakdown support.', url: `${SITE}/amc` },
-  { title: 'Delivery time, lead time and dispatch', text: 'Delivery time depends on the machine and the order: machines in stock are ready to dispatch, others are made to order. The delivery time is confirmed in your quotation.', url: `${SITE}/bulk-quote` },
-  { title: 'Track an order', text: 'Track an order with the order number on the track order page; logged-in customers also see their orders in their account.', url: `${SITE}/track-order` },
-];
-
 // Words that say nothing about the topic
-const STOP = new Set('a an the and or of to for in on at by with from is are was be do does did can could would should will i you we our your my me us it this that these those what which who how when why please hi hello hey need want looking about any some have has there their them they get give tell show know more much many also just than then so if not no yes ok thanks thank sir madam time long days'.split(' '));
+// ("sell", "offer", "provide"… and everyday Hindi words too: they never decide the answer)
+const STOP = new Set(('a an the and or of to for in on at by with from is are was be do does did can could would should will i you we our your my me us it this that these those what which who how when why please hi hello hey need want looking about any some have has there their them they get give tell show know more much many also just than then so if not no yes ok thanks thank sir madam time long days ' +
+  'sell sells selling sold offer offers offering provide provides providing supply supplies supplying available avail make makes kind type types list best good which one ones there here ' +
+  'kya aap ap hai hain ho hum ke ki ka ko se mein me liye mujhe humko chahiye bechte bechta milega milta milti karte banate bataiye batao bhai ji').split(' '));
 // Same meaning, one word (so "cost" finds "price")
-const SAME = { cost: 'price', rate: 'price', rates: 'price', pricing: 'price', prices: 'price', quote: 'quotation', quotes: 'quotation', masala: 'spice', spices: 'spice', filler: 'filling', fill: 'filling', fillers: 'filling', packing: 'pack', packaging: 'pack', packer: 'pack', capsules: 'capsule', tablets: 'tablet', machines: 'machine', machinery: 'machine', equipment: 'machine', location: 'address', located: 'address', where: 'address', repair: 'service', breakdown: 'service', problem: 'service', noise: 'service', fault: 'service', amc: 'maintenance', whatsapp: 'contact', phone: 'contact', call: 'contact', number: 'contact', deliver: 'delivery', shipping: 'delivery', dispatch: 'delivery', export: 'delivery', lead: 'delivery' };
+const SAME = { cost: 'price', rate: 'price', rates: 'price', pricing: 'price', prices: 'price', quote: 'quotation', quotes: 'quotation', masala: 'spice', spices: 'spice', filler: 'filling', fill: 'filling', fillers: 'filling', packing: 'pack', packaging: 'pack', packer: 'pack', capsules: 'capsule', tablets: 'tablet', machines: 'machine', machinery: 'machine', equipment: 'machine', location: 'address', located: 'address', where: 'address', repair: 'service', breakdown: 'service', problem: 'service', noise: 'service', fault: 'service', amc: 'maintenance', whatsapp: 'contact', phone: 'contact', call: 'contact', number: 'contact', deliver: 'delivery', shipping: 'delivery', dispatch: 'delivery', export: 'delivery', lead: 'delivery', exports: 'delivery', abroad: 'delivery', overseas: 'delivery', international: 'delivery', ship: 'delivery', courier: 'delivery',
+  mail: 'email', 'e-mail': 'email', guarantee: 'warranty', guaranty: 'warranty', cgmp: 'gmp', compliant: 'gmp', compliance: 'gmp', install: 'installation', installing: 'installation', commissioning: 'installation',
+  spares: 'spare', parts: 'part', pay: 'payment', payments: 'payment', advance: 'payment', bill: 'invoice', gstin: 'gst', kitna: 'price', kitne: 'price', daam: 'price', dam: 'price', keemat: 'price', kimat: 'price', mashine: 'machine' };
 // Plural to singular: presses -> press, batteries -> battery, machines -> machine
 const singular = (w) => (w.length <= 3 ? w : w.endsWith('sses') ? w.slice(0, -2) : w.endsWith('ies') ? `${w.slice(0, -3)}y` : w.endsWith('s') && !w.endsWith('ss') && !w.endsWith('us') ? w.slice(0, -1) : w);
 const words = (s) => String(s || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9\s-]/g, ' ').split(/[\s-]+/)
@@ -45,7 +39,8 @@ const words = (s) => String(s || '').toLowerCase().normalize('NFKD').replace(/[^
 
 // ── Building the facts ──
 const staticFacts = () => {
-  const out = [...COMPANY];
+  // A company fact is the answer itself (no "Title: …" in front)
+  const out = COMPANY_FACTS.map((f) => ({ ...f, answer: f.text, askWords: f.asks.map((a) => new Set(words(a))) }));
   for (const hub of Object.values(MACHINERY_HUBS)) {
     for (const f of hub.faqs([])) out.push({ title: f.q, text: f.a, answer: f.a, url: `${SITE}${hub.page.path}` });
     for (const t of hub.types) out.push({ title: `${t.name} (${hub.key} machinery)`, text: t.text, url: PRODUCT_DATA[t.slug] ? `${SITE}/products/${t.slug}` : `${SITE}${hub.page.path}` });
@@ -110,7 +105,8 @@ let building = null;
 const build = async () => {
   const facts = [...staticFacts(), ...(await liveFacts())].map((f) => {
     const titleWords = words(f.title);
-    const all = [...titleWords, ...titleWords, ...words(f.text)]; // title words count twice
+    // title words count twice; the ways customers ask it (company facts) count too
+    const all = [...titleWords, ...titleWords, ...words((f.asks || []).join(' ')), ...words(f.text)];
     const tf = new Map();
     for (const w of all) tf.set(w, (tf.get(w) || 0) + 1);
     return { ...f, tf, len: all.length };
@@ -135,7 +131,8 @@ export const findFacts = async (question, limit = 6) => {
   const idx = await getIndex();
   const q = [...new Set(words(question))];
   // Words that appear nowhere in our data (a brand, a place we never mention…): no fact can answer those
-  const unknown = q.filter((w) => !idx.df.has(w)).length;
+  const missing = q.filter((w) => !idx.df.has(w));
+  const unknown = missing.length;
   if (!q.length) return [];
   const k1 = 1.2;
   const b = 0.75;
@@ -150,9 +147,16 @@ export const findFacts = async (question, limit = 6) => {
         const idf = Math.log(1 + (idx.n - idx.df.get(w) + 0.5) / (idx.df.get(w) + 0.5));
         score += idf * ((tf * (k1 + 1)) / (tf + k1 * (1 - b + (b * f.len) / idx.avgLen)));
       }
+      // Asked (almost) exactly like one of a company fact's questions: that fact, even when the
+      // question's only word is a common one ("What machines do you sell?")
+      if (f.askWords) {
+        const qs = new Set(q);
+        const best = Math.max(...f.askWords.map((a) => { const both = [...a].filter((w) => qs.has(w)).length; return both / (a.size + qs.size - both || 1); }));
+        if (best >= 0.6) { score += 6 * best; hits = Math.max(hits, Math.round(best * q.length)); }
+      }
       // The admin's own answers win over automatic facts that match about as well
       if (f.admin) score *= 1.3;
-      return { title: f.title, text: f.text, url: f.url, answer: f.answer, product: f.product, score, cover: hits / q.length, unknown };
+      return { title: f.title, text: f.text, url: f.url, answer: f.answer, product: f.product, score, cover: hits / q.length, unknown, missing, known: q.length - unknown };
     })
     .filter((f) => f.score > 0)
     .sort((x, y) => y.score - x.score)
@@ -186,7 +190,6 @@ export const quoteOffer = (facts, question) => {
 };
 
 // ── Checks on every AI reply before a customer sees it ──
-const PHONE = '+91 87007 92607';
 // Any phone-like number (10+ digits with spaces, dashes or a + in between)
 const PHONE_RE = /\+?\(?\d[\d\s()-]{8,}\d/g;
 const MONEY_RE = /(?:₹|\brs\.?|\binr\b|\$|€)\s?\d|\d[\d,.]*\s?(?:lakh|lac|crore|million|thousand|k\b)/i;
@@ -202,8 +205,12 @@ export const isOffTopic = (facts, question) =>
 
 // Returns the reply with wrong phone numbers and unknown links fixed, or null when it
 // quotes a price the facts don't have (the caller then answers from the facts instead)
+// The small model sometimes talks about its instructions or dodges: those replies are not used
+const BAD_REPLY = /\bFACTS\b|my database|where on the website|found it\?|as an ai\b|I don'?t have (the )?(exact )?(email|address|phone|contact)/i;
 export const checkReply = (reply, facts) => {
-  if (!reply) return null;
+  if (!reply || BAD_REPLY.test(reply)) return null;
+  // A broken WhatsApp link ("wa.me/+91 87007 92607"): the right one
+  reply = reply.replace(/https?:\/\/(?:api\.)?wa\.me\/[+\d\s-]*\d/gi, 'https://wa.me/918700792607');
   const known = facts.map((f) => f.text).join(' ');
   if (MONEY_RE.test(reply)) {
     const amounts = (reply.match(/\d[\d,.]{3,}/g) || []).map(digits).filter((d) => d.length >= 4);
@@ -220,20 +227,29 @@ export const checkReply = (reply, facts) => {
     if (!allowed.has(clean)) return null;
   }
   if ((reply.match(/https?:\/\/[^\s)]+/gi) || []).some((u) => !/^https?:\/\/(www\.)?foodpharmamachinery\.com|^https?:\/\/wa\.me\//i.test(u))) return null;
-  return reply.replace(PHONE_RE, (m) => (digits(m).length < 10 || digits(m).endsWith('8700792607') ? m : PHONE));
+  return reply
+    .replace(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g, EMAIL) // an email the model made up ("sales@…"): ours
+    .replace(PHONE_RE, (m) => (digits(m).length < 10 || digits(m).endsWith('8700792607') ? m : PHONE));
 };
 
 // Asked for our number and the reply leaves it out (the small model sometimes does): say it
 const ASKS_NUMBER = /\b(phone|mobile|contact (no|number|details)|call you|whatsapp (no|number)|helpline)\b|\b(your|contact) (no|number)\b/i;
-export const withPhone = (reply, question) =>
-  !reply || !ASKS_NUMBER.test(question) || digits(reply).includes('8700792607') ? reply : `You can call or WhatsApp us on ${PHONE}, use the contact form, or click the green WhatsApp button in this chat.`;
+// …and the same for our email
+const ASKS_EMAIL = /\b(e-?mail|mail id|email id|email address)\b/i;
+export const withPhone = (reply, question) => {
+  if (!reply) return reply;
+  if (ASKS_EMAIL.test(question) && !reply.includes(EMAIL)) return `You can email us at ${EMAIL}, or call/WhatsApp ${PHONE}. You can also click the green WhatsApp button in this chat.`;
+  if (ASKS_NUMBER.test(question) && !digits(reply).includes('8700792607')) return `You can call or WhatsApp us on ${PHONE}, use the contact form, or click the green WhatsApp button in this chat.`;
+  return reply;
+};
 
 // A reply without any AI (when no AI service answers): the best fact, if it fits well enough
 const GREETING = /^\s*(hi+|hello|hey|hii|namaste|namaskar|good (morning|afternoon|evening)|hola)\b[\s!.,]*$/i;
 const THANKS = /^\s*(thanks?|thank you|thx|ok(ay)?|great|nice|cool)\b[\s!.,]*$/i;
 // First sentences up to about n characters
 const sentences = (text, n = 300) => {
-  const parts = String(text).match(/[^.!?]+[.!?]+(\s|$)/g) || [String(text)];
+  // (a dot inside an email or a link does not end the sentence)
+  const parts = String(text).match(/(?:[^.!?]|[.!?](?=\S))+[.!?]+(\s|$)/g) || [String(text)];
   let out = '';
   for (const p of parts) {
     if (out && (out + p).length > n) break;
@@ -252,15 +268,18 @@ export const replyFromFacts = (facts, question = '') => {
   if (THANKS.test(question)) return "You're welcome! If you need anything else – a machine, a quotation or service – just ask, or tap the green WhatsApp button to talk to our team.";
   const best = facts[0];
   const asksPrice = words(question).includes('price');
-  // A fact only counts as the answer when it matches enough of the question
-  if (!best || best.unknown || best.score < 2.5 || (best.cover < 0.5 && best.score < 6)) {
-    return "I don't want to guess on that one. Our team will confirm it for you – tap the green WhatsApp button or call +91 87007 92607. You can also ask for a quotation on any machine page.";
+  // A fact only counts as the answer when it matches enough of the question; words we have
+  // nothing about (a brand, a drug, a country…) may be at most half of the question
+  if (!best || best.unknown > best.known || best.score < 2.5 || (best.cover < 0.5 && best.score < 6)) {
+    return `I don't want to guess on that one. Our team will confirm it for you – tap the green WhatsApp button or call ${PHONE}. You can also ask for a quotation on any machine page.`;
   }
+  // Say plainly what we found nothing about, then the closest fact
+  const notFound = best.unknown ? `I couldn't find "${best.missing.join(' ')}" on our website, so our team will confirm that part. The closest I have:\n\n` : '';
   const name = best.title.replace(/^Machine: /, '');
   const body = best.answer ? sentences(best.answer, 320) : `${name}: ${sentences(best.text, 280)}`;
   // Price asked but the best fact has no listed price: say how to get one
   const priceNote = asksPrice && !/Listed price|Rs\. \d/.test(body)
     ? '\n\nFor the price, share your requirement on WhatsApp or the quote form and we will send it.'
     : '';
-  return `${body}${best.url ? `\n\nDetails: ${best.url}` : ''}${priceNote}`;
+  return `${notFound}${body}${best.url ? `\n\nDetails: ${best.url}` : ''}${priceNote}`;
 };
