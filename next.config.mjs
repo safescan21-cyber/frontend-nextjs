@@ -29,6 +29,11 @@ const nextConfig = {
       moved('/packaging', '/solutions/packaging'),
       moved('/tablet-press', '/products/tablet-press'),
       moved('/capsule-filling', '/products/capsule-filling'),
+      // Old "view order" links (the order pages live in the customer dashboard)
+      moved('/orders', '/dashboard/orders'),
+      moved('/orders/:id', '/dashboard/orders/:id'),
+      moved('/:loc(en-us|en-gb|fr|ja|ko|ur)/orders', '/:loc/dashboard/orders'),
+      moved('/:loc(en-us|en-gb|fr|ja|ko|ur)/orders/:id', '/:loc/dashboard/orders/:id'),
     ];
   },
   // Every page lives under src/app/[locale]/…: /fr/shop is served as it is, and the

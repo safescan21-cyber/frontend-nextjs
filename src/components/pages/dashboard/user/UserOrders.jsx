@@ -155,7 +155,7 @@ console.log('token:', localStorage.getItem('token'));
                     </td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">₹{order?.totalAmount || order?.amount || 0}</td>
                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                      <Link to={`/orders/${order?._id}`} className="underline hover:text-primary text-blue-600">view order</Link>
+                      <Link to={`/dashboard/orders/${order?._id}`} className="underline hover:text-primary text-blue-600">view order</Link>
                     </td>
                   </tr>
                 ))}
