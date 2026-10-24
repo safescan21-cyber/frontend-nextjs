@@ -13,6 +13,7 @@ import ShareProduct from '../shop/ShareProduct';
 import CatalogSwitch from './pharmaApi/CatalogSwitch';
 import { rankProducts } from '../../utlis/productSearch';
 import CompareButton from '../compare/CompareButton';
+import { canQuoteInstantly } from '../quote/InstantQuote';
 
 
 // Empty boxes = no limit, so expensive machines are never hidden by default
@@ -519,6 +520,11 @@ const ShopPage = ({ embedded = false }) => {
                               <span className="text-sm text-gray-500 line-through">{formatPrice(product.oldPrice)}</span>
                             )}
                           </div>
+                          {canQuoteInstantly(product) && (
+                            <Link to={`/shop/${product._id}#instant-quote`} className="-mt-2 mb-3 inline-block text-sm font-semibold text-blue-600 hover:underline">
+                              {t('Instant quotation (PDF)')} →
+                            </Link>
+                          )}
 
                           {/* ── 🛒 CART CONTROLS ── */}
                           {product.sellOnline === false ? (

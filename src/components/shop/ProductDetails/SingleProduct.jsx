@@ -17,6 +17,7 @@ import ReviewActions from './ReviewActions';
 import ShareProduct from '../ShareProduct';
 import ProductDocuments from './ProductDocuments';
 import QuickQuote from '../../quote/QuickQuote';
+import InstantQuote from '../../quote/InstantQuote';
 import ProductFaqs from './ProductFaqs';
 import CompareButton from '../../compare/CompareButton';
 import { downloadSpecSheet } from '../../../utlis/specSheet';
@@ -629,6 +630,8 @@ const SingleProduct = () => {
                 >
                   {sheetBusy ? '…' : '📄'} {t('Download spec sheet (PDF)')}
                 </button>
+                {/* Formal quotation at once from the listed price (machines with a price only) */}
+                <InstantQuote product={product} />
               </div>
 
               {product.color && (
