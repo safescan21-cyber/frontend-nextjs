@@ -7,6 +7,8 @@ import { useNavigate } from '../../../../../shell/router';
 import { CheckCircle, AlertCircle, Plus, X } from 'lucide-react';
 import TextInput from './TextInput';
 import SelectInput from './SelectInput';
+import CouponInput from './CouponInput';
+import { ORIGINS } from './productOptions';
 import UploadImage from './UploadImage';
 import DocumentUploader from './DocumentUploader';
 import { useAddProductMutation } from '../../../../store/products/productsApi';
@@ -50,18 +52,7 @@ const colors = [
 ];
 
 // ─── Origin and product-type lists (admin can add more; saved in this browser) ───
-const defaultOrigins = [
-  { label: 'India', value: 'india' },
-  { label: 'Germany', value: 'germany' },
-  { label: 'China', value: 'china' },
-  { label: 'Italy', value: 'italy' },
-  { label: 'USA', value: 'usa' },
-  { label: 'Japan', value: 'japan' },
-  { label: 'Switzerland', value: 'switzerland' },
-  { label: 'United Kingdom', value: 'united-kingdom' },
-  { label: 'South Korea', value: 'south-korea' },
-  { label: 'Taiwan', value: 'taiwan' },
-];
+const defaultOrigins = ORIGINS;
 
 const defaultProductTypes = [
   { label: 'Tablet Press', value: 'tablet-press' },
@@ -230,6 +221,8 @@ const AddProduct = () => {
     readyToDispatch: false,
     description: '',
     modelNumber: '', // e.g. ZP-35D: goes into the serial numbers of sold machines
+    manufacturer: '',
+    couponCode: '',
     fitsModels: '', // spare parts: machine models, comma separated
   });
   const [images, setImages] = useState([]);
@@ -408,7 +401,8 @@ const AddProduct = () => {
       return;
     }
 
-    if (!product.name || !product.category || !product.price || !product.description || !product.color) {
+    // Price may stay empty: the website then shows "Contact for price" with WhatsApp
+    if (!product.name || !product.category || !product.description || !product.color) {
       showError('Please fill in all required fields.');
       return;
     }
@@ -422,7 +416,7 @@ const AddProduct = () => {
 
       const payload = {
         ...product,
-        price: Number(product.price),
+        price: product.price ? Number(product.price) : 0,
         oldPrice: product.oldPrice ? Number(product.oldPrice) : undefined,
         warranty: product.warranty ? Number(product.warranty) : undefined,
         stock: product.stock ? Number(product.stock) : undefined,
@@ -453,6 +447,8 @@ const AddProduct = () => {
         readyToDispatch: false,
         description: '',
         modelNumber: '',
+        manufacturer: '',
+        couponCode: '',
         fitsModels: '',
         active: true,
         sellOnline: true,
@@ -587,13 +583,21 @@ const AddProduct = () => {
         />
 
         <TextInput
-          label="Price (₹)"
+          label="Price (₹) – leave empty to show “Contact for price” with WhatsApp"
           name="price"
           type="number"
           placeholder="50000"
           value={product.price}
           onChange={handleChange}
         />
+        <TextInput
+          label="Manufacturer (who makes the machine)"
+          name="manufacturer"
+          placeholder="PureLine Machinery Pvt. Ltd."
+          value={product.manufacturer}
+          onChange={handleChange}
+        />
+        <CouponInput value={product.couponCode} onChange={(v) => setProduct((prev) => ({ ...prev, couponCode: v }))} />
         <TextInput
           label="Original Price (₹) – for discount"
           name="oldPrice"

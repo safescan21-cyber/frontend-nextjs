@@ -69,7 +69,7 @@ const Price = ({ product, big }) => (
       {Number(product.oldPrice) > Number(product.price) && <div className="text-xs text-slate-400 line-through">{inr(product.oldPrice)}</div>}
     </>
   ) : (
-    <div className="text-sm font-semibold text-amber-400">Price on request</div>
+    <div className="text-sm font-semibold text-amber-400">Contact for price</div>
   )
 );
 

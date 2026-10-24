@@ -27,7 +27,8 @@ export const machineFacts = (p, { t, formatLocal } = ENGLISH) => {
   return [
     [t('Category'), t(PRODUCT_DATA[p.category]?.title || label(p.category))],
     ...(p.modelNumber ? [[t('Model number'), p.modelNumber]] : []),
-    [t('Price (ex-works, INR)'), Number(p.price) > 0 ? rs(p.price) : t('On request')],
+    ...(p.manufacturer ? [[t('Manufacturer'), p.manufacturer]] : []),
+    [t('Price (ex-works, INR)'), Number(p.price) > 0 ? rs(p.price) : t('Contact for price')],
     ...(local ? [[t('Approx. price'), `≈ ${local}`]] : []),
     ...(Array.isArray(p.specifications) ? p.specifications : []).filter((s) => s?.key && s?.value).map((s) => [s.key, String(s.value)]),
     ...(Number(p.warranty) > 0 ? [[t('Warranty'), t('{n} months', { n: p.warranty })]] : []),

@@ -18,6 +18,8 @@ import ShareProduct from '../ShareProduct';
 import ProductDocuments from './ProductDocuments';
 import QuickQuote from '../../quote/QuickQuote';
 import InstantQuote from '../../quote/InstantQuote';
+import ContactForPrice, { hasPrice } from '../ContactForPrice';
+import ProductCoupon from '../ProductCoupon';
 import ProductFaqs from './ProductFaqs';
 import CompareButton from '../../compare/CompareButton';
 import { downloadSpecSheet } from '../../../utlis/specSheet';
@@ -185,15 +187,18 @@ const SingleProduct = () => {
     ['Product Name', product.name],
     ['Category', String(product.category || '').replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())],
     ...customSpecs.map((sp) => [sp.key, sp.value]),
+    ...(product.manufacturer ? [['Manufacturer', product.manufacturer]] : []),
     ...(originText ? [['Origin', originText]] : []),
+    ...(product.modelNumber ? [['Model number', product.modelNumber]] : []),
     ...(warrantyText ? [['Warranty', warrantyText]] : []),
-    ['Price (INR)', `₹${Number(product.price || 0).toLocaleString('en-IN')}`],
+    ['Price (INR)', hasPrice(product) ? `₹${Number(product.price).toLocaleString('en-IN')}` : 'Contact for price'],
   ];
   const atAGlance = [
     ...customSpecs.slice(0, 4).map((sp) => `${sp.key}: ${sp.value}`),
     warrantyText && `${warrantyText} warranty`,
     product.readyToDispatch && 'Ready to dispatch',
     Number(product.stock) > 0 ? 'In stock' : 'Currently out of stock — ask for lead time',
+    product.manufacturer && `Manufacturer: ${product.manufacturer}`,
     originText && `Origin: ${originText}`,
   ].filter(Boolean);
 
@@ -217,7 +222,7 @@ const SingleProduct = () => {
     ];
   }
 
-  const discount = product.oldPrice
+  const discount = product.oldPrice && hasPrice(product)
     ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
     : null;
 
@@ -562,7 +567,7 @@ const SingleProduct = () => {
                 <ShareProduct product={product} variant="button" className="shrink-0" />
               </div>
 
-              {product.rating && (
+              {Number(product.rating) > 0 && (
                 <div className="flex items-center gap-3 flex-wrap">
                   <StarRating rating={product.rating} size="lg" />
                   <span className="text-sm font-semibold text-gray-700">{product.rating}</span>
@@ -571,6 +576,15 @@ const SingleProduct = () => {
                 </div>
               )}
 
+              {(product.manufacturer || originText) && (
+                <p className="text-sm text-gray-600">
+                  {product.manufacturer && <><span className="font-semibold text-gray-800">{t('Manufacturer')}:</span> {product.manufacturer}</>}
+                  {product.manufacturer && originText && ' · '}
+                  {originText && <><span className="font-semibold text-gray-800">{t('Origin')}:</span> {t(originText)}</>}
+                </p>
+              )}
+
+              {hasPrice(product) && (<>
               <div className="flex items-end gap-3 flex-wrap">
                 <span className="text-3xl md:text-4xl font-extrabold text-blue-600">
                   ₹{product.price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
@@ -587,6 +601,8 @@ const SingleProduct = () => {
                   </>
                 )}
               </div>
+              <ProductCoupon product={product} />
+              </>)}
 
               {product.description && (
                 <p className="whitespace-pre-line text-gray-600 text-sm md:text-base leading-relaxed border-l-4 border-blue-200 pl-4 bg-blue-50/40 py-2 rounded-r-lg">
@@ -647,7 +663,9 @@ const SingleProduct = () => {
                 </div>
               )}
 
-              {product.sellOnline === false && (
+              {!hasPrice(product) && <ContactForPrice product={product} />}
+
+              {hasPrice(product) && product.sellOnline === false && (
                 <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
                   <p className="font-semibold text-amber-900">{t("Available on enquiry")}</p>
                   <p className="mt-1 text-sm text-amber-800">{t("This machine is supplied against a quotation (configuration, installation and delivery are confirmed first).")}</p>
@@ -660,7 +678,7 @@ const SingleProduct = () => {
                 </div>
               )}
 
-              {product.sellOnline !== false && (<>
+              {hasPrice(product) && product.sellOnline !== false && (<>
               {/* ── 🔐 Quantity Selector (Disabled for guests) ── */}
               <div className="flex items-center gap-4">
                 <span className="text-sm font-semibold text-gray-700">{t("Quantity:")}</span>

@@ -6,6 +6,8 @@ import { useFetchProductByIdQuery, useUpdateProductMutation } from '../../../../
 import { useSelector } from 'react-redux';
 import TextInput from '../addProduct/TextInput';
 import SelectInput from '../addProduct/SelectInput';
+import CouponInput from '../addProduct/CouponInput';
+import { ORIGINS } from '../addProduct/productOptions';
 import UploadImage from '../addProduct/UploadImage';
 import DocumentUploader from '../addProduct/DocumentUploader';
 
@@ -41,6 +43,9 @@ const UpdateProduct = () => {
         description: '',
         image: '',
         modelNumber: '', // e.g. ZP-35D: goes into the serial numbers of sold machines
+        manufacturer: '',
+        origin: '',
+        couponCode: '',
         fitsModels: '' // spare parts: machine models, comma separated
     })
 
@@ -66,6 +71,9 @@ const UpdateProduct = () => {
                 description: description || '',
                 image: imageURL || '',
                 modelNumber: productData.product?.modelNumber || '',
+                manufacturer: productData.product?.manufacturer || '',
+                origin: productData.product?.origin || '',
+                couponCode: productData.product?.couponCode || '',
                 fitsModels: (productData.product?.fitsModels || []).join(', ')
             })
             setDocuments(productData.product?.documents || [])
@@ -154,13 +162,28 @@ const UpdateProduct = () => {
                     onChange={handleChange}
                 />
                 <TextInput
-                    label="Price"
+                    label="Price (₹) – leave empty to show “Contact for price” with WhatsApp"
                     name="price"
                     type="number"
-                    placeholder="50"
+                    placeholder="50000"
                     value={product.price}
                     onChange={handleChange}
                 />
+                <TextInput
+                    label="Manufacturer (who makes the machine)"
+                    name="manufacturer"
+                    placeholder="PureLine Machinery Pvt. Ltd."
+                    value={product.manufacturer}
+                    onChange={handleChange}
+                />
+                <SelectInput
+                    label="Origin (made in)"
+                    name="origin"
+                    value={product.origin}
+                    onChange={handleChange}
+                    options={[{ label: 'Select origin', value: '' }, ...ORIGINS, ...(product.origin && !ORIGINS.some((o) => o.value === product.origin) ? [{ label: product.origin, value: product.origin }] : [])]}
+                />
+                <CouponInput value={product.couponCode} onChange={(v) => setProduct((prev) => ({ ...prev, couponCode: v }))} />
 
                 <FaqEditor value={faqs} onChange={setFaqs} />
 

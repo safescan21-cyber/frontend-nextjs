@@ -14,6 +14,7 @@ import CatalogSwitch from './pharmaApi/CatalogSwitch';
 import { rankProducts } from '../../utlis/productSearch';
 import CompareButton from '../compare/CompareButton';
 import { canQuoteInstantly } from '../quote/InstantQuote';
+import ContactForPrice, { hasPrice } from '../shop/ContactForPrice';
 
 
 // Empty boxes = no limit, so expensive machines are never hidden by default
@@ -441,7 +442,7 @@ const ShopPage = ({ embedded = false }) => {
                                 e.target.src = 'https://picsum.photos/id/20/400/300';
                               }}
                             />
-                            {product.oldPrice && (
+                            {product.oldPrice && hasPrice(product) && (
                               <span className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
                                 SAVE {Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}%
                               </span>
@@ -513,6 +514,9 @@ const ShopPage = ({ embedded = false }) => {
                             )}
                           </div>
 
+                          {!hasPrice(product) ? (
+                            <ContactForPrice product={product} compact />
+                          ) : (<>
                           <div className="flex items-center gap-2 mb-4">
                             <span className="text-xl font-bold text-blue-600">{formatPrice(product.price)}</span>
                             <LocalPrice inr={product.price} />
@@ -607,6 +611,7 @@ const ShopPage = ({ embedded = false }) => {
                               {t("View Cart & Checkout")}
                             </button>
                           )}
+                          </>)}
                         </div>
                       </div>
                     );
