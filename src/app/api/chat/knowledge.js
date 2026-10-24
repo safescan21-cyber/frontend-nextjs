@@ -140,6 +140,7 @@ export const findFacts = async (question, limit = 6) => {
     .map((f) => {
       let score = 0;
       let hits = 0; // how many of the question's words this fact contains
+      let asked = 0; // how closely the question matches one of a company fact's own questions
       for (const w of q) {
         const tf = f.tf.get(w);
         if (!tf) continue;
@@ -152,11 +153,11 @@ export const findFacts = async (question, limit = 6) => {
       if (f.askWords) {
         const qs = new Set(q);
         const best = Math.max(...f.askWords.map((a) => { const both = [...a].filter((w) => qs.has(w)).length; return both / (a.size + qs.size - both || 1); }));
-        if (best >= 0.6) { score += 6 * best; hits = Math.max(hits, Math.round(best * q.length)); }
+        if (best >= 0.6) { score += 6 * best; hits = Math.max(hits, Math.round(best * q.length)); asked = best; }
       }
       // The admin's own answers win over automatic facts that match about as well
       if (f.admin) score *= 1.3;
-      return { title: f.title, text: f.text, url: f.url, answer: f.answer, product: f.product, score, cover: hits / q.length, unknown, missing, known: q.length - unknown };
+      return { title: f.title, text: f.text, url: f.url, answer: f.answer, product: f.product, score, cover: hits / q.length, unknown, missing, known: q.length - unknown, asked, admin: f.admin };
     })
     .filter((f) => f.score > 0)
     .sort((x, y) => y.score - x.score)
@@ -206,7 +207,8 @@ export const isOffTopic = (facts, question) =>
 // Returns the reply with wrong phone numbers and unknown links fixed, or null when it
 // quotes a price the facts don't have (the caller then answers from the facts instead)
 // The small model sometimes talks about its instructions or dodges: those replies are not used
-const BAD_REPLY = /\bFACTS\b|my database|where on the website|found it\?|as an ai\b|I don'?t have (the )?(exact )?(email|address|phone|contact)/i;
+// (only used when the facts do cover the question, so a dodge means the facts answer is better)
+const BAD_REPLY = /\bFACTS\b|my database|where on the website|found it\?|as an ai\b|I don'?t have (that|the|exact|any)|team (can|will) confirm|suggest WhatsApp or the quote form|need (a bit )?more (details|information)|is that right\?/i;
 export const checkReply = (reply, facts) => {
   if (!reply || BAD_REPLY.test(reply)) return null;
   // A broken WhatsApp link ("wa.me/+91 87007 92607"): the right one
@@ -262,6 +264,10 @@ const sentences = (text, n = 300) => {
 export const factsCoverQuestion = (facts) => Boolean(facts[0] && facts[0].score >= 4 && facts[0].cover >= 0.5 && !facts[0].unknown);
 
 export const isSmallTalk = (q) => GREETING.test(q) || THANKS.test(q);
+
+// Asked like one of our company questions, or the admin wrote this exact answer: that answer
+// as written is better than the model's retelling (it can't drop or add anything)
+export const hasExactAnswer = (facts) => Boolean(facts[0]?.answer && !facts[0].unknown && (facts[0].asked >= 0.6 || (facts[0].admin && facts[0].cover >= 0.8)));
 
 export const replyFromFacts = (facts, question = '') => {
   if (GREETING.test(question)) return "Hello! 👋 I'm Nova from Food Pharma Machinery. Ask me about our machines, prices, an instant quotation, spare parts or service – how can I help?";

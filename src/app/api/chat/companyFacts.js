@@ -39,6 +39,12 @@ export const COMPANY_FACTS = [
     asks: ['What machines do you sell?', 'What products do you have?', 'Show me your machine list', 'What do you manufacture?', 'What is your product range?'],
   },
   {
+    title: 'Brand and manufacturer',
+    text: 'Our machines are sold under the Food Pharma Machinery brand (PureLine Machinery Pvt. Ltd., Haridwar). Each machine page in the shop shows its manufacturer and country of origin.',
+    url: `${SITE}/shop`,
+    asks: ['What brands do you have?', 'Which brand are your machines?', 'Who manufactures your machines?', 'Are the machines Indian or imported?'],
+  },
+  {
     title: 'How to get a quotation',
     text: `Use the quick quote form on any machine page or the bulk quote page, or call/WhatsApp ${PHONE}. Share the product, the output you need and your city. Machines with a listed price also have an instant quotation (PDF) button on their page.`,
     url: `${SITE}/bulk-quote`,

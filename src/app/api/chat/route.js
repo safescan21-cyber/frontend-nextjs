@@ -9,7 +9,7 @@
 //      LLM_BASE_URL, e.g. http://127.0.0.1:8090/v1, LLM_MODEL=foodpharma); every reply is
 //      checked (unknown prices -> facts answer; wrong phone numbers / links fixed)
 //   3. model slow or down: the best matching fact is sent as the reply
-import { findFacts, factsBlock, replyFromFacts, checkReply, isOffTopic, isSmallTalk, factsCoverQuestion, logMissedQuestion, quoteOffer, withPhone } from './knowledge';
+import { findFacts, factsBlock, replyFromFacts, checkReply, isOffTopic, isSmallTalk, factsCoverQuestion, logMissedQuestion, quoteOffer, withPhone, hasExactAnswer } from './knowledge';
 
 const SYSTEM = `You are "Nova", a smart, warm, and helpful support assistant for Food Pharma Machinery (PureLine Machinery Pvt. Ltd., Haridwar) – a B2B provider of pharmaceutical machinery.
 Our services: pharma and food processing machines (tablet presses, capsule fillers, blister packaging, liquid and powder filling, sterile processing), spares, AMC and turnkey plants.
@@ -94,6 +94,8 @@ export async function POST(request) {
   // Greetings / thanks: at once. Not about us (jokes, homework…): the standard answer.
   if (isSmallTalk(latest)) return Response.json({ reply: replyFromFacts(facts, latest), source: 'facts' });
   if (isOffTopic(facts, asked)) return Response.json({ reply: replyFromFacts([], asked), source: 'facts' });
+  // One of our company questions (or an admin answer): the written answer, at once
+  if (hasExactAnswer(facts)) return Response.json({ reply: withPhone(replyFromFacts(facts, latest), latest), source: 'facts', quote });
   // Every AI reply is checked: unknown prices -> answer from the facts; wrong phone/links fixed
   // The chat shows the quotation form (the machine has a listed price): a reply that asks which
   // machine or says we don't know is replaced by the machine's facts, and it names the button
