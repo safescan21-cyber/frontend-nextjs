@@ -4,12 +4,22 @@
 // the key from being used as a free AI service, only short chats from this site are
 // accepted, a limited number per visitor.
 // Optional fallback when DeepSeek fails: OPENROUTER_API_KEY (free models).
+//
+// Every question first looks up real facts (machines, prices, FAQs, company details) in
+// knowledge.js; the AI may only use those for specifics. Order of AI services:
+//   1. our own model, when LLM_BASE_URL (+ LLM_MODEL, optional LLM_API_KEY) is set —
+//      any OpenAI-compatible server, e.g. Ollama: LLM_BASE_URL=https://<host>/v1
+//   2. DeepSeek (DEEPSEEK_API_KEY)   3. OpenRouter (OPENROUTER_API_KEY)
+//   4. none answering: the best matching fact is sent as the reply
+import { findFacts, factsBlock, replyFromFacts, checkReply, isOffTopic } from './knowledge';
 
 const SYSTEM = `You are "Nova", a smart, warm, and helpful support assistant for Food Pharma Machinery (PureLine Machinery Pvt. Ltd., Haridwar) – a B2B provider of pharmaceutical machinery.
-Our services: tablet presses, capsule fillers, blister packaging, liquid filling, sterile processing, and turnkey pharma plants.
+Our services: pharma and food processing machines (tablet presses, capsule fillers, blister packaging, liquid and powder filling, sterile processing), spares, AMC and turnkey plants.
 Rules:
 - Keep replies to 2–3 sentences. Be conversational and human.
-- Never invent specific prices. Say pricing is project-based; invite them to fill the contact form or jump on WhatsApp.
+- Use the FACTS you are given for anything specific: prices, models, specifications, addresses, phone numbers, delivery and links. Never invent these. If the FACTS don't answer it, say our team will confirm and suggest WhatsApp or the quote form.
+- Only quote a price when it is listed in the FACTS, and say it is ex-works (GST, freight and installation extra).
+- Only use links that appear in the FACTS.
 - If asked to connect to WhatsApp, tell them to click the green WhatsApp button in the chat.
 - Be helpful, knowledgeable, and never salesy.
 - Only talk about Food Pharma Machinery, its machines, services and pharma/food manufacturing.`;
@@ -43,8 +53,8 @@ const cleanMessages = (list) => {
 const ask = async (url, key, model, messages, extraHeaders = {}) => {
   const res = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}`, ...extraHeaders },
-    body: JSON.stringify({ model, messages: [{ role: 'system', content: SYSTEM }, ...messages], max_tokens: 500, temperature: 0.7 }),
+    headers: { 'Content-Type': 'application/json', ...(key && { Authorization: `Bearer ${key}` }), ...extraHeaders },
+    body: JSON.stringify({ model, messages, max_tokens: 500, temperature: 0.4 }),
     signal: AbortSignal.timeout(25000),
   });
   const data = await res.json().catch(() => null);
@@ -64,22 +74,42 @@ export async function POST(request) {
   const messages = cleanMessages(body?.messages);
   if (!messages) return Response.json({ message: 'Send the chat messages, ending with the visitor’s message' }, { status: 400 });
 
+  // Facts for this question (the last two visitor messages, so "and its price?" still works)
+  const asked = messages.filter((m) => m.role === 'user').slice(-2).map((m) => m.content).join(' ');
+  const facts = await findFacts(asked, 6).catch(() => []);
+  const prompt = [
+    { role: 'system', content: SYSTEM },
+    { role: 'system', content: facts.length ? `FACTS from our website and database:\n${factsBlock(facts)}` : 'FACTS: nothing found for this question. Do not guess specifics; offer WhatsApp or the quote form.' },
+    ...messages,
+  ];
+
+  // Not about us (jokes, homework…): the standard answer, no AI needed
+  if (isOffTopic(facts, asked)) return Response.json({ reply: replyFromFacts([], asked), source: 'facts' });
+  // Every AI reply is checked: unknown prices -> answer from the facts; wrong phone/links fixed
+  const checked = (reply) => (reply ? checkReply(reply, facts) || replyFromFacts(facts, asked) : null);
+
   try {
+    if (process.env.LLM_BASE_URL) {
+      const base = process.env.LLM_BASE_URL.replace(/\/$/, '');
+      const reply = await ask(`${base}/chat/completions`, process.env.LLM_API_KEY, process.env.LLM_MODEL || 'foodpharma', prompt).catch(() => null);
+      if (reply) return Response.json({ reply: checked(reply), source: 'own' });
+    }
     if (process.env.DEEPSEEK_API_KEY) {
-      const reply = await ask('https://api.deepseek.com/v1/chat/completions', process.env.DEEPSEEK_API_KEY, 'deepseek-chat', messages).catch(() => null);
-      if (reply) return Response.json({ reply });
+      const reply = await ask('https://api.deepseek.com/v1/chat/completions', process.env.DEEPSEEK_API_KEY, 'deepseek-chat', prompt).catch(() => null);
+      if (reply) return Response.json({ reply: checked(reply), source: 'deepseek' });
     }
     if (process.env.OPENROUTER_API_KEY) {
       for (const model of ['meta-llama/llama-3.2-3b-instruct', 'mistralai/mistral-7b-instruct', 'microsoft/phi-3-mini-4k-instruct']) {
-        const reply = await ask('https://openrouter.ai/api/v1/chat/completions', process.env.OPENROUTER_API_KEY, model, messages, {
+        const reply = await ask('https://openrouter.ai/api/v1/chat/completions', process.env.OPENROUTER_API_KEY, model, prompt, {
           'HTTP-Referer': 'https://www.foodpharmamachinery.com',
           'X-Title': 'Food Pharma Machinery Chat',
         }).catch(() => null);
-        if (reply) return Response.json({ reply });
+        if (reply) return Response.json({ reply: checked(reply), source: 'openrouter' });
       }
     }
   } catch {
     /* answered below */
   }
-  return Response.json({ message: 'The assistant is not available right now' }, { status: 503 });
+  // No AI service answered: reply with the best matching fact
+  return Response.json({ reply: replyFromFacts(facts, asked), source: 'facts' });
 }
