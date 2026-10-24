@@ -480,6 +480,25 @@ const ROWS = {
   'Granulation & Mixing': ['Granulation et mélange', '造粒・混合', '과립 및 혼합'],
   'Inspection & Checkweighing': ['Inspection et contrôle pondéral', '検査・ウェイトチェック', '검사 및 중량 선별'],
   'Aseptic Filling Lines': ['Lignes de remplissage aseptique', '無菌充填ライン', '무균 충전 라인'],
+  // ── Spec sheet & comparison PDFs (utlis/specSheet.js) ──
+  'Machine specification sheet': ['Fiche technique de la machine', '機械仕様書', '기계 사양서'],
+  'Machine comparison': ['Comparaison de machines', '機械の比較', '기계 비교'],
+  'Specification': ['Caractéristique', '仕様', '사양'],
+  'Value': ['Valeur', '内容', '내용'],
+  'Price (ex-works, INR)': ['Prix (départ usine, INR)', '価格（工場渡し、INR）', '가격(공장 인도, INR)'],
+  'Approx. price': ['Prix approximatif', '概算価格', '대략적인 가격'],
+  'Warranty': ['Garantie', '保証', '보증'],
+  '{n} months': ['{n} mois', '{n}か月', '{n}개월'],
+  'Origin': ['Origine', '原産国', '원산지'],
+  'Availability': ['Disponibilité', '在庫状況', '재고 상태'],
+  'In stock': ['En stock', '在庫あり', '재고 있음'],
+  'Made to order': ['Fabriqué sur commande', '受注生産', '주문 제작'],
+  'On request': ['Sur demande', '要問い合わせ', '문의'],
+  'Full details and quotation:': ['Détails complets et devis :', '詳細とお見積り：', '자세한 정보 및 견적:'],
+  'Prices are indicative; installation, freight and taxes are quoted separately.': ['Prix indicatifs ; l’installation, le transport et les taxes sont chiffrés séparément.', '価格は目安です。据付、運賃、税金は別途お見積りします。', '가격은 참고용이며 설치, 운송비 및 세금은 별도로 견적됩니다.'],
+  'Phone / WhatsApp': ['Téléphone / WhatsApp', '電話 / WhatsApp', '전화 / WhatsApp'],
+  'page {i}/{n}': ['page {i}/{n}', '{i}/{n} ページ', '{i}/{n} 페이지'],
+  'Machine details are in English.': ['Les détails de la machine sont en anglais.', '機械の詳細は英語で記載しています。', '기계 세부 정보는 영어로 제공됩니다.'],
 };
 
 const LANGS = ['fr', 'ja', 'ko'];

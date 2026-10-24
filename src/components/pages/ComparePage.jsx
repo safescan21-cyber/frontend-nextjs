@@ -13,7 +13,8 @@ import { useLocale } from '../../i18n/LocaleContext';
 const API_PARAMS = { page: 1, limit: 1000 }; // same list as the shop page (shared cache)
 
 export default function ComparePage() {
-  const { t } = useLocale();
+  const i18n = useLocale();
+  const { t } = i18n;
   const picked = useCompare();
   const [params] = useSearchParams();
   const { data, isLoading } = useFetchAllProductsQuery(API_PARAMS);
@@ -33,13 +34,13 @@ export default function ComparePage() {
     return picked.map((id) => all.find((p) => p._id === id)).filter(Boolean);
   }, [data, picked]);
 
-  const facts = products.map((p) => new Map(machineFacts(p)));
+  const facts = products.map((p) => new Map(machineFacts(p, i18n)));
   const keys = [...new Set(facts.flatMap((m) => [...m.keys()]))];
   const shareLink = products.length ? `https://www.foodpharmamachinery.com/compare?ids=${products.map((p) => p._id).join(',')}` : '';
 
   const pdf = async () => {
     setMaking(true);
-    try { await downloadComparison(products); } finally { setMaking(false); }
+    try { await downloadComparison(products, i18n); } finally { setMaking(false); }
   };
 
   return (

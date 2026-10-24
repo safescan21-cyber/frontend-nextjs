@@ -70,7 +70,8 @@ const SpecBadge = ({ label, value, icon }) => (
 // Main Component
 // ─────────────────────────────────────────────
 const SingleProduct = () => {
-  const { t } = useLocale();
+  const i18n = useLocale();
+  const { t } = i18n;
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -621,7 +622,7 @@ const SingleProduct = () => {
                   type="button"
                   onClick={async () => {
                     setSheetBusy(true);
-                    try { await downloadSpecSheet(product); } catch { toast.error(t('Could not create the PDF. Please try again.')); } finally { setSheetBusy(false); }
+                    try { await downloadSpecSheet(product, i18n); } catch { toast.error(t('Could not create the PDF. Please try again.')); } finally { setSheetBusy(false); }
                   }}
                   disabled={sheetBusy}
                   className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-orange-400 disabled:opacity-60"
