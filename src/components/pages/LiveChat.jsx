@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { usePathname } from "next/navigation";
+import { BotMessageSquare } from "lucide-react";
 
 // ─── CONFIG ──────────────────────────────────────────────────────
 const WHATSAPP_NUMBER = "918700792607"; // +91 87007 92607
@@ -383,7 +384,7 @@ function LiveChat() {
       {/* ─── FLOATING ACTION BUTTON ───────────────────────── */}
       <button
         onClick={() => { touched.current = true; setOpen(o => !o); }}
-        aria-label="Toggle chat"
+        aria-label="Chat with Nova, our AI assistant"
         className={`fixed bottom-[84px] lg:bottom-6 right-6 z-50 w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 ${open ? "bg-stone-700 hover:bg-stone-600" : "bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 fab-pulse"}`}
       >
         <div className="relative">
@@ -392,9 +393,7 @@ function LiveChat() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
             </svg>
           ) : (
-            <svg className="w-7 h-7 text-white drop-shadow" viewBox="0 0 32 32" fill="currentColor">
-              <path d="M16 2C8.268 2 2 8.268 2 16c0 2.47.659 4.786 1.808 6.782L2 30l7.47-1.78A13.94 13.94 0 0016 30c7.732 0 14-6.268 14-14S23.732 2 16 2zm0 25.3a11.28 11.28 0 01-5.76-1.58l-.414-.246-4.287 1.124 1.145-4.175-.27-.43A11.29 11.29 0 014.7 16C4.7 9.7 9.7 4.7 16 4.7S27.3 9.7 27.3 16 22.3 27.3 16 27.3zm6.2-8.47c-.34-.17-2.01-.99-2.32-1.1-.31-.113-.537-.17-.763.17-.227.34-.877 1.104-1.075 1.33-.197.227-.395.255-.735.085-.34-.17-1.436-.53-2.735-1.688-1.011-.9-1.694-2.013-1.893-2.352-.198-.34-.021-.523.149-.692.153-.153.34-.396.51-.595.17-.198.226-.34.34-.567.113-.226.056-.425-.028-.595-.085-.17-.763-1.84-1.046-2.52-.275-.662-.555-.572-.763-.583l-.65-.01c-.227 0-.596.085-.907.425-.31.34-1.188 1.16-1.188 2.83s1.217 3.28 1.387 3.508c.17.226 2.396 3.66 5.81 5.13.812.35 1.445.559 1.938.716.814.259 1.556.222 2.142.135.653-.098 2.01-.764 2.294-1.501.283-.736.283-1.367.198-1.501-.085-.134-.31-.226-.65-.396z"/>
-            </svg>
+            <BotMessageSquare className="w-7 h-7 text-white drop-shadow" strokeWidth={2.2} aria-hidden="true" />
           )}
           {!open && unread > 0 && (
             <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] font-bold font-sans flex items-center justify-center shadow-lg">
