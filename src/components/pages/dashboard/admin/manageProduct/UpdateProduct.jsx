@@ -158,7 +158,7 @@ const UpdateProduct = () => {
                     onChange={handleChange}
                 />
                 <TextInput
-                    label="Price (₹) – leave empty to show “Contact for price” with WhatsApp"
+                    label="Price (₹) – leave empty to show “Contact for price” with WhatsApp (can be added later)"
                     name="price"
                     type="number"
                     placeholder="50000"
@@ -175,7 +175,7 @@ const UpdateProduct = () => {
                     onChange={handleChange}
                 />
                 <TextInput
-                    label="Stock Quantity – empty or 0 shows “Made to order”"
+                    label="Stock Quantity – empty or 0 shows “Made to order” (can be added later)"
                     name="stock"
                     type="number"
                     placeholder="10"
@@ -183,7 +183,7 @@ const UpdateProduct = () => {
                     onChange={handleChange}
                 />
                 <TextInput
-                    label="Warranty (months)"
+                    label="Warranty (months, optional)"
                     name="warranty"
                     type="number"
                     placeholder="24"

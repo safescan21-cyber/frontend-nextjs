@@ -559,7 +559,7 @@ const AddProduct = () => {
         />
 
         <TextInput
-          label="Price (₹) – leave empty to show “Contact for price” with WhatsApp"
+          label="Price (₹) – leave empty to show “Contact for price” with WhatsApp (can be added later)"
           name="price"
           type="number"
           placeholder="50000"
@@ -575,7 +575,7 @@ const AddProduct = () => {
         />
         <CouponInput value={product.couponCode} onChange={(v) => setProduct((prev) => ({ ...prev, couponCode: v }))} />
         <TextInput
-          label="Original Price (₹) – for discount"
+          label="Original Price (₹) – for discount (optional)"
           name="oldPrice"
           type="number"
           placeholder="60000"
@@ -598,7 +598,7 @@ const AddProduct = () => {
           onChange={handleChange}
         />
         <TextInput
-          label="Stock Quantity"
+          label="Stock Quantity – empty or 0 shows “Made to order” (can be added later)"
           name="stock"
           type="number"
           placeholder="10"
@@ -606,7 +606,7 @@ const AddProduct = () => {
           onChange={handleChange}
         />
         <TextInput
-          label="Warranty (months)"
+          label="Warranty (months, optional)"
           name="warranty"
           type="number"
           placeholder="24"
