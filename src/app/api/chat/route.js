@@ -104,8 +104,11 @@ export async function POST(request) {
   const WRONG_TERMS = /includ\w*[^.]{0,40}\b(gst|freight|installation)\b|\b(gst|freight|installation)\b[^.]{0,40}\bincluded\b|price may vary/i;
   const withQuote = (reply) => {
     if (!quote) return reply;
-    const statesPrice = reply.replace(/\D/g, '').includes(String(quote.price));
-    const text = DODGES.test(reply) || WRONG_TERMS.test(reply) || !statesPrice ? replyFromFacts(facts, latest) : reply;
+    // The machine's own card (price + specifications from the shop page) is the answer: the
+    // model's retelling added things ("with spare parts") the product data doesn't say
+    const card = replyFromFacts(facts, latest);
+    const statesPrice = (s) => s.replace(/\D/g, '').includes(String(quote.price));
+    const text = statesPrice(card) ? card : DODGES.test(reply) || WRONG_TERMS.test(reply) || !statesPrice(reply) ? card : reply;
     return /instant quotation/i.test(text) ? text : `${text}${text.includes('\n') ? '\n\n' : ' '}You can get an instant quotation (PDF) with the "Get instant quotation" button below.`;
   };
   const checked = (reply) => (reply ? withPhone(checkReply(reply, facts) || replyFromFacts(facts, latest), latest) : null);
