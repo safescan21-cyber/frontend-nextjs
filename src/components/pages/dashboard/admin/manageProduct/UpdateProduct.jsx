@@ -7,29 +7,9 @@ import { useSelector } from 'react-redux';
 import TextInput from '../addProduct/TextInput';
 import SelectInput from '../addProduct/SelectInput';
 import CouponInput from '../addProduct/CouponInput';
-import { ORIGINS } from '../addProduct/productOptions';
+import { ORIGINS, CATEGORIES, COLORS, withCurrent } from '../addProduct/productOptions';
 import UploadImage from '../addProduct/UploadImage';
 import DocumentUploader from '../addProduct/DocumentUploader';
-
-const categories = [
-    { label: 'Select Category', value: '' },
-    { label: 'Accessories', value: 'accessories' },
-    { label: 'Dress', value: 'dress' },
-    { label: 'Jewellery', value: 'jewellery' },
-    { label: 'Cosmetics', value: 'cosmetics' }
-];
-
-const colors = [
-    { label: 'Select Color', value: '' },
-    { label: 'Black', value: 'black' },
-    { label: 'Red', value: 'red' },
-    { label: 'Gold', value: 'gold' },
-    { label: 'Blue', value: 'blue' },
-    { label: 'Silver', value: 'silver' },
-    { label: 'Beige', value: 'beige' },
-    { label: 'Green', value: 'green' }
-];
-
 
 const UpdateProduct = () => {
     const {id} = useParams();
@@ -138,14 +118,14 @@ const UpdateProduct = () => {
                     name="category"
                     value={product.category}
                     onChange={handleChange}
-                    options={categories}
+                    options={withCurrent(CATEGORIES, product.category)}
                 />
                 <SelectInput
                     label="Color"
                     name="color"
                     value={product.color}
                     onChange={handleChange}
-                    options={colors}
+                    options={withCurrent(COLORS, product.color)}
                 />
                 <TextInput
                     label="Model number (used in the serial numbers when sold)"
@@ -181,7 +161,7 @@ const UpdateProduct = () => {
                     name="origin"
                     value={product.origin}
                     onChange={handleChange}
-                    options={[{ label: 'Select origin', value: '' }, ...ORIGINS, ...(product.origin && !ORIGINS.some((o) => o.value === product.origin) ? [{ label: product.origin, value: product.origin }] : [])]}
+                    options={withCurrent(ORIGINS, product.origin)}
                 />
                 <CouponInput value={product.couponCode} onChange={(v) => setProduct((prev) => ({ ...prev, couponCode: v }))} />
 

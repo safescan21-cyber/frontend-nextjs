@@ -8,7 +8,7 @@ import { CheckCircle, AlertCircle, Plus, X } from 'lucide-react';
 import TextInput from './TextInput';
 import SelectInput from './SelectInput';
 import CouponInput from './CouponInput';
-import { ORIGINS } from './productOptions';
+import { ORIGINS, CATEGORIES, COLORS } from './productOptions';
 import UploadImage from './UploadImage';
 import DocumentUploader from './DocumentUploader';
 import { useAddProductMutation } from '../../../../store/products/productsApi';
@@ -16,40 +16,9 @@ import getBaseUrl from '../../../../../utlis/baseURL';
 
 const MAX_VIDEO_MB = 100;
 
-// ─── Predefined categories for pharmaceutical equipment ────────
-const predefinedCategories = [
-  { label: 'Tablet Press Machines', value: 'tablet-press' },
-  { label: 'Capsule Filling Machines', value: 'capsule-filling' },
-  { label: 'Blister Packaging Machines', value: 'blister-packaging' },
-  { label: 'Strip Packaging Machines', value: 'strip-packaging' },
-  { label: 'Powder Filling Machines', value: 'powder-filling' },
-  { label: 'Liquid Filling Machines', value: 'liquid-filling' },
-  { label: 'Granulation Equipment', value: 'granulation' },
-  { label: 'Coating Systems', value: 'coating' },
-  { label: 'Fluid Bed Dryers', value: 'fluid-bed-dryer' },
-  { label: 'Milling & Sizing', value: 'milling' },
-  { label: 'Mixing & Blending', value: 'mixing' },
-  { label: 'Compression Tooling', value: 'tooling' },
-  { label: 'Inspection & Detection', value: 'inspection' },
-  { label: 'Lab Equipment', value: 'lab-equipment' },
-  { label: 'Sterile Processing', value: 'sterile' },
-  { label: 'HVAC & Utilities', value: 'hvac' },
-  { label: 'Material Handling', value: 'material-handling' },
-  { label: 'Packaging Accessories', value: 'packaging-accessories' },
-  { label: 'Process Control Software', value: 'process-control' },
-  { label: 'Turnkey Projects', value: 'turnkey' },
-];
-
-const colors = [
-  { label: 'Red', value: 'red' },
-  { label: 'Blue', value: 'blue' },
-  { label: 'Green', value: 'green' },
-  { label: 'Yellow', value: 'yellow' },
-  { label: 'Black', value: 'black' },
-  { label: 'White', value: 'white' },
-  { label: 'Silver', value: 'silver' },
-  { label: 'Custom', value: 'custom' },
-];
+// Categories and colours: shared with Update Product (productOptions.js)
+const predefinedCategories = CATEGORIES;
+const colors = COLORS;
 
 // ─── Origin and product-type lists (admin can add more; saved in this browser) ───
 const defaultOrigins = ORIGINS;
@@ -410,9 +379,15 @@ const AddProduct = () => {
       showError('Please upload at least one product image.');
       return;
     }
+    // A specification needs both a name and a value (the server refuses half rows)
+    const halfSpec = specifications.findIndex((s) => !s.key.trim() !== !s.value.trim());
+    if (halfSpec !== -1) {
+      showError(`Specification ${halfSpec + 1}: fill in both the name and the value, or remove the row.`);
+      return;
+    }
 
     try {
-      const cleanSpecs = specifications.filter(s => s.key.trim() !== '' || s.value.trim() !== '');
+      const cleanSpecs = specifications.filter(s => s.key.trim() !== '' && s.value.trim() !== '');
 
       const payload = {
         ...product,
@@ -457,6 +432,7 @@ const AddProduct = () => {
       setVideos([]);
       setDocuments([]);
       setSpecifications([]);
+      setFaqs([]);
       setCustomCategory('');
       setShowCustomCategory(false);
       setCategoryError('');
