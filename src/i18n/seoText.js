@@ -126,6 +126,11 @@ const enGb = {
   '/bulk-quote': ['Bulk Order & Quote Request – UK', 'Request a bulk quote for pharma and food processing machinery and spares. Volume pricing, export shipping to the UK and a reply within 1 business day.'],
 };
 
+const enAu = {
+  '/': ['Food Pharma Machinery | Pharma & Food Machinery for Australia', 'Pharma and food processing machinery made in India for buyers in Australia: tablet presses, capsule fillers, blister and liquid filling lines, mixers, lab equipment and spares.'],
+  '/bulk-quote': ['Bulk Order & Quote Request – Australia', 'Request a bulk quote for pharma and food processing machinery and spares. Volume pricing, export shipping to Australia quoted, and a reply within 1 business day.'],
+};
+
 const ur = {
   '/': ['فوڈ فارما مشینری | فارما اور فوڈ پروسیسنگ مشینری', 'بھارت میں تیار کردہ فارما اور فوڈ پروسیسنگ مشینری: ٹیبلٹ پریس، کیپسول فلر، بلسٹر اور مائع بھرنے کی لائنیں، مکسر، لیب آلات اور پرزے۔'],
   '/shop': ['فارما اور فوڈ پروسیسنگ مشینری کی دکان', 'ٹیبلٹ پریس، کیپسول فلر، بلسٹر پیکنگ، مائع اور ٹیوب بھرنے کی مشینیں، مکسر اور لیب ترازو خریدیں۔ cGMP ڈیزائن، پرزے اور معاونت۔'],
@@ -164,7 +169,7 @@ const ur = {
   '/products/cleanroom': ['کلین روم آلات', 'لیمینر فلو یونٹس، پاس باکس اور ماحولیاتی نگرانی کے حل۔'],
 };
 
-export const SEO_TEXT = { fr, ja, ko, ur, 'en-us': enUs, 'en-gb': enGb };
+export const SEO_TEXT = { fr, ja, ko, ur, 'en-us': enUs, 'en-gb': enGb, 'en-au': enAu };
 
 // { title, description } for a page in a country version, or null to keep English
 export const seoText = (locale, path) => {
@@ -198,9 +203,9 @@ export const fitDescription = (text, max = MAX_DESCRIPTION, end = '…') => {
   return words + end;
 };
 
-// The US and UK versions are in English like the India site: pages without their own
-// text above still get a title and description of their own (not copies)
-const REGION = { 'en-us': ['USA', ' Exported to the USA.'], 'en-gb': ['UK', ' Exported to the UK.'] };
+// The US, UK and Australia versions are in English like the India site: pages without their
+// own text above still get a title and description of their own (not copies)
+const REGION = { 'en-us': ['USA', ' Exported to the USA.'], 'en-gb': ['UK', ' Exported to the UK.'], 'en-au': ['Australia', ' For buyers in Australia.'] };
 
 // Title (without the brand) and description of a page in a country version
 export const localizedText = (locale, path, title, description) => {

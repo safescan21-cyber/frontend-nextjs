@@ -4,6 +4,7 @@ import { BotMessageSquare } from "lucide-react";
 import getBaseURL from "../../utlis/baseURL";
 import { getLeadOrigin } from "../../utlis/leadOrigin";
 import { gaEvent } from "../../utlis/analytics";
+import { LOCALE_CODES } from "../../i18n/locales";
 
 // ─── CONFIG ──────────────────────────────────────────────────────
 const WHATSAPP_NUMBER = "918700792607"; // +91 87007 92607
@@ -92,7 +93,7 @@ if (typeof window !== "undefined") {
 }
 
 // Pages where the chat must not pop up by itself (buying, logging in, admin)
-const QUIET_PAGES = /^\/(?:(?:en-us|en-gb|fr|ja|ko|ur)\/)?(cart|checkout|login|register|forgotpassword|resetpassword|dashboard)(\/|$)/;
+const QUIET_PAGES = new RegExp(`^/(?:(?:${LOCALE_CODES.join("|")})/)?(cart|checkout|login|register|forgotpassword|resetpassword|dashboard)(/|$)`);
 
 // ─── WHATSAPP BUTTON ────────────────────────────────────────────
 function WhatsAppButton({ aiSummary = "" }) {

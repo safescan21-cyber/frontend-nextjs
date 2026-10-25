@@ -3,7 +3,7 @@
 // its built-in rates.
 export const revalidate = 86400;
 
-const WANTED = ['USD', 'GBP', 'EUR', 'JPY', 'KRW'];
+const WANTED = ['USD', 'GBP', 'EUR', 'JPY', 'KRW', 'AUD'];
 
 export async function GET() {
   try {

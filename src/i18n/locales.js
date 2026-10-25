@@ -5,6 +5,7 @@
 export const LOCALES = {
   'en-us': { lang: 'en-US', hreflang: 'en-us', label: 'United States', short: 'US', flag: '🇺🇸', currency: 'USD', language: 'en' },
   'en-gb': { lang: 'en-GB', hreflang: 'en-gb', label: 'United Kingdom', short: 'UK', flag: '🇬🇧', currency: 'GBP', language: 'en' },
+  'en-au': { lang: 'en-AU', hreflang: 'en-au', label: 'Australia', short: 'AU', flag: '🇦🇺', currency: 'AUD', language: 'en' },
   fr: { lang: 'fr', hreflang: 'fr', label: 'France (Français)', short: 'FR', flag: '🇫🇷', currency: 'EUR', language: 'fr' },
   ja: { lang: 'ja', hreflang: 'ja', label: '日本 (日本語)', short: 'JP', flag: '🇯🇵', currency: 'JPY', language: 'ja' },
   ko: { lang: 'ko', hreflang: 'ko', label: '한국 (한국어)', short: 'KR', flag: '🇰🇷', currency: 'KRW', language: 'ko' },

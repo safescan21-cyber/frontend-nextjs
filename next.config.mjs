@@ -1,8 +1,11 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { LOCALE_CODES, DEFAULT_SEGMENT } from './src/i18n/locales.js';
 
 // This folder is the project root (a stray package-lock.json higher up must not be picked)
 const root = path.dirname(fileURLToPath(import.meta.url));
+// Country folders (en-us|en-gb|en-au|fr…), read from the one list in src/i18n/locales.js
+const LOC = LOCALE_CODES.join('|');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -32,16 +35,16 @@ const nextConfig = {
       // Old "view order" links (the order pages live in the customer dashboard)
       moved('/orders', '/dashboard/orders'),
       moved('/orders/:id', '/dashboard/orders/:id'),
-      moved('/:loc(en-us|en-gb|fr|ja|ko|ur)/orders', '/:loc/dashboard/orders'),
-      moved('/:loc(en-us|en-gb|fr|ja|ko|ur)/orders/:id', '/:loc/dashboard/orders/:id'),
+      moved(`/:loc(${LOC})/orders`, '/:loc/dashboard/orders'),
+      moved(`/:loc(${LOC})/orders/:id`, '/:loc/dashboard/orders/:id'),
     ];
   },
   // Every page lives under src/app/[locale]/…: /fr/shop is served as it is, and the
-  // India site (no country folder) as /_in/… (never visible to visitors). Keep the
-  // folder list in step with LOCALES and DEFAULT_SEGMENT in src/i18n/locales.js.
+  // India site (no country folder) as /_in/… (never visible to visitors). The folder list
+  // comes from LOCALES and DEFAULT_SEGMENT in src/i18n/locales.js.
   // Not for Next's own files, API routes or files with an extension.
   async rewrites() {
-    const skip = '(?!(?:en-us|en-gb|fr|ja|ko|ur|_in|_next|api)(?:/|$))(?!.*\\.)';
+    const skip = `(?!(?:${LOC}|${DEFAULT_SEGMENT}|_next|api)(?:/|$))(?!.*\\.)`;
     return {
       beforeFiles: [
         { source: '/', destination: '/_in' },

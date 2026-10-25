@@ -1,7 +1,7 @@
 // Approximate local prices for the country versions. Checkout stays in INR; these are
 // estimates only. Rates (1 INR in each currency) are refreshed daily by /api/fx from
-// open.er-api.com; the numbers below are used until then (21 Oct 2026).
-let RATES = { USD: 0.010527, GBP: 0.007887, EUR: 0.009389, JPY: 1.666793, KRW: 13.95986 };
+// open.er-api.com; the numbers below are used until then (21 Oct 2026; AUD 25 Oct 2026).
+let RATES = { USD: 0.010527, GBP: 0.007887, EUR: 0.009389, JPY: 1.666793, KRW: 13.95986, AUD: 0.01498 };
 
 export const setRates = (rates) => {
   if (!rates || typeof rates !== 'object') return;
