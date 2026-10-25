@@ -150,11 +150,17 @@ const ContactRow = ({ icon: Icon, label, children }) => (
 export default function PharmaMachineFooter() {
   const { t } = useLocale();
   // ── Product query ──
-  const { data: apiData, isLoading: productsLoading } = useFetchAllProductsQuery({
+  const { data: apiData, isLoading: productsQueryLoading } = useFetchAllProductsQuery({
     page: 1,
     limit: 1000,
   });
-  const allProducts = apiData?.products || [];
+  // The server draws the footer before the product data is in the store, so its HTML says
+  // "Loading". The browser's first render must say the same (or React reports a hydration
+  // error and redraws the page); the list fills in right after (same as the Navbar).
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => { setHydrated(true); }, []);
+  const productsLoading = productsQueryLoading || !hydrated;
+  const allProducts = hydrated ? apiData?.products || [] : [];
 
   const navProducts = (() => {
     if (allProducts.length === 0) return NAV_PRODUCTS_FALLBACK;
@@ -200,10 +206,12 @@ export default function PharmaMachineFooter() {
   const [email, setEmail] = useState("");
   const [subscribeError, setSubscribeError] = useState("");
   const [subscribing, setSubscribing] = useState(false);
-  // Remember a successful signup on this device so we show "subscribed" next visit
-  const [subscribedAs, setSubscribedAs] = useState(() => {
-    try { return localStorage.getItem(NEWSLETTER_KEY) || ""; } catch { return ""; }
-  });
+  // Remember a successful signup on this device so we show "subscribed" next visit (read after
+  // the first render: the server can't see this browser's storage)
+  const [subscribedAs, setSubscribedAs] = useState("");
+  useEffect(() => {
+    try { setSubscribedAs(localStorage.getItem(NEWSLETTER_KEY) || ""); } catch { /* storage blocked */ }
+  }, []);
   const [subscribeMessage, setSubscribeMessage] = useState("");
 
   const handleSubscribe = async (e) => {
