@@ -220,8 +220,12 @@ const Home = () => {
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
 
+            {/* Text and badge fade on their own: the old slide's text leaves at once and the new
+                one appears once its photo has faded in, so two slides' text never overlap */}
+            <div className={`absolute inset-0 transition-opacity ease-out ${index === currentIndex ? 'opacity-100 duration-500 delay-500' : 'opacity-0 duration-200'}`}>
             {image.offer && (
-              <div className={`absolute top-4 sm:top-8 left-4 sm:left-8 z-20 ${getOfferBadgeColor(image.offer.type)} text-white px-3 sm:px-4 py-1 sm:py-2 rounded-full shadow-lg`}>
+              // (md:left-20: clear of the "show all slides" button, which only exists from md up)
+              <div className={`absolute top-4 sm:top-8 left-4 sm:left-8 md:left-20 z-20 ${getOfferBadgeColor(image.offer.type)} text-white px-3 sm:px-4 py-1 sm:py-2 rounded-full shadow-lg`}>
                 <div className="flex items-center space-x-2">
                   {getOfferIcon(image.offer.type)}
                   <span className="font-bold text-xs sm:text-sm">{t(image.offer.value)}</span>
@@ -258,6 +262,7 @@ const Home = () => {
                   <span>{t(image.cta)}</span>
                 </button>
               </div>
+            </div>
             </div>
           </div>
         ))}
