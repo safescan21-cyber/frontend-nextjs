@@ -11,7 +11,7 @@ export const generateMetadata = seoMetadata(() => ['food-machinery']);
 export default async function Page({ params }) {
   const { locale } = await params;
   const [seo, list] = await Promise.all([getSeo(locale, ['food-machinery']), productList()]);
-  // Only what the cards show, and never the demo products
+  // Only what the cards show
   const products = realMachines(list.value?.products, hub.categories).map(({ _id, name, category, price, images }) => ({ _id, name, category, price, images: (images || []).slice(0, 1) }));
   return (
     <SitePage seo={seo}>

@@ -3,10 +3,8 @@
 // types only; prices and models come from the real products in the shop. Google gets the
 // same FAQs as FAQPage data (seo/pageSeo.js).
 
-// Demo products (Backend/scripts/seed-demo-products.js) are never shown or priced here
-const DEMO_MATCH = /\/demo-products\//;
 export const realMachines = (products = [], categories = null) =>
-  products.filter((p) => p?._id && p.name && !(p.images || []).some((i) => DEMO_MATCH.test(i)) && (!categories || categories.includes(p.category)));
+  products.filter((p) => p?._id && p.name && p.active !== false &&(!categories || categories.includes(p.category)));
 
 const lakh = (n) => `Rs. ${(n / 100000).toLocaleString('en-IN', { maximumFractionDigits: 2 })} lakh`;
 

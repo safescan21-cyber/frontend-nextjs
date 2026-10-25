@@ -1,13 +1,12 @@
 // /llms.txt — a short Markdown guide to the site for AI assistants (https://llmstxt.org).
 // Pages come from the same list as /sitemap.xml; machines and pharma APIs are read live
-// from the API (demo products stay out, like the sitemap).
+// from the API.
 import { STATIC_PAGES } from '../../seo/pageSeo';
 import { SITE_URL, SITE_NAME, COMPANY } from '../../components/seo/organization';
 
 const API = (process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.foodpharmamachinery.com')
   .replace(/\/api\/?$/, '')
   .replace(/\/$/, '');
-const DEMO_MATCH = /\/demo-products\//;
 
 export const revalidate = 3600;
 
@@ -28,7 +27,7 @@ const MAIN = ['/', '/pharma-machinery', '/food-machinery', '/shop', '/products',
 
 export async function GET() {
   const [prod, apis] = await Promise.all([getJson('/api/products?limit=100'), getJson('/api/pharma-apis?limit=100')]);
-  const machines = (prod?.products || []).filter((p) => !(p.images || []).some((i) => DEMO_MATCH.test(i)));
+  const machines = (prod?.products || []).filter((p) => p.active !== false);
   const apiItems = apis?.items || [];
 
   const page = (p) => link(p.title || (p.path === '/' ? `${SITE_NAME} home page` : p.path), p.path === '/' ? '/' : p.path, p.description);

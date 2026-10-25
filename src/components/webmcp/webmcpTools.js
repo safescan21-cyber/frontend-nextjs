@@ -4,7 +4,6 @@ import getBaseURL from '../../utlis/baseURL';
 import { SITE_URL } from '../seo/organization';
 
 const API = () => getBaseURL().replace(/\/api\/?$/, '').replace(/\/$/, '');
-const DEMO_MATCH = /\/demo-products\//;
 const READ_ONLY = { readOnlyHint: true };
 
 const getJson = async (path) => {
@@ -21,7 +20,6 @@ const machineSummary = (p) => ({
   category: p.category,
   priceINR: p.price,
   buyOnline: p.sellOnline !== false,
-  demo: (p.images || []).some((i) => DEMO_MATCH.test(i)) || undefined,
   description: text(p.description),
 });
 
@@ -61,7 +59,7 @@ export const WEBMCP_TOOLS = [
         .filter((p) => !(maxPriceINR > 0) || p.price <= maxPriceINR)
         .slice(0, 20)
         .map(machineSummary);
-      return { count: found.length, machines: found, note: found.some((m) => m.demo) ? 'Items marked demo are sample listings, not for sale.' : undefined };
+      return { count: found.length, machines: found };
     },
   },
   {

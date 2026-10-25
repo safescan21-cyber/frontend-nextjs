@@ -19,7 +19,6 @@ export const DEFAULT_IMAGE = `${SITE_URL}/og-image.png`;
 const API = (process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.foodpharmamachinery.com')
   .replace(/\/api\/?$/, '')
   .replace(/\/$/, '');
-const DEMO_MATCH = /\/demo-products\//; // demo products (Backend/scripts/seed-demo-products.js) stay out of Google
 
 const fullTitle = (t) => (!t ? DEFAULT_TITLE : brandTitle(t)); // brand only when the title still fits
 const plain = (html) => String(html || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -106,7 +105,6 @@ export async function seoForPath(segments = []) {
       canonical: url,
       image: images[0],
       type: 'product',
-      noindex: images.some((u) => DEMO_MATCH.test(u)),
       jsonLd: [
         {
           '@context': 'https://schema.org',
