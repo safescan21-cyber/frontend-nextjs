@@ -5,6 +5,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Loader2, Search, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
 import getBaseURL from '../../../../../utlis/baseURL';
+import MetaDrafts from './MetaDrafts';
 
 const token = () => { try { return localStorage.getItem('token'); } catch { return null; } };
 
@@ -89,6 +90,8 @@ export default function SeoHealth() {
           )}
         </>
       )}
+
+      <MetaDrafts />
     </div>
   );
 }

@@ -103,7 +103,8 @@ export async function seoForPath(segments = []) {
     const crumbs = [['Home', '/'], ['Shop', '/shop'], [p.name, null]];
     return {
       title: fullTitle(p.name),
-      description: clip(text || `${p.name} for pharma and food manufacturing. Price, specifications and quote from ${SITE_NAME}.`, 158),
+      // An approved Google description (SEO Health → drafts by our model) wins
+      description: p.metaDescription || clip(text || `${p.name} for pharma and food manufacturing. Price, specifications and quote from ${SITE_NAME}.`, 158),
       canonical: url,
       image: images[0],
       type: 'product',
