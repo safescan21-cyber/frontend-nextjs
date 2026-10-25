@@ -437,9 +437,10 @@ const ShopPage = ({ embedded = false }) => {
                               src={sizedImage(productImage, 480)}
                               srcSet={productImage.includes('res.cloudinary.com/') ? `${sizedImage(productImage, 480)} 480w, ${sizedImage(productImage, 800)} 800w` : undefined}
                               sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                              // the first row is on screen at once (Google's LCP): load it first, the rest later
-                              loading={index < 4 ? 'eager' : 'lazy'}
-                              fetchPriority={index === 0 ? 'high' : undefined}
+                              // on the shop page the first row is on screen at once (Google's LCP): load it
+                              // first; inside the home page the hero comes first, so the grid waits
+                              loading={!embedded && index < 4 ? 'eager' : 'lazy'}
+                              fetchPriority={!embedded && index === 0 ? 'high' : undefined}
                               decoding="async"
                               alt={product.name}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
