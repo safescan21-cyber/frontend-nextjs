@@ -44,7 +44,7 @@ const ManageUser = () => {
       refetch();
     } catch (err) {
       console.error(err);
-      alert('Delete failed');
+      alert(err?.data?.message || 'Delete failed');
     }
   };
 
@@ -62,7 +62,7 @@ const ManageUser = () => {
       refetch(); // refresh the list
     } catch (err) {
       console.error('Role update failed:', err);
-      alert('Failed to update role');
+      alert(err?.data?.message || 'Failed to update role');
     } finally {
       setUpdatingUserId(null);
     }

@@ -6,6 +6,17 @@ const productsApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: `${getBaseURL()}/api/products`,
     credentials: "include",
+    // Also send the saved login token: with only the cookie, an old cookie from an earlier
+    // login made admin actions fail with 401 ("invalid signature")
+    prepareHeaders: (headers) => {
+      try {
+        const token = localStorage.getItem("token");
+        if (token) headers.set("Authorization", `Bearer ${token}`);
+      } catch (e) {
+        /* storage unavailable */
+      }
+      return headers;
+    },
   }),
   tagTypes: ["Products"],
   endpoints: (builder) => ({

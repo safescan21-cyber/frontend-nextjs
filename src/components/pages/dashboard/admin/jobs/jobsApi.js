@@ -6,6 +6,16 @@ export const jobsApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: `${getBaseUrl()}/api/jobs`,
     credentials: 'include',
+    // Also send the saved login token (an old cookie alone made admin actions fail with 401)
+    prepareHeaders: (headers) => {
+      try {
+        const token = localStorage.getItem('token');
+        if (token) headers.set('Authorization', `Bearer ${token}`);
+      } catch (e) {
+        /* storage unavailable */
+      }
+      return headers;
+    },
   }),
   tagTypes: ['Job'],
   endpoints: (builder) => ({
