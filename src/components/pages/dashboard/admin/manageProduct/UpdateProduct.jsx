@@ -3,7 +3,6 @@ import Toggle from '../../../../ui/Toggle';
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from '../../../../../shell/router';
 import { useFetchProductByIdQuery, useUpdateProductMutation } from '../../../../store/products/productsApi';
-import { useSelector } from 'react-redux';
 import TextInput from '../addProduct/TextInput';
 import SelectInput from '../addProduct/SelectInput';
 import CouponInput from '../addProduct/CouponInput';
@@ -14,14 +13,16 @@ import DocumentUploader from '../addProduct/DocumentUploader';
 const UpdateProduct = () => {
     const {id} = useParams();
     const navigate =  useNavigate();
-    const {user} = useSelector((state) => state.auth)
     const [product, setProduct] = useState({
         name: '',
         category: '',
         color: '',
         price: '',
+        oldPrice: '',
+        stock: '',
+        warranty: '',
+        readyToDispatch: false,
         description: '',
-        image: '',
         modelNumber: '', // e.g. ZP-35D: goes into the serial numbers of sold machines
         manufacturer: '',
         origin: '',
@@ -31,13 +32,17 @@ const UpdateProduct = () => {
 
     const {data: productData, isLoading: isProductLoading, error: fetchError, refetch} = useFetchProductByIdQuery(id);
 
-    const [newImage, setNewImage] = useState(null)
+    // The machine's photos (the first is the main one); uploads are added to the end
+    const [images, setImages] = useState([])
+    const [saveError, setSaveError] = useState('')
     const [documents, setDocuments] = useState([])
     const [faqs, setFaqs] = useState([])
     const [flags, setFlags] = useState({ active: true, sellOnline: true })
     const [docsUploading, setDocsUploading] = useState(false)
 
-    const {name, category, color, description, image: imageURL, price } = productData?.product || {};
+    const {name, category, color, description, price } = productData?.product || {};
+    // Empty number fields stay empty in the form (0 or missing = not set yet)
+    const numberOrEmpty = (v) => (Number(v) > 0 ? String(v) : '');
 
     const [updateProduct, {isLoading:isUpdating, error: updateError}] = useUpdateProductMutation();
 
@@ -47,15 +52,19 @@ const UpdateProduct = () => {
                 name: name || '',
                 category: category || '',
                 color: color || '',
-                price: price || '',
+                price: numberOrEmpty(price),
+                oldPrice: numberOrEmpty(productData.product?.oldPrice),
+                stock: numberOrEmpty(productData.product?.stock),
+                warranty: numberOrEmpty(productData.product?.warranty),
+                readyToDispatch: !!productData.product?.readyToDispatch,
                 description: description || '',
-                image: imageURL || '',
                 modelNumber: productData.product?.modelNumber || '',
                 manufacturer: productData.product?.manufacturer || '',
                 origin: productData.product?.origin || '',
                 couponCode: productData.product?.couponCode || '',
                 fitsModels: (productData.product?.fitsModels || []).join(', ')
             })
+            setImages((productData.product?.images || []).filter(Boolean))
             setDocuments(productData.product?.documents || [])
             setFaqs(productData.product?.faqs || [])
             setFlags({ active: productData.product?.active !== false, sellOnline: productData.product?.sellOnline !== false })
@@ -73,20 +82,26 @@ const UpdateProduct = () => {
 
     };
 
-    const handleImageChange= (image) => {
-        setNewImage(image);
-    }
-
     const handleSubmit =  async (e) => {
         e.preventDefault();
+        setSaveError('');
+        if (images.length === 0) {
+            setSaveError('Please keep or upload at least one product image.');
+            return;
+        }
 
+        // Empty price / stock / warranty = not set (price 0 shows "Contact for price")
+        const toNumber = (v) => (v === '' || v === null || v === undefined ? 0 : Number(v));
         const updatedProduct = {
             ...product,
-            image: newImage ? newImage : product.image, 
+            price: toNumber(product.price),
+            oldPrice: product.oldPrice === '' ? null : Number(product.oldPrice),
+            stock: toNumber(product.stock),
+            warranty: toNumber(product.warranty),
+            images,
             documents,
             faqs: faqs.filter((f) => f.q.trim() && f.a.trim()),
             ...flags,
-            author: user?._id
         };
 
         try {
@@ -96,6 +111,7 @@ const UpdateProduct = () => {
             navigate("/dashboard/manage-products")
         } catch (error) {
             console.error('Failed to update product:', error);
+            setSaveError(error?.data?.message || 'The product could not be saved. Please try again.');
         }
 
     }
@@ -109,7 +125,7 @@ const UpdateProduct = () => {
                 <TextInput
                 label="Product Name"
                 name="name"
-                placeholder="Ex: Diamond Earrings"
+                placeholder="Ex: High-Speed Tablet Press"
                 value={product.name}
                 onChange={handleChange}
                 />
@@ -149,6 +165,38 @@ const UpdateProduct = () => {
                     value={product.price}
                     onChange={handleChange}
                 />
+                {/* Can be left empty when adding the machine and filled in here later */}
+                <TextInput
+                    label="Original Price (₹) – for discount (optional)"
+                    name="oldPrice"
+                    type="number"
+                    placeholder="60000"
+                    value={product.oldPrice}
+                    onChange={handleChange}
+                />
+                <TextInput
+                    label="Stock Quantity – empty or 0 shows “Made to order”"
+                    name="stock"
+                    type="number"
+                    placeholder="10"
+                    value={product.stock}
+                    onChange={handleChange}
+                />
+                <TextInput
+                    label="Warranty (months)"
+                    name="warranty"
+                    type="number"
+                    placeholder="24"
+                    value={product.warranty}
+                    onChange={handleChange}
+                />
+                <Toggle
+                    checked={!!product.readyToDispatch}
+                    onChange={(v) => setProduct((p) => ({ ...p, readyToDispatch: v }))}
+                    label="Ready to dispatch"
+                    description="Available for immediate shipping"
+                    tone="green"
+                />
                 <TextInput
                     label="Manufacturer (who makes the machine)"
                     name="manufacturer"
@@ -167,13 +215,23 @@ const UpdateProduct = () => {
 
                 <FaqEditor value={faqs} onChange={setFaqs} />
 
-                 <UploadImage
-                name="image"
-                id="image"
-                value={newImage || product.image}
-                placeholder='Image'
-                setImage={handleImageChange}
-                />
+                <div>
+                    <p className='block text-sm font-medium text-gray-700'>Photos (the first one is the main photo)</p>
+                    {images.length > 0 ? (
+                        <div className='mt-2 flex flex-wrap gap-2'>
+                            {images.map((url, i) => (
+                                <div key={url + i} className='relative h-20 w-20'>
+                                    <img src={url} alt={`${product.name} – photo ${i + 1}`} className='h-full w-full rounded border object-cover' />
+                                    <button type='button' onClick={() => setImages((list) => list.filter((_, j) => j !== i))}
+                                        aria-label={`Remove photo ${i + 1}`}
+                                        className='absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs text-white hover:bg-red-700'>×</button>
+                                </div>
+                            ))}
+                        </div>
+                    ) : <p className='mt-1 text-sm text-red-600'>No photos: upload at least one.</p>}
+                </div>
+                {/* New uploads are added after the current photos */}
+                <UploadImage name="images" setImages={(urls) => setImages((list) => [...list, ...urls])} />
                 <div>
                 <label htmlFor="description" className='block text-sm font-medium text-gray-700'>Description</label>
                 <textarea name="description" id="description"
@@ -191,6 +249,7 @@ const UpdateProduct = () => {
 
                 <DocumentUploader documents={documents} setDocuments={setDocuments} onBusyChange={setDocsUploading} />
 
+                {saveError && <p role='alert' className='rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700'>{saveError}</p>}
                 <div>
                     <button type='submit'
                     className='add-product-btn'
