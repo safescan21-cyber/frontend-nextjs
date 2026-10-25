@@ -21,6 +21,9 @@ export default function HubIndex({ hubs = [] }) {
           </Link>
         ))}
       </div>
+      <p className="mx-auto max-w-5xl px-4 text-sm text-slate-600">
+        Not listed? See <Link to="/machinery-supplier" className="font-semibold text-blue-600 hover:underline">machinery for every Indian state and union territory</Link>.
+      </p>
     </div>
   );
 }

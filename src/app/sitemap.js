@@ -20,6 +20,8 @@ export default async function sitemap() {
   const [photos, clients] = await Promise.all([getJson('/api/showcase?kind=photo', 3600), getJson('/api/showcase?kind=client', 3600)]);
   const factoryReady = Boolean(photos?.items?.length || clients?.items?.length);
   return STATIC_PAGES.filter((p) => p.path !== '/factory' || factoryReady).flatMap((p) => {
+    // India-only pages (the state pages): one entry, no country versions
+    if (p.indiaOnly) return [{ url: `${SITE_URL}${p.path}`, priority: 0.6 }];
     const languages = alternateUrls(SITE_URL, p.path);
     return ['', ...LOCALE_CODES].map((locale) => ({
       url: `${SITE_URL}${localePath(locale, p.path)}`,

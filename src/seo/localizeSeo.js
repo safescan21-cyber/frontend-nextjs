@@ -11,10 +11,12 @@ export function localizeSeo(seo, locale, path) {
   if (!seo || seo.notFound) return seo;
   const out = { ...seo };
 
-  // Every indexable page lists all its language versions (India version included)
-  if (seo.canonical && !seo.noindex) out.alternates = alternateUrls(SITE_URL, path);
+  // Every indexable page lists all its language versions (India version included), except
+  // India-only pages (the state pages): they have one version, and a country copy such as
+  // /en-us/machinery-supplier/kerala names the India page as the original
+  if (seo.canonical && !seo.noindex && !seo.indiaOnly) out.alternates = alternateUrls(SITE_URL, path);
   if (seo.description) out.description = fitDescription(seo.description);
-  if (!locale) return out;
+  if (!locale || seo.indiaOnly) return out;
 
   // Translated text, or for the US/UK versions their own variant of the English text
   const t = seoText(locale, path);

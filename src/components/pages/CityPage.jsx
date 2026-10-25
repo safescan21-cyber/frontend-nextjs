@@ -5,6 +5,7 @@ import { MapPin, Truck, Wrench, ShieldCheck, FileText } from 'lucide-react';
 import { Link } from '../../shell/router';
 import { PRODUCT_DATA } from './productCategoryData';
 import { CITY_HUBS } from '../seo/cityHubs';
+import { INDIA_STATES } from '../seo/indiaStates';
 import QuickQuote from '../quote/QuickQuote';
 import { useLocale } from '../../i18n/LocaleContext';
 
@@ -13,6 +14,7 @@ const label = (slug) => slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUppe
 export default function CityPage({ hub, installations = [] }) {
   const { t } = useLocale();
   const others = CITY_HUBS.filter((c) => c.slug !== hub.slug);
+  const state = INDIA_STATES.find((s) => s.name === hub.state);
   return (
     <div className="min-h-screen bg-slate-50 pb-28">
       <section className="bg-gradient-to-r from-orange-600 to-amber-700 px-4 py-10 text-white">
@@ -73,6 +75,10 @@ export default function CityPage({ hub, installations = [] }) {
             <ul className="mt-2 space-y-1 text-sm">
               {others.map((c) => <li key={c.slug}><Link to={`/pharma-machinery-supplier/${c.slug}`} className="text-blue-600 hover:underline">{c.city}, {c.state}</Link></li>)}
             </ul>
+            <p className="mt-3 border-t border-slate-100 pt-3 text-sm">
+              {state && <><Link to={`/machinery-supplier/${state.slug}`} className="font-semibold text-blue-600 hover:underline">All of {state.name}</Link> · </>}
+              <Link to="/machinery-supplier" className="font-semibold text-blue-600 hover:underline">Machinery by state</Link>
+            </p>
           </div>
         </aside>
       </div>

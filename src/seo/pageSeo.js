@@ -10,6 +10,7 @@ import { PRODUCT_DATA } from '../components/pages/productCategoryData';
 import { SITE_URL, SITE_NAME } from '../components/seo/organization';
 import { brandTitle } from '../i18n/seoText';
 import { CITY_PAGES } from '../components/seo/cityHubs';
+import { STATE_PAGES, indiaState, stateLines, stateFaqs } from '../components/seo/indiaStates';
 import { HUB_PAGES, MACHINERY_HUBS, realMachines } from '../components/seo/machineryHubs';
 
 export const DEFAULT_TITLE = `${SITE_NAME} | Pharma & Food Processing Machinery`;
@@ -30,6 +31,7 @@ const EXISTING_ROUTES = new Set(['/', '/shop', '/about', '/products', '/career',
 export const STATIC_PAGES = (() => {
   const pages = Object.values(seoPages).filter((p) => EXISTING_ROUTES.has(p.path) || p.path.startsWith('/solutions/'));
   pages.push(...HUB_PAGES, ...CITY_PAGES); // /pharma-machinery, /food-machinery, /pharma-machinery-supplier/<city>
+  pages.push(...STATE_PAGES); // /machinery-supplier and /machinery-supplier/<state> (India only)
   for (const s of SOLUTIONS) {
     if (!pages.some((p) => p.path === `/solutions/${s.slug}`)) pages.push({ path: `/solutions/${s.slug}`, title: s.title, description: s.intro });
   }
@@ -286,6 +288,36 @@ export async function seoForPath(segments = []) {
     };
   }
 
+  // ── State pages (/machinery-supplier/<state>): India only, with their questions as FAQ data ──
+  const statePath = path.match(/^\/machinery-supplier\/([^/]+)$/);
+  if (statePath) {
+    const state = indiaState(statePath[1]);
+    if (!state) return { notFound: true };
+    const page = STATE_PAGES.find((p) => p.path === path);
+    const crumbs = [['Home', '/'], ['Machinery by state', '/machinery-supplier'], [state.name, null]];
+    return {
+      title: fullTitle(page.title),
+      description: page.description,
+      canonical: `${SITE_URL}${path}`,
+      indiaOnly: true,
+      jsonLd: [
+        breadcrumbLd(crumbs),
+        {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: stateFaqs(state).map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
+        },
+      ],
+      summary: {
+        crumbs,
+        heading: page.title,
+        lines: [page.description, state.pharma, `${state.name} is known for ${state.food}.`].filter(Boolean),
+        list: stateLines(state).map((l) => `${l.form}: ${l.line}`),
+        links: [['/machinery-supplier', 'All states'], ['/pharma-machinery', 'Pharma machinery'], ['/food-machinery', 'Food machinery'], ['/bulk-quote', 'Request a quote']],
+      },
+    };
+  }
+
   // ── Static pages ──
   const page = STATIC_PAGES.find((p) => p.path === path);
   if (page) {
@@ -293,6 +325,7 @@ export async function seoForPath(segments = []) {
       title: fullTitle(page.title),
       description: page.description || DEFAULT_DESCRIPTION,
       canonical: `${SITE_URL}${path === '/' ? '/' : path}`,
+      ...(page.indiaOnly && { indiaOnly: true }),
       summary: {
         heading: path === '/' ? `${SITE_NAME} — pharma & food processing machinery` : page.title,
         lines: [page.description],
