@@ -1,12 +1,13 @@
-// PM2 setup for the live site (VPS, /var/www/frontend-next): one copy of the Next.js
-// server per CPU core (2), sharing port 3001 behind nginx.
+// PM2 setup for the live site (VPS): one copy of the Next.js server per CPU core (2),
+// sharing port 3001 behind nginx. It runs /var/www/frontend-live, a link to the current
+// release in /var/www/frontend-releases (scripts/deploy.sh builds elsewhere and switches it).
 //   first start / after editing this file:  pm2 delete foodpharma-next; pm2 start ecosystem.config.cjs; pm2 save
-//   after each deploy (no downtime, one copy at a time):  pm2 reload foodpharma-next
+//   deploys: scripts/deploy.sh (pm2 reload, one copy at a time)
 module.exports = {
   apps: [
     {
       name: 'foodpharma-next',
-      cwd: '/var/www/frontend-next/.next/standalone',
+      cwd: '/var/www/frontend-live',
       script: 'server.js',
       exec_mode: 'cluster',
       instances: 2,
