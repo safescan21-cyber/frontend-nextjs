@@ -94,9 +94,16 @@ const Home = () => {
   // (All slides sit on top of each other, so loading="lazy" alone still fetched every image.)
   const [shownSlides, setShownSlides] = useState(() => new Set([0]));
   useEffect(() => {
-    if (!images.length) return;
+    if (!images.length) return undefined;
     const next = (currentIndex + 1) % images.length;
-    setShownSlides((s) => (s.has(currentIndex) && s.has(next) ? s : new Set([...s, currentIndex, next])));
+    const show = (i) => setShownSlides((s) => (s.has(i) ? s : new Set([...s, i])));
+    show(currentIndex); // the slide on screen: at once
+    // The next slide's image waits until the page has loaded, so it doesn't compete with the
+    // first slide (what visitors and Google see first) on a slow phone connection
+    const add = () => show(next);
+    if (document.readyState === 'complete') { add(); return undefined; }
+    window.addEventListener('load', add, { once: true });
+    return () => window.removeEventListener('load', add);
   }, [currentIndex, images.length]);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [showThumbnails, setShowThumbnails] = useState(false);

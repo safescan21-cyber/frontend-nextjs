@@ -484,7 +484,8 @@ function LiveChat() {
       {/* ─── FLOATING ACTION BUTTON ───────────────────────── */}
       <button
         onClick={() => { touched.current = true; setShowWelcome(false); cancelPendingSound(); setOpen(o => !o); }}
-        aria-label="Chat with Nova, our AI assistant"
+        // (the name includes the unread count the badge shows)
+        aria-label={!open && unread > 0 ? `Chat with Nova, our AI assistant (${unread} new message${unread > 1 ? 's' : ''})` : 'Chat with Nova, our AI assistant'}
         className={`fixed bottom-[84px] lg:bottom-6 right-4 lg:right-6 z-50 w-12 h-12 lg:w-16 lg:h-16 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 ${open ? "bg-stone-700 hover:bg-stone-600" : "bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 fab-pulse"}`}
       >
         <div className="relative">

@@ -89,8 +89,8 @@ const MobileActionButtons = () => {
         </svg>
       ),
       link: 'https://wa.me/918700792607?text=Hello%20I%20would%20like%20to%20know%20more',
-      bgColor: 'bg-green-600',
-      hoverBg: 'hover:bg-green-700',
+      bgColor: 'bg-green-700',
+      hoverBg: 'hover:bg-green-800',
     },
     // Signed out: Login. Signed in: Account (their photo) → dashboard
     user
