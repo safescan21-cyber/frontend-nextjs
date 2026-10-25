@@ -100,9 +100,12 @@ export async function POST(request) {
   // The chat shows the quotation form (the machine has a listed price): a reply that asks which
   // machine or says we don't know is replaced by the machine's facts, and it names the button
   const DODGES = /\?\s*$|don'?t have|do not have|not sure|guess|ask our team|will confirm|tick the box/i;
+  // It must also state that machine's listed price, and never claim GST/freight is included
+  const WRONG_TERMS = /includ\w*[^.]{0,40}\b(gst|freight|installation)\b|\b(gst|freight|installation)\b[^.]{0,40}\bincluded\b|price may vary/i;
   const withQuote = (reply) => {
     if (!quote) return reply;
-    const text = DODGES.test(reply) ? replyFromFacts(facts, latest) : reply;
+    const statesPrice = reply.replace(/\D/g, '').includes(String(quote.price));
+    const text = DODGES.test(reply) || WRONG_TERMS.test(reply) || !statesPrice ? replyFromFacts(facts, latest) : reply;
     return /instant quotation/i.test(text) ? text : `${text}${text.includes('\n') ? '\n\n' : ' '}You can get an instant quotation (PDF) with the "Get instant quotation" button below.`;
   };
   const checked = (reply) => (reply ? withPhone(checkReply(reply, facts) || replyFromFacts(facts, latest), latest) : null);
