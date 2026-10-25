@@ -347,7 +347,7 @@ export default function PharmaMachineFooter() {
               <p className="font-barlowC font-bold text-3xl sm:text-4xl bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent group-hover:from-orange-400 group-hover:to-amber-300 transition-all">
                 {value}
               </p>
-              <p className="mt-1 font-barlowC font-semibold text-[11px] tracking-[0.2em] uppercase text-slate-500">
+              <p className="mt-1 font-barlowC font-semibold text-[11px] tracking-[0.2em] uppercase text-slate-400">
                 {t(label)}
               </p>
             </div>
@@ -359,7 +359,7 @@ export default function PharmaMachineFooter() {
       <div className="relative max-w-7xl mx-auto px-5 sm:px-8 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8">
         {/* Brand */}
         <div className="lg:col-span-3">
-          <Link to="/" aria-label={t("Food Pharma Machinery — Home")} className="flex items-center gap-3 mb-4 group">
+          <Link to="/" className="flex items-center gap-3 mb-4 group">
             <span className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-orange-700 text-white flex items-center justify-center shadow-lg shadow-orange-900/40 group-hover:rotate-90 transition-transform duration-700">
               <IconGear />
             </span>
@@ -367,7 +367,7 @@ export default function PharmaMachineFooter() {
               <span className="block font-barlowC font-bold text-[24px] leading-none text-white tracking-tight">
                 FOOD PHARMA <span className="text-orange-500">MACHINERY</span>
               </span>
-              <span className="block mt-1 font-barlowC text-[11px] tracking-[0.2em] uppercase text-slate-500">
+              <span className="block mt-1 font-barlowC text-[11px] tracking-[0.2em] uppercase text-slate-400">
                 by PureLine Machinery Pvt. Ltd.
               </span>
             </span>
@@ -446,7 +446,6 @@ export default function PharmaMachineFooter() {
                 href={PHONE_TEL}
                 itemProp="telephone"
                 className="text-[16px] font-semibold text-white hover:text-orange-400 transition-colors"
-                aria-label={t("Call our sales line")}
               >
                 {PHONE_DISPLAY}
               </a>
@@ -588,8 +587,7 @@ export default function PharmaMachineFooter() {
               href={WHATSAPP_LINK}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-4 flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white transition-all hover:-translate-y-0.5 shadow-lg shadow-emerald-900/30 text-[13px] font-barlowC font-bold tracking-wider uppercase"
-              aria-label={t("Chat with us on WhatsApp")}
+              className="mt-4 flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white transition-all hover:-translate-y-0.5 shadow-lg shadow-emerald-900/30 text-[13px] font-barlowC font-bold tracking-wider uppercase"
             >
               <IconWhatsApp className="w-5 h-5" />
               {t("Chat on WhatsApp")}

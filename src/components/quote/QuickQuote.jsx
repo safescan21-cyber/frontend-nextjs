@@ -131,7 +131,7 @@ export default function QuickQuote({ id, machine = '', machines = [], productId 
       <button
         type="submit"
         disabled={sending}
-        className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white shadow hover:bg-orange-600 disabled:opacity-60"
+        className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-orange-700 px-4 py-3 text-sm font-semibold text-white shadow hover:bg-orange-800 disabled:opacity-60"
       >
         {sending && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
         {t('Get my quote')}

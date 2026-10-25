@@ -127,7 +127,7 @@ const enGb = {
 };
 
 const enAu = {
-  '/': ['Food Pharma Machinery | Pharma & Food Machinery for Australia', 'Pharma and food processing machinery made in India for buyers in Australia: tablet presses, capsule fillers, blister and liquid filling lines, mixers, lab equipment and spares.'],
+  '/': ['Food Pharma Machinery | Pharma & Food Machinery, Australia', 'Pharma and food processing machinery made in India for buyers in Australia: tablet presses, capsule fillers, blister and liquid filling lines, mixers, lab equipment and spares.'],
   '/bulk-quote': ['Bulk Order & Quote Request – Australia', 'Request a bulk quote for pharma and food processing machinery and spares. Volume pricing, export shipping to Australia quoted, and a reply within 1 business day.'],
 };
 
@@ -180,7 +180,7 @@ export const seoText = (locale, path) => {
 // ── Length and wording rules shared by the server (seo/localizeSeo.js) and the
 // browser (components/Seo.jsx), so both always write the same tags ──
 const BRAND = 'Food Pharma Machinery';
-const MAX_TITLE = 65; // about what Google shows
+export const MAX_TITLE = 60; // about what Google shows before "…"
 const MAX_DESCRIPTION = 160;
 
 // 'Contact Us' -> 'Contact Us | Food Pharma Machinery', but only when that still fits
@@ -214,7 +214,8 @@ export const localizedText = (locale, path, title, description) => {
   const region = REGION[locale];
   if (region && title) {
     return {
-      title: `${title} – ${region[0]}`,
+      // the country only when it still fits (the page's language tags already say which country it is for)
+      title: `${title} – ${region[0]}`.length <= MAX_TITLE ? `${title} – ${region[0]}` : title,
       description: description ? fitDescription(description, MAX_DESCRIPTION - region[1].length, '.') + region[1] : description,
     };
   }

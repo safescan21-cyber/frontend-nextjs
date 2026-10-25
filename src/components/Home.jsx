@@ -1,7 +1,6 @@
 'use client';
 import { useLocale } from '../i18n/LocaleContext';
-import { sizedImage } from '../utlis/imageUrl';
-import { slideSrcSet, orderedSlides } from './heroSlidesData';
+import { slideSrcSet, slideThumb, orderedSlides } from './heroSlidesData';
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Play, Pause, Grid } from 'lucide-react';
 import ShopPage from '../components/pages/ShopePage';
@@ -91,6 +90,14 @@ const Home = () => {
   const images = orderedSlides(!heroSlidesLoading && !heroSlidesError ? heroSlidesData : []);
 
   const [currentIndex, setCurrentIndex] = useState(0);
+  // Slides whose image is in the page: the first, then each one shown and the one after it.
+  // (All slides sit on top of each other, so loading="lazy" alone still fetched every image.)
+  const [shownSlides, setShownSlides] = useState(() => new Set([0]));
+  useEffect(() => {
+    if (!images.length) return;
+    const next = (currentIndex + 1) % images.length;
+    setShownSlides((s) => (s.has(currentIndex) && s.has(next) ? s : new Set([...s, currentIndex, next])));
+  }, [currentIndex, images.length]);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [showThumbnails, setShowThumbnails] = useState(false);
   const [slideDuration, setSlideDuration] = useState(5000);
@@ -190,18 +197,20 @@ const Home = () => {
               index === currentIndex ? 'opacity-100 z-10 scale-100' : 'opacity-0 z-0 scale-105'
             }`}
           >
-            {/* First slide loads straight away (it is the first thing visitors see); the rest load in the background */}
-            <img
-              src={image.url}
-              srcSet={slideSrcSet(image.url)}
-              sizes="100vw"
-              alt={t(image.title)}
-              className="w-full h-full object-cover"
-              onError={handleImageError}
-              loading={index === 0 ? 'eager' : 'lazy'}
-              fetchPriority={index === 0 ? 'high' : 'low'}
-              decoding="async"
-            />
+            {/* First slide loads straight away (it is the first thing visitors see); the next one
+                loads while the current one shows */}
+            {shownSlides.has(index) && (
+              <img
+                src={image.url}
+                srcSet={slideSrcSet(image.url)}
+                sizes="100vw"
+                alt={t(image.title)}
+                className="w-full h-full object-cover"
+                onError={handleImageError}
+                fetchPriority={index === 0 ? 'high' : 'low'}
+                decoding="async"
+              />
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
 
             {image.offer && (
@@ -315,7 +324,7 @@ const Home = () => {
                   }`}
                 >
                   <img
-                    src={sizedImage(image.url, 200)}
+                    src={slideThumb(image.url)}
                     alt=""
                     loading="lazy"
                     decoding="async"

@@ -64,8 +64,8 @@ const MobileActionButtons = () => {
         </svg>
       ),
       link: '/shop',
-      bgColor: 'bg-amber-500',
-      hoverBg: 'hover:bg-amber-600',
+      bgColor: 'bg-amber-700',
+      hoverBg: 'hover:bg-amber-800',
     },
     {
       id: 'bulk',

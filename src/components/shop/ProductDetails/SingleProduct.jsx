@@ -28,6 +28,7 @@ import { track, getLikedProducts, setProductLiked } from '../../../utlis/track';
 import { addToCart, selectCartItems } from '../../store/cartSlice';
 import { showCartAddedToast } from '../../../utlis/notifications';
 import toast from 'react-hot-toast';
+import { sizedImage, sizedSrcSet } from '../../../utlis/imageUrl';
 
 // ─────────────────────────────────────────────
 // Star Rating
@@ -446,7 +447,7 @@ const SingleProduct = () => {
             <span className="text-gray-300">/</span>
             <Link to="/shop" className="hover:text-blue-600 transition-colors">{t("Shop")}</Link>
             <span className="text-gray-300">/</span>
-            <span className="text-gray-400 capitalize">{product.category?.replace(/-/g, ' ')}</span>
+            <span className="text-gray-500 capitalize">{product.category?.replace(/-/g, ' ')}</span>
             <span className="text-gray-300">/</span>
             <span className="text-gray-800 font-medium truncate max-w-[200px]">{product.name}</span>
           </nav>
@@ -474,7 +475,7 @@ const SingleProduct = () => {
                   <video
                     key={videoUrls[selectedImage - imageUrls.length]}
                     src={videoSrc(videoUrls[selectedImage - imageUrls.length])}
-                    poster={videoPoster(videoUrls[selectedImage - imageUrls.length])}
+                    poster={sizedImage(videoPoster(videoUrls[selectedImage - imageUrls.length]), 1200)}
                     controls
                     autoPlay
                     muted
@@ -486,8 +487,12 @@ const SingleProduct = () => {
                   </video>
                 ) : (
                   <img
-                    src={imageError ? `https://picsum.photos/seed/${product._id}/600/500` : imageUrls[selectedImage]}
+                    src={imageError ? `https://picsum.photos/seed/${product._id}/600/500` : sizedImage(imageUrls[selectedImage], 800)}
+                    srcSet={imageError ? undefined : sizedSrcSet(imageUrls[selectedImage], [480, 800, 1200])}
+                    sizes="(min-width: 1024px) 50vw, 100vw"
                     alt={product.name}
+                    // the page's main image: fetched first (it is what Google measures as LCP)
+                    fetchPriority="high"
                     onError={() => setImageError(true)}
                     className="w-full h-full object-contain p-4 transition-all duration-300"
                   />
@@ -501,7 +506,7 @@ const SingleProduct = () => {
                       ? product.rating >= 4.5 ? 'top-14 right-4' : 'top-4 right-4' // keep clear of the video controls
                       : 'bottom-4 right-4'
                   } z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all duration-200 ${
-                    wishlist ? 'bg-red-500 text-white' : 'bg-white text-gray-400 hover:text-red-500 border border-gray-200'
+                    wishlist ? 'bg-red-500 text-white' : 'bg-white text-gray-500 hover:text-red-500 border border-gray-200'
                   }`}
                 >
                   <svg className="w-5 h-5" fill={wishlist ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
@@ -519,8 +524,9 @@ const SingleProduct = () => {
                     }`}
                   >
                     <img
-                      src={img}
-                      alt={`View ${i + 1}`}
+                      src={sizedImage(img, 160)}
+                      alt={`${product.name} – view ${i + 1}`}
+                      loading="lazy"
                       onError={(e) => { e.target.src = `https://picsum.photos/seed/${product._id}${i}/200`; }}
                       className="w-full h-full object-cover"
                     />
@@ -537,7 +543,7 @@ const SingleProduct = () => {
                         selectedImage === idx ? 'border-blue-500 shadow-md scale-105' : 'border-gray-200 hover:border-blue-300'
                       }`}
                     >
-                      {videoPoster(v) && <img src={videoPoster(v)} alt="" className="w-full h-full object-cover opacity-80" loading="lazy" />}
+                      {videoPoster(v) && <img src={sizedImage(videoPoster(v), 160)} alt={`${product.name} – video ${i + 1}`} className="w-full h-full object-cover opacity-80" loading="lazy" />}
                       <span className="absolute inset-0 flex items-center justify-center">
                         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-blue-600 shadow">
                           <svg className="ml-0.5 h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
@@ -571,7 +577,7 @@ const SingleProduct = () => {
                 <div className="flex items-center gap-3 flex-wrap">
                   <StarRating rating={product.rating} size="lg" />
                   <span className="text-sm font-semibold text-gray-700">{product.rating}</span>
-                  <span className="text-sm text-gray-400">({Math.floor(product.rating * 12)} reviews)</span>
+                  <span className="text-sm text-gray-500">({Math.floor(product.rating * 12)} reviews)</span>
                   <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">✓ Verified</span>
                 </div>
               )}
@@ -592,10 +598,10 @@ const SingleProduct = () => {
                 <LocalPrice inr={product.price} className="text-base text-slate-500 pb-1" />
                 {product.oldPrice && (
                   <>
-                    <span className="text-xl text-gray-400 line-through">
+                    <span className="text-xl text-gray-500 line-through">
                       ₹{product.oldPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                     </span>
-                    <span className="text-sm font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-lg">
+                    <span className="text-sm font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-lg">
                       Save ₹{(product.oldPrice - product.price).toLocaleString('en-IN')}
                     </span>
                   </>
@@ -691,13 +697,13 @@ const SingleProduct = () => {
                     className={`w-10 h-10 flex items-center justify-center text-lg font-bold transition-colors ${
                       isAuthenticated 
                         ? 'text-gray-600 hover:bg-gray-100' 
-                        : 'text-gray-400 cursor-not-allowed'
+                        : 'text-gray-500 cursor-not-allowed'
                     }`}
                   >
                     −
                   </button>
                   <span className={`w-12 text-center text-sm font-bold ${
-                    isAuthenticated ? 'text-gray-800' : 'text-gray-400'
+                    isAuthenticated ? 'text-gray-800' : 'text-gray-500'
                   }`}>
                     {quantity}
                   </span>
@@ -707,15 +713,15 @@ const SingleProduct = () => {
                     className={`w-10 h-10 flex items-center justify-center text-lg font-bold transition-colors ${
                       isAuthenticated 
                         ? 'text-gray-600 hover:bg-gray-100' 
-                        : 'text-gray-400 cursor-not-allowed'
+                        : 'text-gray-500 cursor-not-allowed'
                     }`}
                   >
                     +
                   </button>
                 </div>
-                <span className="text-xs text-gray-400">{t("Max 100 units")}</span>
+                <span className="text-xs text-gray-500">{t("Max 100 units")}</span>
                 {!isAuthenticated && (
-                  <span className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-full font-medium">
+                  <span className="text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded-full font-medium">
                     🔒 {t('Login to select quantity')}
                   </span>
                 )}
@@ -750,7 +756,7 @@ const SingleProduct = () => {
                   className={`flex-1 px-6 py-3.5 rounded-xl font-semibold text-sm md:text-base transition-all duration-300 ${
                     isAuthenticated
                       ? 'border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white hover:shadow-lg hover:shadow-blue-200 hover:scale-[1.02]'
-                      : 'border-2 border-gray-300 text-gray-400 cursor-not-allowed'
+                      : 'border-2 border-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 >
                   {isAuthenticated ? `⚡ ${t('Buy now')}` : `🔒 ${t('Login to Buy')}`}
@@ -775,7 +781,7 @@ const SingleProduct = () => {
                   <div key={b.label} className="text-center p-2 bg-gray-50 rounded-xl">
                     <div className="text-xl mb-1">{b.icon}</div>
                     <div className="text-xs font-semibold text-gray-700">{b.label}</div>
-                    <div className="text-xs text-gray-400">{b.sub}</div>
+                    <div className="text-xs text-gray-500">{b.sub}</div>
                   </div>
                 ))}
               </div>
@@ -912,7 +918,7 @@ const SingleProduct = () => {
                   <h3 className="text-lg font-bold text-gray-900">
                     {t("Customer Reviews")}
                     {reviews.length > 0 && (
-                      <span className="ml-2 text-sm font-normal text-gray-400">
+                      <span className="ml-2 text-sm font-normal text-gray-500">
                         ({reviews.length} {reviews.length === 1 ? 'review' : 'reviews'})
                       </span>
                     )}
@@ -966,7 +972,7 @@ const SingleProduct = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                          Upload Photos <span className="text-gray-400 font-normal">(Optional)</span>
+                          Upload Photos <span className="text-gray-500 font-normal">(Optional)</span>
                         </label>
                         <input
                           type="file"
@@ -1028,7 +1034,7 @@ const SingleProduct = () => {
                 {reviewsLoading && (
                   <div className="text-center py-12">
                     <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                    <p className="text-gray-400 text-sm">{t("Loading reviews...")}</p>
+                    <p className="text-gray-500 text-sm">{t("Loading reviews...")}</p>
                   </div>
                 )}
 
@@ -1079,7 +1085,7 @@ const SingleProduct = () => {
                                   style={{ width: `${pct}%` }}
                                 />
                               </div>
-                              <span className="text-xs text-gray-400 w-16 flex-shrink-0">
+                              <span className="text-xs text-gray-500 w-16 flex-shrink-0">
                                 {count} ({Math.round(pct)}%)
                               </span>
                             </div>
@@ -1122,7 +1128,7 @@ const SingleProduct = () => {
                     </div>
 
                     {filteredSortedReviews.length === 0 ? (
-                      <div className="text-center py-10 text-gray-400">
+                      <div className="text-center py-10 text-gray-500">
                         <div className="text-3xl mb-2">🔍</div>
                         <p className="font-medium">{t("No reviews match this filter.")}</p>
                         <button
@@ -1145,7 +1151,7 @@ const SingleProduct = () => {
                                   <div className="font-semibold text-gray-800 text-sm">{review.userName}</div>
                                   <div className="flex items-center gap-2 mt-0.5">
                                     <StarRating rating={review.rating} size="sm" />
-                                    <span className="text-xs text-gray-400">
+                                    <span className="text-xs text-gray-500">
                                       {new Date(review.createdAt).toLocaleDateString('en-IN', {
                                         year: 'numeric', month: 'long', day: 'numeric',
                                       })}
@@ -1185,7 +1191,7 @@ const SingleProduct = () => {
                   <div className="text-center py-16">
                     <div className="text-5xl mb-4">💬</div>
                     <p className="font-semibold text-gray-600 text-lg">{t("No reviews yet")}</p>
-                    <p className="text-gray-400 text-sm mt-1 mb-5">{t("Be the first to share your experience!")}</p>
+                    <p className="text-gray-500 text-sm mt-1 mb-5">{t("Be the first to share your experience!")}</p>
                     {!showReviewForm && (
                       <button
                         onClick={() => setShowReviewForm(true)}
@@ -1229,8 +1235,9 @@ const SingleProduct = () => {
                 >
                   <div className="relative bg-gray-50 overflow-hidden">
                     <img
-                      src={thumb}
+                      src={sizedImage(thumb, 480)}
                       alt={rp.name}
+                      loading="lazy"
                       onError={(e) => { e.target.src = `https://picsum.photos/seed/${rp._id}/400/300`; }}
                       className="w-full h-36 md:h-44 object-cover group-hover:scale-105 transition-transform duration-300"
                     />
@@ -1239,7 +1246,7 @@ const SingleProduct = () => {
                     )}
                   </div>
                   <div className="p-3 md:p-4">
-                    <p className="text-xs text-gray-400 capitalize mb-1">{rp.category?.replace(/-/g, ' ')}</p>
+                    <p className="text-xs text-gray-500 capitalize mb-1">{rp.category?.replace(/-/g, ' ')}</p>
                     <h3 className="text-sm font-semibold text-gray-800 line-clamp-2 mb-2">{rp.name}</h3>
                     <div className="flex items-center justify-between">
                       <span className="text-base font-bold text-blue-600">₹{rp.price.toLocaleString('en-IN')}</span>

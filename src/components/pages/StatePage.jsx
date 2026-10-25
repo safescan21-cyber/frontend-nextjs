@@ -44,7 +44,7 @@ export default function StatePage({ state, installations = [] }) {
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {lines.map((l) => (
               <Link key={l.key} to={l.to} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm hover:border-orange-400">
-                <span className="text-xs font-semibold uppercase text-orange-600">{l.hub === 'pharma' ? 'Pharma' : 'Food'}</span>
+                <span className="text-xs font-semibold uppercase text-orange-700">{l.hub === 'pharma' ? 'Pharma' : 'Food'}</span>
                 <span className="mt-0.5 block font-semibold text-slate-900">{l.form}</span>
                 <span className="mt-1 block text-sm text-slate-600">{l.line}</span>
               </Link>

@@ -7,7 +7,7 @@
 //   food:   main farm and food products processed there
 //   corp:   the state's industrial development corporation ('' when there is none to name)
 //   lines:  machine lines that fit (keys of LINES below), cities: city pages (cityHubs.js)
-//   sea:    machines reach it partly by sea (islands)
+//   sea:    machines reach it partly by sea (islands); short: a shorter name for page titles
 import { MACHINERY_HUBS } from './machineryHubs';
 
 export const INDIA_STATES = [
@@ -39,9 +39,9 @@ export const INDIA_STATES = [
   { slug: 'uttar-pradesh', name: 'Uttar Pradesh', kind: 'state', corp: 'UPSIDA', pharma: 'Lucknow and the Noida–Ghaziabad area have pharma units.', food: 'sugar, wheat, dairy, mangoes and potatoes', lines: ['tablets', 'dry-mixes', 'snacks', 'juices'] },
   { slug: 'uttarakhand', name: 'Uttarakhand', kind: 'state', corp: 'SIIDCUL', pharma: 'Our factory is in Haridwar. SIDCUL Haridwar, Roorkee, Selaqui (Dehradun) and Pantnagar have many pharma, nutraceutical and FMCG plants.', food: 'basmati rice, fruit and herbs', lines: ['tablets', 'capsules', 'oral-liquids', 'ointments', 'juices'], cities: ['haridwar'] },
   { slug: 'west-bengal', name: 'West Bengal', kind: 'state', corp: 'WBIDC', pharma: 'Kolkata has a long-established pharma industry.', food: 'rice, Darjeeling tea, fish and sweets', lines: ['tablets', 'snacks', 'dry-mixes'] },
-  { slug: 'andaman-and-nicobar-islands', name: 'Andaman and Nicobar Islands', kind: 'union territory', corp: 'ANIIDCO', pharma: '', food: 'coconut, seafood and spices', lines: ['juices', 'spices'], sea: true },
+  { slug: 'andaman-and-nicobar-islands', name: 'Andaman and Nicobar Islands', short: 'Andaman & Nicobar', kind: 'union territory', corp: 'ANIIDCO', pharma: '', food: 'coconut, seafood and spices', lines: ['juices', 'spices'], sea: true },
   { slug: 'chandigarh', name: 'Chandigarh', kind: 'union territory', corp: '', pharma: 'Chandigarh sits next to Mohali and Panchkula and about an hour from the Baddi pharma belt.', food: 'bakery, dairy and packaged foods', lines: ['tablets', 'snacks'] },
-  { slug: 'dadra-nagar-haveli-daman-diu', name: 'Dadra and Nagar Haveli and Daman and Diu', kind: 'union territory', corp: '', pharma: 'Silvassa and Daman, next to Vapi, have pharma, plastics and packaging plants.', food: 'packaged foods and seafood', lines: ['tablets', 'oral-liquids', 'snacks'], cities: ['vapi'] },
+  { slug: 'dadra-nagar-haveli-daman-diu', name: 'Dadra and Nagar Haveli and Daman and Diu', short: 'Daman, Diu & Dadra Nagar Haveli', kind: 'union territory', corp: '', pharma: 'Silvassa and Daman, next to Vapi, have pharma, plastics and packaging plants.', food: 'packaged foods and seafood', lines: ['tablets', 'oral-liquids', 'snacks'], cities: ['vapi'] },
   { slug: 'delhi', name: 'Delhi', kind: 'union territory', corp: 'DSIIDC', pharma: 'Many pharma companies have head offices in Delhi; industrial areas include Okhla, Narela and Bawana.', food: 'spices (Khari Baoli market), snacks and confectionery', lines: ['spices', 'snacks', 'tablets'] },
   { slug: 'jammu-and-kashmir', name: 'Jammu and Kashmir', kind: 'union territory', corp: 'J&K SIDCO', pharma: 'Industrial estates in Kathua and Samba have pharma units.', food: 'saffron, apples and walnuts', lines: ['spices', 'juices', 'tablets'] },
   { slug: 'ladakh', name: 'Ladakh', kind: 'union territory', corp: '', pharma: '', food: 'apricots and sea buckthorn', lines: ['juices'] },
@@ -91,7 +91,8 @@ export const STATE_PAGES = [
   },
   ...INDIA_STATES.map((s) => ({
     path: `/machinery-supplier/${s.slug}`,
-    title: `Pharma & Food Machinery Supplier in ${s.name}`,
+    // within the ~60 characters Google shows: a shorter wording for the longest names
+    title: [`Pharma & Food Machinery Supplier in ${s.name}`, `Pharma & Food Machinery in ${s.short || s.name}`, `Machinery Supplier in ${s.short || s.name}`].find((t) => t.length <= 60) || `Machinery in ${s.short || s.name}`,
     description: `Pharma and food processing machines for ${s.name}${s.pharma ? ' pharma plants' : ''} and ${s.food.split(',')[0]} processing: quotation, delivery from Haridwar, installation support, AMC and spares.`.slice(0, 160),
     indiaOnly: true,
   })),

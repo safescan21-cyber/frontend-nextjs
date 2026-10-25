@@ -17,7 +17,7 @@ const CatalogSwitch = ({ active, className = '' }) => {
       <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
       <span>
         <span className="block text-sm font-semibold">{label}</span>
-        <span className={`block text-xs ${active === key ? 'text-blue-100' : 'text-slate-500'}`}>{sub}</span>
+        <span className={`block text-xs ${active === key ? 'text-white' : 'text-slate-600'}`}>{sub}</span>
       </span>
     </Link>
   );

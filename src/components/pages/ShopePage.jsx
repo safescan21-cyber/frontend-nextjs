@@ -407,8 +407,11 @@ const ShopPage = ({ embedded = false }) => {
                   </button>
                 </div>
               ) : (
+                <>
+                {/* Heading for screen readers, so the machine names (h3) follow an h2 on phones too */}
+                <h2 className="sr-only">{t("Machines")}</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredProducts.map((product) => {
+                  {filteredProducts.map((product, index) => {
                     const productImage =
                       product.images && product.images.length > 0
                         ? product.images[0]
@@ -434,7 +437,9 @@ const ShopPage = ({ embedded = false }) => {
                               src={sizedImage(productImage, 480)}
                               srcSet={productImage.includes('res.cloudinary.com/') ? `${sizedImage(productImage, 480)} 480w, ${sizedImage(productImage, 800)} 800w` : undefined}
                               sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                              loading="lazy"
+                              // the first row is on screen at once (Google's LCP): load it first, the rest later
+                              loading={index < 4 ? 'eager' : 'lazy'}
+                              fetchPriority={index === 0 ? 'high' : undefined}
                               decoding="async"
                               alt={product.name}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -617,6 +622,7 @@ const ShopPage = ({ embedded = false }) => {
                     );
                   })}
                 </div>
+                </>
               )}
             </div>
           </div>

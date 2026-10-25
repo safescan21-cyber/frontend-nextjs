@@ -496,7 +496,7 @@ function LiveChat() {
             <BotMessageSquare className="w-6 h-6 lg:w-7 lg:h-7 text-white drop-shadow" strokeWidth={2.2} aria-hidden="true" />
           )}
           {!open && unread > 0 && (
-            <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] font-bold font-sans flex items-center justify-center shadow-lg">
+            <span aria-hidden="true" className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-rose-600 text-white text-[10px] font-bold font-sans flex items-center justify-center shadow-lg">
               {unread}
             </span>
           )}

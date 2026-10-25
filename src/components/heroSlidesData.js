@@ -13,6 +13,11 @@ export const slideSrcSet = (url) => {
   return SLIDE_WIDTHS.map((w) => `${base}${join}w=${w} ${w}w`).join(', ');
 };
 
+// A small copy for the slide thumbnails (Unsplash at 240 px instead of the 1600 px slide)
+export const slideThumb = (url) => (/^https:\/\/images\.unsplash\.com\//.test(url || '')
+  ? url.replace(/([?&])w=\d+/, '$1w=240')
+  : sizedImage(url, 240));
+
 // ── Default slides: pharma & food machinery (free Unsplash photos, no attribution required) ──
 // Admin slides from the dashboard are shown alongside these, ordered by `order`.
 export const DEFAULT_SLIDES = [
