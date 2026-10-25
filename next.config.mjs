@@ -55,7 +55,17 @@ const nextConfig = {
       {
         // Google sign-in popups need this (same header the Vite site/nginx sends)
         source: '/:path*',
-        headers: [{ key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' }],
+        headers: [
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
+          // Same protection the API gets from helmet: HTTPS only, no framing by other sites
+          // (clickjacking), no MIME guessing, no full addresses sent to other sites
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          // (payment is left out: Stripe's card / Google Pay frame needs it at checkout)
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+        ],
       },
     ];
   },

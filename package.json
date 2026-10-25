@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev -p 3001",
     "build": "next build",
-    "start": "next start -p 3001"
+    "start": "next start -p 3001",
+    "test": "node --import ./test/register.mjs --test \"test/*.test.mjs\""
   },
   "dependencies": {
     "@cloudinary/react": "^1.14.4",

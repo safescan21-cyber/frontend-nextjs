@@ -188,6 +188,8 @@ export const quoteOffer = (facts, question) => {
   // A priced machine that is clearly what they asked about ("aerosol filling machine"): offer it too
   if (facts[0]?.product?.price > 0 && facts[0].cover >= 0.6 && !facts[0].unknown) return facts[0].product;
   if (!/\bhow much\b/i.test(question) && !words(question).some((w) => QUOTE_WORDS.has(w))) return null;
+  // A question one of our written answers covers (GST invoice, payment…) is not about a machine
+  if (hasExactAnswer(facts)) return null;
   // (a price/quotation question: the best priced machine among all the facts found)
   const f = facts.find((x) => x.product && x.product.price > 0 && x.cover >= 0.5);
   return f ? f.product : null;
@@ -279,7 +281,8 @@ export const replyFromFacts = (facts, question = '') => {
   // Price asked: the priced shop machine among the best facts answers (the chat also shows its
   // quotation form), not a general description without a price
   const asksQuote = asksPrice || words(question).some((w) => QUOTE_WORDS.has(w));
-  const priced = asksQuote && !facts[0]?.product?.price ? facts.find((f) => f.product?.price > 0 && f.cover >= 0.5) : null;
+  // (never instead of a written answer: "Do you give GST invoice?" is not a machine question)
+  const priced = asksQuote && !facts[0]?.product?.price && !facts[0]?.answer ? facts.find((f) => f.product?.price > 0 && f.cover >= 0.5) : null;
   const best = priced ? { ...priced, unknown: facts[0].unknown, missing: facts[0].missing, known: facts[0].known, score: Math.max(priced.score, facts[0].score) } : facts[0];
   // A fact only counts as the answer when it matches enough of the question; words we have
   // nothing about (a brand, a drug, a country…) may be at most half of the question
