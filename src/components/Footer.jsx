@@ -663,7 +663,7 @@ export default function PharmaMachineFooter() {
       {/* ─── Legal footer ─── */}
       <div className="relative max-w-7xl mx-auto px-5 sm:px-8 py-6 flex flex-col lg:flex-row items-center justify-between gap-4">
         <p className="text-[12.5px] text-slate-500 order-3 lg:order-1 text-center">
-          &copy; {new Date().getFullYear()} Food Pharma Machinery (PureLine Machinery Pvt. Ltd.). All rights reserved.
+          &copy; 1992–{new Date().getFullYear()} Food Pharma Machinery (PureLine Machinery Pvt. Ltd.). All rights reserved.
         </p>
         <nav aria-label={t("Legal links")} className="order-2 flex flex-wrap justify-center gap-x-6 gap-y-1">
           <Link to="/privacy" className="text-[12.5px] text-slate-500 hover:text-orange-400 transition-colors">
