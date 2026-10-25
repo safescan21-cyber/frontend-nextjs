@@ -14,12 +14,12 @@ import { getLeadOrigin } from '../../utlis/leadOrigin';
 import { gaEvent } from '../../utlis/analytics';
 
 const GST = 18; // % – same as Backend/src/quotes/bulkQuoteRoutes.js (INSTANT_GST)
-const DEMO_IMAGE = /\/demo-products\//;
 const rs = (n) => `₹${Number(n || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
 const field = 'mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200';
 
-// Only machines with a real listed price (demo products are not for sale)
-export const canQuoteInstantly = (p) => Number(p?.price) > 0 && !(p?.images || []).some((i) => DEMO_IMAGE.test(i));
+// Every machine with a listed price (the machines with photos in the "demo-products" folder
+// are real machines with real prices too)
+export const canQuoteInstantly = (p) => Number(p?.price) > 0;
 
 export default function InstantQuote({ product }) {
   const { t } = useLocale();

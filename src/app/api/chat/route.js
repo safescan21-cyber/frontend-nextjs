@@ -118,5 +118,5 @@ export async function POST(request) {
     /* answered below */
   }
   // Model slow or down: reply with the best matching fact
-  return Response.json({ reply: withPhone(replyFromFacts(facts, latest), latest), source: 'facts', quote });
+  return Response.json({ reply: withQuote(withPhone(replyFromFacts(facts, latest), latest)), source: 'facts', quote });
 }

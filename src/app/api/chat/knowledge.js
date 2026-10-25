@@ -1,8 +1,8 @@
 // What the chat assistant knows: real facts from the website and the database, searched for
 // every question (retrieval) so the AI answers from them instead of guessing.
 //   const facts = await findFacts('price of rotary tablet press', 6)
-// Sources: machines and pharma APIs from the API (refreshed every 10 minutes, demo products
-// left out), the FAQs / machine types / lines of /pharma-machinery and /food-machinery, the
+// Sources: machines and pharma APIs from the API (refreshed every 5 minutes; every shop
+// machine, prices included), the FAQs / machine types / lines of /pharma-machinery and /food-machinery, the
 // solutions and city pages, the site's pages and company facts.
 import { MACHINERY_HUBS } from '../../../components/seo/machineryHubs';
 import { CITY_HUBS } from '../../../components/seo/cityHubs';
@@ -15,7 +15,6 @@ import { COMPANY_FACTS, PHONE, EMAIL } from './companyFacts';
 const SITE = 'https://www.foodpharmamachinery.com';
 const API = (process.env.NEXT_PUBLIC_BACKEND_URL || 'https://api.foodpharmamachinery.com').replace(/\/api\/?$/, '').replace(/\/$/, '');
 const REFRESH_MS = 5 * 60 * 1000; // new admin answers reach the chat within 5 minutes
-const DEMO = /\/demo-products\//;
 
 const plain = (html) => String(html || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 const clip = (s, n) => (s.length > n ? `${s.slice(0, n - 1).replace(/\s+\S*$/, '')}…` : s);
@@ -71,7 +70,7 @@ const liveFacts = async () => {
   for (const x of qa) if (x?.question && x?.answer) out.push({ title: x.question, text: x.answer, answer: x.answer, url: '', admin: true });
   const products = (await getJson('/api/products/?category=&color=&minPrice=0&maxPrice=&page=1&limit=1000'))?.products || [];
   for (const p of products) {
-    if (!p?.name || p.active === false || (p.images || []).some((i) => DEMO.test(i))) continue;
+    if (!p?.name || p.active === false) continue;
     const specs = (p.specifications || []).filter((s) => s?.key && s?.value).slice(0, 8).map((s) => `${s.key}: ${s.value}`).join('; ');
     const facts = [
       `Category: ${PRODUCT_DATA[p.category]?.title || label(p.category)}`,
@@ -155,8 +154,9 @@ export const findFacts = async (question, limit = 6) => {
         const best = Math.max(...f.askWords.map((a) => { const both = [...a].filter((w) => qs.has(w)).length; return both / (a.size + qs.size - both || 1); }));
         if (best >= 0.6) { score += 6 * best; hits = Math.max(hits, Math.round(best * q.length)); asked = best; }
       }
-      // The admin's own answers win over automatic facts that match about as well
-      if (f.admin) score *= 1.3;
+      // The admin's own answers win over automatic facts that match about as well, and a real
+      // shop machine over a general description of its kind ("aerosol filling machine")
+      if (f.admin || f.product) score *= 1.3;
       return { title: f.title, text: f.text, url: f.url, answer: f.answer, product: f.product, score, cover: hits / q.length, unknown, missing, known: q.length - unknown, asked, admin: f.admin };
     })
     .filter((f) => f.score > 0)
@@ -185,8 +185,11 @@ export const logMissedQuestion = (question) => {
 // is among the best facts, the chat offers an instant quotation (PDF) for it
 const QUOTE_WORDS = new Set(['price', 'quotation', 'buy', 'purchase', 'order', 'invoice', 'proforma']);
 export const quoteOffer = (facts, question) => {
+  // A priced machine that is clearly what they asked about ("aerosol filling machine"): offer it too
+  if (facts[0]?.product?.price > 0 && facts[0].cover >= 0.6 && !facts[0].unknown) return facts[0].product;
   if (!/\bhow much\b/i.test(question) && !words(question).some((w) => QUOTE_WORDS.has(w))) return null;
-  const f = facts.slice(0, 3).find((x) => x.product && x.product.price > 0);
+  // (a price/quotation question: the best priced machine among all the facts found)
+  const f = facts.find((x) => x.product && x.product.price > 0 && x.cover >= 0.5);
   return f ? f.product : null;
 };
 
@@ -208,7 +211,7 @@ export const isOffTopic = (facts, question) =>
 // quotes a price the facts don't have (the caller then answers from the facts instead)
 // The small model sometimes talks about its instructions or dodges: those replies are not used
 // (only used when the facts do cover the question, so a dodge means the facts answer is better)
-const BAD_REPLY = /\bFACTS\b|my database|where on the website|found it\?|as an ai\b|I don'?t have (that|the|exact|any)|team (can|will) confirm|suggest WhatsApp or the quote form|need (a bit )?more (details|information)|is that right\?/i;
+const BAD_REPLY = /\bFACTS\b|\bthe facts?\b|rather not guess|that's your call|my database|where on the website|found it\?|as an ai\b|I don'?t have (that|the|exact|any)|team (can|will) confirm|suggest WhatsApp or the quote form|need (a bit )?more (details|information)|is that right\?/i;
 export const checkReply = (reply, facts) => {
   if (!reply || BAD_REPLY.test(reply)) return null;
   // A broken WhatsApp link ("wa.me/+91 87007 92607"): the right one
@@ -272,8 +275,12 @@ export const hasExactAnswer = (facts) => Boolean(facts[0]?.answer && !facts[0].u
 export const replyFromFacts = (facts, question = '') => {
   if (GREETING.test(question)) return "Hello! 👋 I'm Nova from Food Pharma Machinery. Ask me about our machines, prices, an instant quotation, spare parts or service – how can I help?";
   if (THANKS.test(question)) return "You're welcome! If you need anything else – a machine, a quotation or service – just ask, or tap the green WhatsApp button to talk to our team.";
-  const best = facts[0];
-  const asksPrice = words(question).includes('price');
+  const asksPrice = words(question).includes('price') || /\bhow much\b/i.test(question);
+  // Price asked: the priced shop machine among the best facts answers (the chat also shows its
+  // quotation form), not a general description without a price
+  const asksQuote = asksPrice || words(question).some((w) => QUOTE_WORDS.has(w));
+  const priced = asksQuote && !facts[0]?.product?.price ? facts.find((f) => f.product?.price > 0 && f.cover >= 0.5) : null;
+  const best = priced ? { ...priced, unknown: facts[0].unknown, missing: facts[0].missing, known: facts[0].known, score: Math.max(priced.score, facts[0].score) } : facts[0];
   // A fact only counts as the answer when it matches enough of the question; words we have
   // nothing about (a brand, a drug, a country…) may be at most half of the question
   if (!best || best.unknown > best.known || best.score < 2.5 || (best.cover < 0.5 && best.score < 6)) {
@@ -282,7 +289,8 @@ export const replyFromFacts = (facts, question = '') => {
   // Say plainly what we found nothing about, then the closest fact
   const notFound = best.unknown ? `I couldn't find "${best.missing.join(' ')}" on our website, so our team will confirm that part. The closest I have:\n\n` : '';
   const name = best.title.replace(/^Machine: /, '');
-  const body = best.answer ? sentences(best.answer, 320) : `${name}: ${sentences(best.text, 280)}`;
+  // (a shop machine gets room for its price and full specifications)
+  const body = best.answer ? sentences(best.answer, 320) : `${name}: ${sentences(best.text, best.product ? 560 : 280)}`;
   // Price asked but the best fact has no listed price: say how to get one
   const priceNote = asksPrice && !/Listed price|Rs\. \d/.test(body)
     ? '\n\nFor the price, share your requirement on WhatsApp or the quote form and we will send it.'
