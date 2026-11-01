@@ -4,8 +4,12 @@ import { STATIC_PAGES } from '../seo/pageSeo';
 import { SITE_URL } from '../components/seo/organization';
 import { LOCALE_CODES, localePath, alternateUrls } from '../i18n/locales';
 import { getJson } from './serverData';
+import { PRODUCT_DATA } from '../components/pages/productCategoryData';
 
-const priority = (p) => (p === '/' ? 1 : ['/shop', '/products', '/solutions'].includes(p) ? 0.9 : p.startsWith('/solutions/') || p === '/project-cost-calculator' ? 0.8 : 0.6);
+const priority = (p) => (p === '/' ? 1 : ['/shop', '/products', '/solutions'].includes(p) ? 0.9 : p.startsWith('/solutions/') || p.startsWith('/products/') || p === '/project-cost-calculator' ? 0.8 : 0.6);
+
+// Machine category pages (/products/tablet-press…): their SEO is built in seo/pageSeo.js
+const CATEGORY_PAGES = Object.keys(PRODUCT_DATA).map((slug) => ({ path: `/products/${slug}` }));
 
 // No lastmod: these pages don't change on every request, and a date that always
 // says "now" teaches Google to ignore lastmod for the whole site.
@@ -19,7 +23,7 @@ export default async function sitemap() {
   // a noindex page must not be listed here (the weekly SEO check flags it)
   const [photos, clients] = await Promise.all([getJson('/api/showcase?kind=photo', 3600), getJson('/api/showcase?kind=client', 3600)]);
   const factoryReady = Boolean(photos?.items?.length || clients?.items?.length);
-  return STATIC_PAGES.filter((p) => p.path !== '/factory' || factoryReady).flatMap((p) => {
+  return [...STATIC_PAGES.filter((p) => p.path !== '/factory' || factoryReady), ...CATEGORY_PAGES].flatMap((p) => {
     // India-only pages (the state pages): one entry, no country versions
     if (p.indiaOnly) return [{ url: `${SITE_URL}${p.path}`, priority: 0.6 }];
     const languages = alternateUrls(SITE_URL, p.path);
