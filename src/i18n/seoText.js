@@ -1,6 +1,7 @@
 // Translated page titles and descriptions per country version: path -> [title, description].
 // Pages missing here keep their English text. US/UK only override a few lines that
 // talk about India. Used by the server (page.jsx) and the browser (components/Seo.jsx).
+import { CITY_HUBS } from '../components/seo/cityHubs';
 
 const fr = {
   '/': ['Food Pharma Machinery | Machines pharma et agroalimentaires', 'Machines pharmaceutiques et agroalimentaires fabriquées en Inde : presses à comprimés, gélules, blisters, remplissage et mélangeurs. Export vers la France.'],
@@ -118,17 +119,17 @@ const ko = {
 
 const enUs = {
   '/': ['Food Pharma Machinery | Pharma & Food Machinery for the USA', 'Pharma and food processing machinery made in India and exported to the USA: tablet presses, capsule fillers, blister and liquid filling lines, mixers, lab equipment and spares.'],
-  '/bulk-quote': ['Bulk Order & Quote Request – USA', 'Request a bulk quote for pharma and food processing machinery and spares. Volume pricing, export shipping to the USA and a reply within 1 business day.'],
+  '/bulk-quote': ['Bulk Pharma Machines – Bulk Order & Quote – USA', 'Bulk pharma machines: request a bulk quote for pharma and food processing machinery and spares. Volume pricing, export shipping to the USA and a reply within 1 business day.'],
 };
 
 const enGb = {
   '/': ['Food Pharma Machinery | Pharma & Food Machinery for the UK', 'Pharma and food processing machinery made in India and exported to the UK: tablet presses, capsule fillers, blister and liquid filling lines, mixers, lab equipment and spares.'],
-  '/bulk-quote': ['Bulk Order & Quote Request – UK', 'Request a bulk quote for pharma and food processing machinery and spares. Volume pricing, export shipping to the UK and a reply within 1 business day.'],
+  '/bulk-quote': ['Bulk Pharma Machines – Bulk Order & Quote – UK', 'Bulk pharma machines: request a bulk quote for pharma and food processing machinery and spares. Volume pricing, export shipping to the UK and a reply within 1 business day.'],
 };
 
 const enAu = {
   '/': ['Food Pharma Machinery | Pharma & Food Machinery, Australia', 'Pharma and food processing machinery made in India for buyers in Australia: tablet presses, capsule fillers, blister and liquid filling lines, mixers, lab equipment and spares.'],
-  '/bulk-quote': ['Bulk Order & Quote Request – Australia', 'Request a bulk quote for pharma and food processing machinery and spares. Volume pricing, export shipping to Australia quoted, and a reply within 1 business day.'],
+  '/bulk-quote': ['Bulk Pharma Machines – Bulk Order & Quote – Australia', 'Bulk pharma machines: request a bulk quote for pharma and food processing machinery and spares. Volume pricing, export shipping to Australia quoted, and a reply within 1 business day.'],
 };
 
 const ur = {
@@ -169,11 +170,73 @@ const ur = {
   '/products/cleanroom': ['کلین روم آلات', 'لیمینر فلو یونٹس، پاس باکس اور ماحولیاتی نگرانی کے حل۔'],
 };
 
+// Pages added later (spares, AMC, hubs, city pages…): their own title in every language, so no
+// country version repeats the English title
+const MORE = {
+  fr: {
+    '/spares': ['Pièces détachées par modèle de machine', 'Trouvez les pièces de rechange par modèle : poinçons, matrices, buses de remplissage, courroies et pièces d’usure pour machines pharmaceutiques et alimentaires.'],
+    '/amc': ['Contrat de maintenance annuel (AMC) pour machines', 'Contrats de maintenance annuels avec visites préventives planifiées et assistance prioritaire en cas de panne pour vos machines pharmaceutiques et alimentaires.'],
+    '/service-request': ['Demande d’intervention – réparation et assistance', 'Signalez une panne ou demandez une intervention : indiquez le modèle, le numéro de série et le problème. Notre équipe vous répond rapidement.'],
+    '/factory': ['Notre usine et nos installations', 'L’usine PureLine Machinery à Haridwar : fabrication, essais des machines, expédition et installations chez nos clients.'],
+    '/pharma-machinery-supplier': ['Fournisseur de machines pour les pôles pharma indiens', 'Machines, installation, maintenance et pièces détachées pour les usines des principaux pôles pharmaceutiques de l’Inde, depuis notre usine de Haridwar.'],
+    '/pharma-plant-checklist': ['Check-list de création d’usine pharma (PDF gratuit)', 'Étapes pour créer une usine pharmaceutique : licences, locaux, utilités, machines et validation. Check-list gratuite en PDF.'],
+    '/pharma-machinery': ['Fabricant et fournisseur de machines pharmaceutiques', 'Machines pharmaceutiques fabriquées en Inde : presses à comprimés, remplisseuses de gélules, blistéreuses, remplissage de liquides, granulation et enrobage.'],
+    '/food-machinery': ['Machines de transformation et d’emballage alimentaire', 'Machines alimentaires fabriquées en Inde : mélange, broyage, remplissage de poudres et de liquides, ensachage, étiquetage et lignes complètes.'],
+  },
+  ja: {
+    '/spares': ['機種別スペアパーツ', '機種ごとにスペアパーツを検索：杵・臼、充填ノズル、ベルトなど製薬・食品機械の消耗部品。'],
+    '/amc': ['年間保守契約（AMC）', '計画的な予防保守訪問と故障時の優先対応を含む、製薬・食品機械の年間保守契約。'],
+    '/service-request': ['修理・サービス依頼', '機械の故障や修理のご依頼：機種、シリアル番号、症状をお知らせください。担当チームが迅速に対応します。'],
+    '/factory': ['工場と設置実績', 'ハリドワールのPureLine Machinery工場：製造、機械の試験、出荷、そしてお客様先での設置。'],
+    '/pharma-machinery-supplier': ['インドの製薬拠点向け機械サプライヤー', 'ハリドワールの自社工場から、インド各地の製薬拠点の工場へ機械、据付、保守、スペアパーツを提供します。'],
+    '/pharma-plant-checklist': ['製薬工場立ち上げチェックリスト（無料PDF）', '製薬工場の立ち上げ手順：許認可、建屋、ユーティリティ、機械、バリデーション。無料PDFチェックリスト。'],
+    '/pharma-machinery': ['製薬機械メーカー・サプライヤー（インド）', 'インド製の製薬機械：打錠機、カプセル充填機、ブリスター包装機、液体充填機、造粒・コーティング機。'],
+    '/food-machinery': ['食品加工・包装機械メーカー（インド）', 'インド製の食品機械：混合、粉砕、粉体・液体充填、袋詰め包装、ラベリング、ライン一式。'],
+  },
+  ko: {
+    '/spares': ['기종별 예비 부품', '기종별 예비 부품 찾기: 펀치·다이, 충전 노즐, 벨트 등 제약·식품 기계 소모 부품.'],
+    '/amc': ['연간 유지보수 계약(AMC)', '계획된 예방 정비 방문과 고장 시 우선 지원을 포함한 제약·식품 기계 연간 유지보수 계약.'],
+    '/service-request': ['수리·서비스 요청', '기계 고장 및 수리 요청: 기종, 일련번호, 증상을 알려 주시면 담당 팀이 신속히 대응합니다.'],
+    '/factory': ['공장 및 설치 사례', '하리드와르 PureLine Machinery 공장: 제조, 기계 시험, 출하 및 고객사 설치.'],
+    '/pharma-machinery-supplier': ['인도 제약 클러스터용 기계 공급업체', '하리드와르 자사 공장에서 인도 주요 제약 클러스터의 공장에 기계, 설치, 유지보수, 예비 부품을 공급합니다.'],
+    '/pharma-plant-checklist': ['제약 공장 설립 체크리스트(무료 PDF)', '제약 공장 설립 단계: 인허가, 건물, 유틸리티, 기계, 밸리데이션. 무료 PDF 체크리스트.'],
+    '/pharma-machinery': ['인도 제약 기계 제조·공급업체', '인도산 제약 기계: 타정기, 캡슐 충전기, 블리스터 포장기, 액체 충전기, 과립·코팅 장비.'],
+    '/food-machinery': ['인도 식품 가공·포장 기계 제조업체', '인도산 식품 기계: 혼합, 분쇄, 분체·액체 충전, 파우치 포장, 라벨링 및 전체 라인.'],
+  },
+  ur: {
+    '/spares': ['مشین ماڈل کے مطابق اسپیئر پارٹس', 'ماڈل کے مطابق اسپیئر پارٹس تلاش کریں: پنچ، ڈائی، فلنگ نوزل، بیلٹ اور فارما و فوڈ مشینوں کے دیگر پرزے۔'],
+    '/amc': ['سالانہ دیکھ بھال کا معاہدہ (AMC)', 'فارما اور فوڈ مشینوں کے لیے سالانہ معاہدے: طے شدہ احتیاطی وزٹ اور خرابی پر ترجیحی مدد۔'],
+    '/service-request': ['سروس کی درخواست – مرمت اور مدد', 'مشین کی خرابی یا مرمت کی درخواست دیں: ماڈل، سیریل نمبر اور مسئلہ بتائیں، ہماری ٹیم جلد رابطہ کرے گی۔'],
+    '/factory': ['ہماری فیکٹری اور تنصیبات', 'ہری دوار میں پیور لائن مشینری کی فیکٹری: تیاری، مشینوں کی جانچ، روانگی اور گاہکوں کے ہاں تنصیب۔'],
+    '/pharma-machinery-supplier': ['بھارت کے فارما مراکز کے لیے مشینری', 'ہری دوار کی فیکٹری سے بھارت کے بڑے فارما مراکز کے کارخانوں کو مشینیں، تنصیب، دیکھ بھال اور پرزے۔'],
+    '/pharma-plant-checklist': ['فارما پلانٹ لگانے کی چیک لسٹ (مفت PDF)', 'فارما پلانٹ لگانے کے مراحل: لائسنس، عمارت، یوٹیلیٹیز، مشینیں اور توثیق۔ مفت PDF چیک لسٹ۔'],
+    '/pharma-machinery': ['فارما مشینری بنانے اور فراہم کرنے والے', 'بھارت میں تیار فارما مشینیں: ٹیبلٹ پریس، کیپسول فلر، بلسٹر پیکنگ، مائع بھرائی، گرینولیشن اور کوٹنگ۔'],
+    '/food-machinery': ['فوڈ پروسیسنگ اور پیکیجنگ مشینری', 'بھارت میں تیار فوڈ مشینیں: مکسنگ، پیسائی، پاؤڈر اور مائع بھرائی، پاؤچ پیکنگ، لیبلنگ اور مکمل لائنیں۔'],
+  },
+};
+Object.assign(fr, MORE.fr);
+Object.assign(ja, MORE.ja);
+Object.assign(ko, MORE.ko);
+Object.assign(ur, MORE.ur);
+
+// City pages (/pharma-machinery-supplier/<city>): one pattern per language
+const CITY_TEXT = {
+  fr: (c) => [`Fournisseur de machines pharmaceutiques à ${c}`, `Presses à comprimés, remplisseuses de gélules, blistéreuses et autres machines pour les usines de ${c}. Devis, livraison, installation, maintenance et pièces.`],
+  ja: (c) => [`${c}の製薬機械サプライヤー`, `${c}の工場向け打錠機、カプセル充填機、ブリスター包装機などの製薬機械。見積、配送、据付、保守、部品。`],
+  ko: (c) => [`${c} 제약 기계 공급업체`, `${c} 공장용 타정기, 캡슐 충전기, 블리스터 포장기 등 제약 기계. 견적, 배송, 설치, 유지보수, 부품.`],
+  ur: (c) => [`${c} میں فارما مشینری سپلائر`, `${c} کے کارخانوں کے لیے ٹیبلٹ پریس، کیپسول فلر، بلسٹر پیکنگ اور دیگر فارما مشینیں۔ کوٹیشن، ترسیل، تنصیب، دیکھ بھال اور پرزے۔`],
+};
+const cityName = (path) => {
+  const slug = (String(path).match(/^\/pharma-machinery-supplier\/([^/]+)$/) || [])[1];
+  return slug ? CITY_HUBS.find((c) => c.slug === slug)?.city : null;
+};
+
 export const SEO_TEXT = { fr, ja, ko, ur, 'en-us': enUs, 'en-gb': enGb, 'en-au': enAu };
 
 // { title, description } for a page in a country version, or null to keep English
 export const seoText = (locale, path) => {
-  const row = locale && SEO_TEXT[locale]?.[path];
+  const city = locale && CITY_TEXT[locale] && cityName(path);
+  const row = (locale && SEO_TEXT[locale]?.[path]) || (city && CITY_TEXT[locale](city));
   return row ? { title: row[0], description: row[1] } : null;
 };
 
@@ -206,6 +269,7 @@ export const fitDescription = (text, max = MAX_DESCRIPTION, end = '…') => {
 // The US, UK and Australia versions are in English like the India site: pages without their
 // own text above still get a title and description of their own (not copies)
 const REGION = { 'en-us': ['USA', ' Exported to the USA.'], 'en-gb': ['UK', ' Exported to the UK.'], 'en-au': ['Australia', ' For buyers in Australia.'] };
+const REGION_SHORT = { 'en-us': 'US', 'en-gb': 'UK', 'en-au': 'AU' };
 
 // Title (without the brand) and description of a page in a country version
 export const localizedText = (locale, path, title, description) => {
@@ -215,7 +279,8 @@ export const localizedText = (locale, path, title, description) => {
   if (region && title) {
     return {
       // the country only when it still fits (the page's language tags already say which country it is for)
-      title: `${title} – ${region[0]}`.length <= MAX_TITLE ? `${title} – ${region[0]}` : title,
+      // (the short code "AU" when the country's name doesn't fit, so the title stays its own)
+      title: [`${title} – ${region[0]}`, `${title} – ${REGION_SHORT[locale]}`].find((t) => t.length <= MAX_TITLE) || title,
       description: description ? fitDescription(description, MAX_DESCRIPTION - region[1].length, '.') + region[1] : description,
     };
   }

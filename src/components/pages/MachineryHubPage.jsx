@@ -1,4 +1,5 @@
 'use client';
+import useFactoryReady from '../../utlis/useFactoryReady';
 // /pharma-machinery and /food-machinery: the main pages for "pharma machinery" and
 // "food machinery" searches. Machine types, the real machines from the shop with prices,
 // lines by product, buying tips, FAQs and a quick quote.
@@ -27,6 +28,7 @@ const THEMES = {
 };
 
 export default function MachineryHubPage({ hub: hubKey = 'pharma', products = [] }) {
+  const factoryReady = useFactoryReady(); // /factory is noindex until it has photos
   const hub = MACHINERY_HUBS[hubKey] || MACHINERY_HUBS.pharma;
   const t = THEMES[hub.theme] || THEMES.blue;
   const machines = realMachines(products, hub.categories);
@@ -134,7 +136,7 @@ export default function MachineryHubPage({ hub: hubKey = 'pharma', products = []
               ))}
             </ol>
             <p className="mt-3 text-sm text-slate-600">
-              <Link to="/factory" className={a}>Our factory</Link> · <Link to="/spares" className={a}>Spare parts</Link> · <Link to="/amc" className={a}>AMC plans</Link> · <Link to="/service-request" className={a}>Service request</Link> · <Link to="/compare" className={a}>Compare machines</Link> · <Link to={hub.other.to} className={a}>{hub.other.label}</Link>
+              {factoryReady && <><Link to="/factory" className={a}>Our factory</Link> · </>}<Link to="/spares" className={a}>Spare parts</Link> · <Link to="/amc" className={a}>AMC plans</Link> · <Link to="/service-request" className={a}>Service request</Link> · <Link to={hub.other.to} className={a}>{hub.other.label}</Link>
             </p>
           </section>
 

@@ -9,6 +9,7 @@ import { useFetchAllProductsQuery } from "../components/store/products/productsA
 import { useState, useEffect } from "react";
 import axios from "axios";
 import getBaseUrl from "../utlis/baseURL";
+import useFactoryReady from "../utlis/useFactoryReady";
 
 const WHATSAPP_NUMBER = "918700792607"; // country code + number, as wa.me requires
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=Hello%2C%20I%20would%20like%20to%20enquire%20about%20your%20machines.`;
@@ -148,6 +149,8 @@ const ContactRow = ({ icon: Icon, label, children }) => (
 
 /* ─── Main Footer ─────────────────────────────────────────── */
 export default function PharmaMachineFooter() {
+  // /factory is noindex until it has photos: its link only shows once it has
+  const factoryReady = useFactoryReady();
   const { t } = useLocale();
   // ── Product query ──
   const { data: apiData, isLoading: productsQueryLoading } = useFetchAllProductsQuery({
@@ -598,7 +601,7 @@ export default function PharmaMachineFooter() {
             <ColHeading>{t("Company")}</ColHeading>
             <nav aria-label={t("Company pages")}>
               <ul role="list">
-                {NAV_COMPANY.map(({ label, to }) => (
+                {NAV_COMPANY.filter(({ to }) => to !== "/factory" || factoryReady).map(({ label, to }) => (
                   <li key={t(label)}>
                     <FooterLink to={to}>{t(label)}</FooterLink>
                   </li>

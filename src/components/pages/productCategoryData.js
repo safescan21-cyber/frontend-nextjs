@@ -80,7 +80,9 @@ export const PRODUCT_DATA = {
   },
   "liquid-filling": {
     title: "Liquid Filling & Capping",
-    description: "Volumetric and peristaltic filling lines for syrups, suspensions, and solutions.",
+    // Search title (Google Search Console query: "pharmaceutical filling machine")
+    seoTitle: "Pharmaceutical Liquid Filling & Capping Machines",
+    description: "Pharmaceutical filling machines: volumetric and peristaltic liquid filling lines for syrups, suspensions, and solutions.",
     products: [
       { name: "LF-4A Monoblock", images: ["https://placehold.co/400x300?text=LF-4A"], video: "", spec: "4 heads, up to 60 bpm" },
     ],

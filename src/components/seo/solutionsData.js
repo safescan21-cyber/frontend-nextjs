@@ -32,7 +32,7 @@ export const SOLUTIONS = [
   {
     slug: 'packaging',
     name: 'Packaging',
-    title: 'Pharma & Food Packaging Machines',
+    title: 'Pharma & Food Packaging Machinery',
     intro:
       'Primary and secondary packaging equipment — blister and strip packing, cartoning, labelling, wrapping and sachet filling — to take your product from line to shipment.',
     machines: ['Blister Packaging Lines', 'Strip Packaging Machines', 'Cartoning Machines', 'Labelling Machines', 'Wrapping Systems', 'Sachet Filling Machines'],

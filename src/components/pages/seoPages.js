@@ -10,8 +10,9 @@
 export const seoPages = {
   home: {
     path: '/',
+    title: 'Food Pharma Machinery | Pharma & Food Machinery Suppliers',
     description:
-      'Pharma and food processing machinery from India: tablet presses, capsule fillers, blister and liquid filling lines, mixers, lab equipment and spares.',
+      'Pharmaceutical and food machinery suppliers in India: tablet presses, capsule fillers, pharma packaging and filling machines, mixers and spares.',
   },
   shop: {
     path: '/shop',
@@ -69,9 +70,9 @@ export const seoPages = {
   },
   packaging: {
     path: '/solutions/packaging',
-    title: 'Packaging Machinery',
+    title: 'Pharma Packaging Machinery Manufacturers in India',
     description:
-      'Blister packing, bottle filling, labelling and cartoning machines that keep pharma and food packaging lines fast and consistent.',
+      'Pharmaceutical packaging machinery and food packaging machines made in India: blister and strip packing, bottle filling, labelling and cartoning.',
   },
   sterile: {
     path: '/solutions/sterile',
@@ -123,9 +124,9 @@ export const seoPages = {
   },
   bulkQuote: {
     path: '/bulk-quote',
-    title: 'Bulk Order & Quote Request',
+    title: 'Bulk Pharma Machines – Bulk Order & Quote Request',
     description:
-      'Request a bulk quote for pharma and food processing machinery and spares. Volume pricing, delivery across India and a reply within 1 business day.',
+      'Bulk pharma machines and food machinery: request a bulk quote for machines and spares. Volume pricing, delivery across India and a reply within 1 business day.',
   },
   testimonials: {
     path: '/testimonials',
@@ -171,7 +172,7 @@ export const seoPages = {
   },
   hubs: {
     path: '/pharma-machinery-supplier',
-    title: 'Pharma Machinery Supplier for India’s Pharma Hubs',
+    title: 'Pharma Machinery Suppliers for India’s Pharma Hubs',
     description:
       'Pharma machinery, installation support, AMC and spares for plants in Haridwar, Baddi, Ahmedabad, Hyderabad, Vapi, Mumbai, Pune, Indore and Sikkim.',
   },

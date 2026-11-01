@@ -8,7 +8,7 @@ export default function HubIndex({ hubs = [] }) {
     <div className="min-h-screen bg-slate-50 pb-28">
       <section className="bg-gradient-to-r from-orange-600 to-amber-700 px-4 py-10 text-white">
         <div className="mx-auto max-w-5xl">
-          <h1 className="text-3xl font-bold sm:text-4xl">Pharma machinery for India's pharma hubs</h1>
+          <h1 className="text-3xl font-bold sm:text-4xl">Pharma machinery suppliers for India's pharma hubs</h1>
           <p className="mt-2 max-w-2xl text-orange-50">Machines, installation support, AMC and spares for plants across India, built at our factory in Haridwar.</p>
         </div>
       </section>

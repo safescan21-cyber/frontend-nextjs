@@ -5,6 +5,7 @@
 // server-rendered HTML.
 import '../App.css';
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Provider } from 'react-redux';
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'react-hot-toast';
@@ -18,11 +19,24 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import MobileActionButtons from '../components/MobileActionButtons';
 import CookieConsent from '../components/pages/CookieConsent';
-import LiveChat from '../components/pages/LiveChat';
 import RouteSeo from '../components/seo/RouteSeo';
 import WebMcpTools from '../components/webmcp/WebMcpTools';
 import CompareBar from '../components/compare/CompareBar';
 import { dedupeHead } from './headTags';
+
+// The chat's code is only fetched after the page has loaded, so on phones it doesn't
+// compete with the page's own code and its first image
+const LiveChat = dynamic(() => import('../components/pages/LiveChat'), { ssr: false });
+const usePageLoaded = () => {
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    const done = () => setLoaded(true);
+    if (document.readyState === 'complete') { done(); return undefined; }
+    window.addEventListener('load', done, { once: true });
+    return () => window.removeEventListener('load', done);
+  }, []);
+  return loaded;
+};
 
 // Global toast look: dark theme to match the site, readable on mobile
 const toastOptions = {
@@ -47,6 +61,7 @@ const toastOptions = {
 
 export default function SiteShell({ locale = '', children }) {
   const [store] = useState(makeStore);
+  const pageLoaded = usePageLoaded();
 
   // Next.js and the pages' <Seo> both write head tags; keep only the newest of each
   useEffect(() => {
@@ -74,7 +89,7 @@ export default function SiteShell({ locale = '', children }) {
             <MobileActionButtons />
             <Footer />
             <CookieConsent />
-            <LiveChat />
+            {pageLoaded && <LiveChat />}
           </div>
           <WebMcpTools />
         </LocaleProvider>

@@ -6,6 +6,15 @@ import { LOCALE_CODES, DEFAULT_SEGMENT } from './src/i18n/locales.js';
 const root = path.dirname(fileURLToPath(import.meta.url));
 // Country folders (en-us|en-gb|en-au|fr…), read from the one list in src/i18n/locales.js
 const LOC = LOCALE_CODES.join('|');
+// Old /resources/<slug> placeholder pages -> the page that really covers the topic
+const RESOURCE_MOVES = {
+  technical: '/shop', // each machine page has its manuals and documents
+  catalogs: '/products',
+  cad: '/contact',
+  'case-studies': '/projects',
+  'white-papers': '/press',
+  sds: '/contact',
+};
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -37,6 +46,11 @@ const nextConfig = {
       moved('/orders/:id', '/dashboard/orders/:id'),
       moved(`/:loc(${LOC})/orders`, '/:loc/dashboard/orders'),
       moved(`/:loc(${LOC})/orders/:id`, '/:loc/dashboard/orders/:id'),
+      // The /resources/* placeholders (noindex, no content) go to the real page for each topic
+      ...Object.entries(RESOURCE_MOVES).flatMap(([slug, to]) => [
+        moved(`/resources/${slug}`, to),
+        moved(`/:loc(${LOC})/resources/${slug}`, `/:loc${to}`),
+      ]),
     ];
   },
   // Every page lives under src/app/[locale]/…: /fr/shop is served as it is, and the

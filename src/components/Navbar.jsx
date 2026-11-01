@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   Menu, X, ChevronDown, Package,
   Truck, Shield, Users, FileText, Phone,
-  BarChart3, BookOpen, Download, Mail,
+  BarChart3, BookOpen, Mail,
   Wind, Gauge, HardHat, Award,
   Search, Heart, ShoppingCart, LogOut,
   LayoutDashboard, User, CreditCard, ShoppingBag, PlusCircle, MessageSquare,
@@ -144,14 +144,16 @@ const solutionsData = [
   },
 ];
 
+// Only pages with real content (the old /resources/* placeholders were noindex and now
+// redirect to these pages: next.config.mjs)
 const resourcesLinks = [
   { name: 'Project Cost Calculator', path: '/project-cost-calculator', icon: Gauge, description: 'Estimate plant & machine cost' },
-  { name: 'Technical Library', path: '/resources/technical',    icon: BookOpen,  description: 'Manuals and documentation' },
-  { name: 'Product Catalogs',  path: '/resources/catalogs',     icon: FileText,  description: 'Download PDF catalogs' },
-  { name: 'CAD Drawings',      path: '/resources/cad',          icon: Gauge,     description: '2D/3D models' },
-  { name: 'Case Studies',      path: '/resources/case-studies', icon: Users,     description: 'Success stories' },
-  { name: 'White Papers',      path: '/resources/white-papers', icon: FileText,  description: 'Industry research' },
-  { name: 'SDS Sheets',        path: '/resources/sds',          icon: Shield,    description: 'Safety data sheets' },
+  { name: 'Pharma Plant Checklist', path: '/pharma-plant-checklist', icon: BookOpen, description: 'Plant setup steps (free PDF)' },
+  { name: 'Spare Parts', path: '/spares', icon: Package, description: 'Find parts by machine model' },
+  { name: 'AMC Plans', path: '/amc', icon: Shield, description: 'Annual maintenance contracts' },
+  { name: 'Projects', path: '/projects', icon: Users, description: 'Plants and lines we supplied' },
+  { name: 'Press & News', path: '/press', icon: Newspaper, description: 'Company news and launches' },
+  { name: 'Machinery by State', path: '/machinery-supplier', icon: Truck, description: 'Every Indian state and UT' },
 ];
 
 // Main links exposed to search engines as site navigation (JSON-LD)
@@ -700,16 +702,6 @@ const Navbar = () => {
                         </Link>
                       );
                     })}
-                    <div className="border-t border-slate-700 mt-2 pt-3 px-4 flex flex-col sm:flex-row gap-2 sm:gap-6">
-                      <button type="button" className="text-xs text-slate-400 hover:text-amber-400 flex items-center space-x-1">
-                        <Download className="w-3 h-3" aria-hidden="true" />
-                        <span>{t("Downloads")}</span>
-                      </button>
-                      <button type="button" className="text-xs text-slate-400 hover:text-amber-400 flex items-center space-x-1">
-                        <Award className="w-3 h-3" aria-hidden="true" />
-                        <span>{t("Certifications")}</span>
-                      </button>
-                    </div>
                   </HoverDropdown>
 
                   {/* Projects and Contact live in the top bar: the main row has no room for them (content stops at 1536px) */}

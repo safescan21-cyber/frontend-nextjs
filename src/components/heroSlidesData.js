@@ -3,14 +3,15 @@
 import { sizedImage } from '../utlis/imageUrl';
 
 // Unsplash serves any width on request: give phones a small file and big screens a large one
-export const SLIDE_WIDTHS = [640, 960, 1280, 1600];
+export const SLIDE_WIDTHS = [480, 750, 1080, 1600];
 export const slideSrcSet = (url) => {
   // Cloudinary slides (uploaded by the admin): resized, compressed copies
   if (sizedImage(url, 640) !== url) return SLIDE_WIDTHS.map((w) => `${sizedImage(url, w)} ${w}w`).join(', ');
   if (!/^https:\/\/images\.unsplash\.com\//.test(url || '')) return undefined;
-  const base = url.replace(/([?&])w=\d+&?/, '$1').replace(/[?&]$/, '');
+  const base = url.replace(/([?&])(w|q)=\d+/g, '$1').replace(/&{2,}/g, '&').replace(/\?&/, '?').replace(/[?&]$/, '');
   const join = base.includes('?') ? '&' : '?';
-  return SLIDE_WIDTHS.map((w) => `${base}${join}w=${w} ${w}w`).join(', ');
+  // Phone copies sit under the dark text overlay: quality 60 looks the same and loads faster
+  return SLIDE_WIDTHS.map((w) => `${base}${join}w=${w}&q=${w <= 1080 ? 60 : 75} ${w}w`).join(', ');
 };
 
 // A small copy for the slide thumbnails (Unsplash at 240 px instead of the 1600 px slide)

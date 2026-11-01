@@ -25,13 +25,13 @@ export const PHARMA_HUB = {
   key: 'pharma',
   page: {
     path: '/pharma-machinery',
-    title: 'Pharma Machinery Manufacturer & Supplier in India',
+    title: 'Pharma Machinery Manufacturers & Suppliers in India',
     description:
-      'Pharma machinery from Haridwar, India: tablet presses, capsule fillers, blister packing, liquid filling, granulation, coating and more. Prices, specs and quotes.',
+      'Pharmaceutical machinery made in Haridwar, India: tablet presses, capsule fillers, pharma packaging and filling machines, granulation and coating.',
   },
   crumb: 'Pharma machinery',
   theme: 'blue',
-  h1: 'Pharma machinery manufacturer & supplier in India',
+  h1: 'Pharmaceutical machinery manufacturer & supplier in India',
   intro:
     'Food Pharma Machinery (PureLine Machinery Pvt. Ltd.) makes and supplies pharmaceutical machines for tablets, capsules, liquids, injectables and packaging, from single machines to complete lines, with installation support, AMC and spare parts.',
   typesTitle: 'Types of pharma machinery we supply',
@@ -87,9 +87,9 @@ export const FOOD_HUB = {
   key: 'food',
   page: {
     path: '/food-machinery',
-    title: 'Food Processing & Packaging Machinery Manufacturer in India',
+    title: 'Food Packaging Machinery & Food Filling Machines',
     description:
-      'Food machinery from Haridwar, India: mixers, pulverisers, powder and liquid filling, pouch packing, sealing, labelling and inspection. Prices, specs and quotes.',
+      'Food packaging machinery from Haridwar, India: mixers, pulverisers, food filling machines for powders and liquids, pouch packing, sealing and labelling.',
   },
   crumb: 'Food machinery',
   theme: 'emerald',

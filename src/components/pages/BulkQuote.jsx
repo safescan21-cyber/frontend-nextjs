@@ -126,7 +126,7 @@ const BulkQuote = () => {
             </div>
           ) : (
             <>
-              <h1 className="text-3xl font-bold text-slate-800 md:text-4xl">Bulk order & quote request</h1>
+              <h1 className="text-3xl font-bold text-slate-800 md:text-4xl">Bulk pharma machines: order & quote request</h1>
               <p className="mt-2 max-w-3xl text-slate-600">
                 Buying several machines, spares or larger quantities? Tell us what you need and we'll send a custom quote with volume pricing.
               </p>

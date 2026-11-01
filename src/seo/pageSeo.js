@@ -346,7 +346,7 @@ export async function seoForPath(segments = []) {
     if (!c) return { notFound: true };
     const description = `${c.description} Compare models, specifications and get a quote from ${SITE_NAME}.`;
     return {
-      title: fullTitle(c.title),
+      title: fullTitle(c.seoTitle || c.title),
       description,
       canonical: `${SITE_URL}${path}`,
       jsonLd: [breadcrumbLd([['Home', '/'], ['Products', '/products'], [c.title, null]])],

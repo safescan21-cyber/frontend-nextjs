@@ -8,11 +8,13 @@ import { CITY_HUBS } from '../seo/cityHubs';
 import { INDIA_STATES } from '../seo/indiaStates';
 import QuickQuote from '../quote/QuickQuote';
 import { useLocale } from '../../i18n/LocaleContext';
+import useFactoryReady from '../../utlis/useFactoryReady';
 
 const label = (slug) => slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
 export default function CityPage({ hub, installations = [] }) {
   const { t } = useLocale();
+  const factoryReady = useFactoryReady(); // /factory is noindex until it has photos
   const others = CITY_HUBS.filter((c) => c.slug !== hub.slug);
   const state = INDIA_STATES.find((s) => s.name === hub.state);
   return (
@@ -64,7 +66,7 @@ export default function CityPage({ hub, installations = [] }) {
           )}
 
           <p className="mt-8 text-sm text-slate-600">
-            <Link to="/pharma-machinery" className="font-semibold text-blue-600 hover:underline">All pharma machinery</Link> · <Link to="/spares" className="font-semibold text-blue-600 hover:underline">Spare parts</Link> · <Link to="/amc" className="font-semibold text-blue-600 hover:underline">AMC</Link> · <Link to="/service-request" className="font-semibold text-blue-600 hover:underline">Service request</Link> · <Link to="/factory" className="font-semibold text-blue-600 hover:underline">Our factory</Link> · <Link to="/project-cost-calculator" className="font-semibold text-blue-600 hover:underline">Plant cost calculator</Link>
+            <Link to="/pharma-machinery" className="font-semibold text-blue-600 hover:underline">All pharma machinery</Link> · <Link to="/spares" className="font-semibold text-blue-600 hover:underline">Spare parts</Link> · <Link to="/amc" className="font-semibold text-blue-600 hover:underline">AMC</Link> · <Link to="/service-request" className="font-semibold text-blue-600 hover:underline">Service request</Link>{factoryReady && <> · <Link to="/factory" className="font-semibold text-blue-600 hover:underline">Our factory</Link></>} · <Link to="/project-cost-calculator" className="font-semibold text-blue-600 hover:underline">Plant cost calculator</Link>
           </p>
         </div>
 
