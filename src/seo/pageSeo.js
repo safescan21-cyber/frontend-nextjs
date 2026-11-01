@@ -109,7 +109,8 @@ export async function seoForPath(segments = []) {
       image: images[0],
       type: 'product',
       jsonLd: [
-        {
+        // Google only accepts a Product with a price or ratings ("Product snippets" in Search Console)
+        price && {
           '@context': 'https://schema.org',
           '@type': 'Product',
           name: p.name,
@@ -118,21 +119,19 @@ export async function seoForPath(segments = []) {
           ...(images.length && { image: images }),
           ...(text && { description: clip(text, 500) }),
           ...(p.category && { category: categoryName }),
-          ...(price && {
-            offers: {
-              '@type': 'Offer',
-              url,
-              priceCurrency: 'INR',
-              price,
-              availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-              itemCondition: 'https://schema.org/NewCondition',
-              seller: { '@id': `${SITE_URL}/#organization` },
-            },
-          }),
+          offers: {
+            '@type': 'Offer',
+            url,
+            priceCurrency: 'INR',
+            price,
+            availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            itemCondition: 'https://schema.org/NewCondition',
+            seller: { '@id': `${SITE_URL}/#organization` },
+          },
         },
         breadcrumbLd(crumbs),
         ...productExtrasLd(p, url, text),
-      ],
+      ].filter(Boolean),
       summary: {
         crumbs,
         heading: p.name,
@@ -175,14 +174,13 @@ export async function seoForPath(segments = []) {
       jsonLd: [
         {
           '@context': 'https://schema.org',
-          '@type': 'Product',
+          '@type': 'ChemicalSubstance',
           name: a.name,
           url,
           category: a.category,
           ...(a.images?.length && { image: a.images.slice(0, 5) }),
           description: clip(plain(a.description) || facts.join('. '), 500),
           ...(a.casNumber && { additionalProperty: [{ '@type': 'PropertyValue', name: 'CAS number', value: a.casNumber }] }),
-          brand: { '@id': `${SITE_URL}/#organization` },
         },
         breadcrumbLd(crumbs),
       ],

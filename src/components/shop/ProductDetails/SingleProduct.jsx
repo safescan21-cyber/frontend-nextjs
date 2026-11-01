@@ -402,7 +402,8 @@ const SingleProduct = () => {
   // ── SEO: title, description, share image and Product structured data ──
   const plainDescription = String(product?.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
   const productImages = [product?.image, ...(Array.isArray(product?.images) ? product.images : [])].filter((u) => typeof u === 'string' && u);
-  const productJsonLd = product && {
+  // Google only accepts a Product with a price or ratings ("Product snippets" in Search Console)
+  const productJsonLd = product && (Number(product.price) > 0 || reviews.length > 0) && {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,

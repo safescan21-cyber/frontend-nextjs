@@ -125,11 +125,8 @@ export const SolutionPage = () => {
             description: s.intro,
             provider: { '@type': 'Organization', name: 'Food Pharma Machinery', url: SITE_URL },
             areaServed: 'Worldwide',
-            hasOfferCatalog: {
-              '@type': 'OfferCatalog',
-              name: s.title,
-              itemListElement: s.machines.map((m) => ({ '@type': 'Offer', itemOffered: { '@type': 'Product', name: m } })),
-            },
+            // machine names only (no prices here): not Products, which Google requires a price or rating for
+            keywords: s.machines.join(', '),
           },
         ]}
       />
