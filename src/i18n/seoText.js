@@ -118,17 +118,25 @@ const ko = {
 };
 
 const enUs = {
-  '/': ['Food Pharma Machinery | Pharma & Food Machinery for the USA', 'Pharma and food processing machinery made in India and exported to the USA: tablet presses, capsule fillers, blister and liquid filling lines, mixers, lab equipment and spares.'],
+  // Search Console (Nov 2026): wording buyers search for ("pharma machinery suppliers")
+  '/': ['Food Pharma Machinery | Pharma Machinery Suppliers, USA', 'Pharma machinery suppliers in India exporting to the USA: tablet presses, capsule fillers, pharma packaging and filling machines, mixers and spares.'],
+  // Search Console (Nov 2026): this page was shown abroad with a title about India's hubs
+  '/pharma-machinery-supplier': ['Pharma Machinery Exporter from India to the USA', 'Pharma machinery made in Haridwar, India and exported to the USA: tablet presses, capsule fillers, packaging and filling lines, spares and quotes.'],
   '/bulk-quote': ['Bulk Pharma Machines – Bulk Order & Quote – USA', 'Bulk pharma machines: request a bulk quote for pharma and food processing machinery and spares. Volume pricing, export shipping to the USA and a reply within 1 business day.'],
 };
 
 const enGb = {
-  '/': ['Food Pharma Machinery | Pharma & Food Machinery for the UK', 'Pharma and food processing machinery made in India and exported to the UK: tablet presses, capsule fillers, blister and liquid filling lines, mixers, lab equipment and spares.'],
+  // Search Console (Nov 2026): shown 470 times for 1 click with the old generic title
+  '/': ['Food Pharma Machinery | Pharma Machinery Suppliers, UK', 'Pharma machinery suppliers in India exporting to the UK: tablet presses, capsule fillers, pharma packaging and filling machines, mixers and spares.'],
+  // Search Console (Nov 2026): this page was shown abroad with a title about India's hubs
+  '/pharma-machinery-supplier': ['Pharma Machinery Exporter from India to the UK', 'Pharma machinery made in Haridwar, India and exported to the UK: tablet presses, capsule fillers, packaging and filling lines, spares and quotes.'],
   '/bulk-quote': ['Bulk Pharma Machines – Bulk Order & Quote – UK', 'Bulk pharma machines: request a bulk quote for pharma and food processing machinery and spares. Volume pricing, export shipping to the UK and a reply within 1 business day.'],
 };
 
 const enAu = {
   '/': ['Food Pharma Machinery | Pharma & Food Machinery, Australia', 'Pharma and food processing machinery made in India for buyers in Australia: tablet presses, capsule fillers, blister and liquid filling lines, mixers, lab equipment and spares.'],
+  // Search Console (Nov 2026): this page was shown abroad with a title about India's hubs
+  '/pharma-machinery-supplier': ['Pharma Machinery Exporter from India to Australia', 'Pharma machinery made in Haridwar, India and exported to Australia: tablet presses, capsule fillers, packaging and filling lines, spares and quotes.'],
   '/bulk-quote': ['Bulk Pharma Machines – Bulk Order & Quote – Australia', 'Bulk pharma machines: request a bulk quote for pharma and food processing machinery and spares. Volume pricing, export shipping to Australia quoted, and a reply within 1 business day.'],
 };
 
