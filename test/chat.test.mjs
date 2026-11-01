@@ -9,8 +9,10 @@ const MACHINE = {
   warranty: 24, stock: 2, origin: 'germany', specifications: [{ key: 'Stations', value: '16 (D tooling)' }, { key: 'Output', value: 'Up to 28,800 tablets/hour' }],
   description: 'High-speed rotary press for production batches.', images: [],
 };
+// A part in the same category (the live shop's only item on 1 Nov 2026)
+const TOOLING = { _id: '6adde2259aa38de49a2a3ea8', name: 'D Tooling for Press Machine', category: 'tablet-press', price: 3000, stock: 5, images: [] };
 globalThis.fetch = async (url) => {
-  const body = String(url).includes('/api/products') ? { products: [MACHINE] } : { items: [] };
+  const body = String(url).includes('/api/products') ? { products: [MACHINE, TOOLING] } : { items: [] };
   return { ok: true, json: async () => body };
 };
 delete process.env.LLM_BASE_URL; // the route answers from the facts only
@@ -64,6 +66,15 @@ test('company questions get the written answer; unknown words are named, not gue
   assert.match(k.replyFromFacts(await facts(q), q), /couldn't find "paracetamol"/);
   const off = await facts('What is the weather today?');
   assert.ok(k.isOffTopic(off, 'What is the weather today?'));
+});
+
+test('machine questions: a part that only shares the category is not the answer', async () => {
+  for (const q of ['Do you make tablet press machines?', 'kya aap tablet machine banate ho', 'tablet press price']) {
+    const f = await facts(q);
+    assert.notEqual(f[0].title, 'Machine: D Tooling for Press Machine', q);
+    assert.notEqual(k.quoteOffer(f, q)?.price, 3000, q);
+    assert.doesNotMatch(k.replyFromFacts(f, q), /Rs\. 3,000/, q);
+  }
 });
 
 test('quotation: offered for a priced machine, not for other questions', async () => {

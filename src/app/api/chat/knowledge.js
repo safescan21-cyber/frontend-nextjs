@@ -32,7 +32,8 @@ const SAME = { cost: 'price', rate: 'price', rates: 'price', pricing: 'price', p
   spares: 'spare', parts: 'part', pay: 'payment', payments: 'payment', advance: 'payment', bill: 'invoice', gstin: 'gst', kitna: 'price', kitne: 'price', daam: 'price', dam: 'price', keemat: 'price', kimat: 'price', mashine: 'machine' };
 // Plural to singular: presses -> press, batteries -> battery, machines -> machine
 const singular = (w) => (w.length <= 3 ? w : w.endsWith('sses') ? w.slice(0, -2) : w.endsWith('ies') ? `${w.slice(0, -3)}y` : w.endsWith('s') && !w.endsWith('ss') && !w.endsWith('us') ? w.slice(0, -1) : w);
-const words = (s) => String(s || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9\s-]/g, ' ').split(/[\s-]+/)
+// "tablet machine" / "tablet making machine" is what buyers call a tablet press
+const words = (s) => String(s || '').toLowerCase().replace(/\btablets? (?:making |banane (?:ki |wali )?)?(?:machines?|mashines?)\b/g, 'tablet press machine').normalize('NFKD').replace(/[^a-z0-9\s-]/g, ' ').split(/[\s-]+/)
   .filter((w) => w.length > 1 && !STOP.has(w))
   .map((w) => SAME[w] || singular(w));
 
@@ -83,7 +84,7 @@ const liveFacts = async () => {
       specs && `Specifications: ${specs}`,
       clip(plain(p.description), 300),
     ].filter(Boolean).join('. ');
-    out.push({ title: `Machine: ${p.name}`, text: facts, url: `${SITE}/shop/${p._id}`, product: { id: String(p._id), name: p.name, price: Number(p.price) > 0 ? Number(p.price) : 0 } });
+    out.push({ title: `Machine: ${p.name}`, text: facts, url: `${SITE}/shop/${p._id}`, product: { id: String(p._id), name: p.name, price: Number(p.price) > 0 ? Number(p.price) : 0 }, nameWords: new Set(words(p.name)) });
   }
   const apis = (await getJson('/api/pharma-apis?limit=500'))?.items || [];
   for (const a of apis) {
@@ -125,6 +126,13 @@ const getIndex = async () => {
   return index || building;
 };
 
+// Share of the question's own words (not "machine", "price"…) found in a machine's name
+const GENERIC = new Set(['machine', 'price', 'quotation', 'buy', 'purchase', 'order', 'invoice', 'proforma', 'manufacture', 'manufacturer', 'supplier', 'india']);
+const nameMatch = (q, nameWords) => {
+  const own = q.filter((w) => !GENERIC.has(w));
+  return own.length ? own.filter((w) => nameWords.has(w)).length / own.length : 0;
+};
+
 // Best facts for a question: [{ title, text, url, answer?, score }]
 export const findFacts = async (question, limit = 6) => {
   const idx = await getIndex();
@@ -156,8 +164,13 @@ export const findFacts = async (question, limit = 6) => {
       }
       // The admin's own answers win over automatic facts that match about as well, and a real
       // shop machine over a general description of its kind ("aerosol filling machine")
-      if (f.admin || f.product) score *= 1.3;
-      return { title: f.title, text: f.text, url: f.url, answer: f.answer, product: f.product, score, cover: hits / q.length, unknown, missing, known: q.length - unknown, asked, admin: f.admin };
+      // (the machine's NAME must match: "D Tooling for Press Machine" is in the tablet press
+      // category, but it is not the answer to "do you make tablet press machines?")
+      const named = f.nameWords ? nameMatch(q, f.nameWords) : 0;
+      if (f.admin || named >= 0.6) score *= 1.3;
+      // a machine that only shares its category with the question ranks below the category itself
+      else if (f.nameWords) score *= 0.7;
+      return { title: f.title, text: f.text, url: f.url, answer: f.answer, product: f.product, named, score, cover: hits / q.length, unknown, missing, known: q.length - unknown, asked, admin: f.admin };
     })
     .filter((f) => f.score > 0)
     .sort((x, y) => y.score - x.score)
@@ -186,12 +199,12 @@ export const logMissedQuestion = (question) => {
 const QUOTE_WORDS = new Set(['price', 'quotation', 'buy', 'purchase', 'order', 'invoice', 'proforma']);
 export const quoteOffer = (facts, question) => {
   // A priced machine that is clearly what they asked about ("aerosol filling machine"): offer it too
-  if (facts[0]?.product?.price > 0 && facts[0].cover >= 0.6 && !facts[0].unknown) return facts[0].product;
+  if (facts[0]?.product?.price > 0 && facts[0].cover >= 0.6 && facts[0].named >= 0.6 && !facts[0].unknown) return facts[0].product;
   if (!/\bhow much\b/i.test(question) && !words(question).some((w) => QUOTE_WORDS.has(w))) return null;
   // A question one of our written answers covers (GST invoice, payment…) is not about a machine
   if (hasExactAnswer(facts)) return null;
   // (a price/quotation question: the best priced machine among all the facts found)
-  const f = facts.find((x) => x.product && x.product.price > 0 && x.cover >= 0.5);
+  const f = facts.find((x) => x.product && x.product.price > 0 && x.cover >= 0.5 && x.named >= 0.6);
   return f ? f.product : null;
 };
 
@@ -282,7 +295,7 @@ export const replyFromFacts = (facts, question = '') => {
   // quotation form), not a general description without a price
   const asksQuote = asksPrice || words(question).some((w) => QUOTE_WORDS.has(w));
   // (never instead of a written answer: "Do you give GST invoice?" is not a machine question)
-  const priced = asksQuote && !facts[0]?.product?.price && !facts[0]?.answer ? facts.find((f) => f.product?.price > 0 && f.cover >= 0.5) : null;
+  const priced = asksQuote && !facts[0]?.product?.price && !facts[0]?.answer ? facts.find((f) => f.product?.price > 0 && f.cover >= 0.5 && f.named >= 0.6) : null;
   const best = priced ? { ...priced, unknown: facts[0].unknown, missing: facts[0].missing, known: facts[0].known, score: Math.max(priced.score, facts[0].score) } : facts[0];
   // A fact only counts as the answer when it matches enough of the question; words we have
   // nothing about (a brand, a drug, a country…) may be at most half of the question
