@@ -155,6 +155,7 @@ const resourcesLinks = [
   { name: 'Press & News', path: '/press', icon: Newspaper, description: 'Company news and launches' },
   { name: 'Machinery by State', path: '/machinery-supplier', icon: Truck, description: 'Every Indian state and UT' },
   { name: 'Export by Country', path: '/export', icon: Truck, description: 'Machines exported from India' },
+  { name: 'Industrial Areas', path: '/industrial-areas', icon: Truck, description: 'Pharma clusters and food parks' },
 ];
 
 // Main links exposed to search engines as site navigation (JSON-LD)

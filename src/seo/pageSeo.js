@@ -12,6 +12,7 @@ import { brandTitle } from '../i18n/seoText';
 import { CITY_PAGES } from '../components/seo/cityHubs';
 import { STATE_PAGES, indiaState, stateLines, stateFaqs } from '../components/seo/indiaStates';
 import { COUNTRY_PAGES, REGIONS, exportCountry, countryFaqs, countryRoute, countrySupply } from '../components/seo/countries';
+import { AREA_PAGES, industrialArea, areaFaqs } from '../components/seo/industrialAreas';
 import { HUB_PAGES, MACHINERY_HUBS, realMachines } from '../components/seo/machineryHubs';
 
 export const DEFAULT_TITLE = `${SITE_NAME} | Pharma & Food Processing Machinery`;
@@ -34,6 +35,7 @@ export const STATIC_PAGES = (() => {
   pages.push(...HUB_PAGES, ...CITY_PAGES); // /pharma-machinery, /food-machinery, /pharma-machinery-supplier/<city>
   pages.push(...STATE_PAGES); // /machinery-supplier and /machinery-supplier/<state> (India only)
   pages.push(...COUNTRY_PAGES); // /export and /export/<country> (one version each)
+  pages.push(...AREA_PAGES); // /industrial-areas and /industrial-areas/<area> (India only)
   for (const s of SOLUTIONS) {
     if (!pages.some((p) => p.path === `/solutions/${s.slug}`)) pages.push({ path: `/solutions/${s.slug}`, title: s.title, description: s.intro });
   }
@@ -345,6 +347,36 @@ export async function seoForPath(segments = []) {
         lines: [page.description, `Mains supply: ${countrySupply(c)}.`, countryRoute(c), c.regulator && `Medicines regulator: ${c.regulator}.`].filter(Boolean),
         list: REGIONS[c.region].lines.map((l) => stateLines({ lines: [l] })[0]).map((l) => `${l.form}: ${l.line}`),
         links: [['/export', 'All countries'], ['/pharma-machinery', 'Pharma machinery'], ['/food-machinery', 'Food machinery'], ['/bulk-quote', 'Request a quote']],
+      },
+    };
+  }
+
+  // ── Industrial area pages (/industrial-areas/<area>): India only, with their questions as FAQ data ──
+  const areaPath = path.match(/^\/industrial-areas\/([^/]+)$/);
+  if (areaPath) {
+    const a = industrialArea(areaPath[1]);
+    if (!a) return { notFound: true };
+    const page = AREA_PAGES.find((p) => p.path === path);
+    const crumbs = [['Home', '/'], ['Industrial areas', '/industrial-areas'], [a.name, null]];
+    return {
+      title: fullTitle(page.title),
+      description: page.description,
+      canonical: `${SITE_URL}${path}`,
+      indiaOnly: true,
+      jsonLd: [
+        breadcrumbLd(crumbs),
+        {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: areaFaqs(a).map(([q, ans]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: ans } })),
+        },
+      ],
+      summary: {
+        crumbs,
+        heading: page.title,
+        lines: [page.description, a.note],
+        list: stateLines({ lines: a.lines }).map((l) => `${l.form}: ${l.line}`),
+        links: [['/industrial-areas', 'All industrial areas'], ['/machinery-supplier', 'Machinery by state'], ['/pharma-machinery', 'Pharma machinery'], ['/food-machinery', 'Food machinery']],
       },
     };
   }

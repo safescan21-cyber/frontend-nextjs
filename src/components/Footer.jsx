@@ -94,6 +94,7 @@ const NAV_COMPANY = [
   { label: "Our Factory & Installations", to: "/factory" },
   { label: "Areas We Serve", to: "/pharma-machinery-supplier" },
   { label: "Export by Country", to: "/export" },
+  { label: "Industrial Areas", to: "/industrial-areas" },
   { label: "Free Plant Setup Checklist", to: "/pharma-plant-checklist" },
 ];
 
