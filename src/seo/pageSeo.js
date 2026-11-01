@@ -11,6 +11,7 @@ import { SITE_URL, SITE_NAME } from '../components/seo/organization';
 import { brandTitle } from '../i18n/seoText';
 import { CITY_PAGES } from '../components/seo/cityHubs';
 import { STATE_PAGES, indiaState, stateLines, stateFaqs } from '../components/seo/indiaStates';
+import { COUNTRY_PAGES, REGIONS, exportCountry, countryFaqs, countryRoute, countrySupply } from '../components/seo/countries';
 import { HUB_PAGES, MACHINERY_HUBS, realMachines } from '../components/seo/machineryHubs';
 
 export const DEFAULT_TITLE = `${SITE_NAME} | Pharma & Food Processing Machinery`;
@@ -32,6 +33,7 @@ export const STATIC_PAGES = (() => {
   const pages = Object.values(seoPages).filter((p) => EXISTING_ROUTES.has(p.path) || p.path.startsWith('/solutions/'));
   pages.push(...HUB_PAGES, ...CITY_PAGES); // /pharma-machinery, /food-machinery, /pharma-machinery-supplier/<city>
   pages.push(...STATE_PAGES); // /machinery-supplier and /machinery-supplier/<state> (India only)
+  pages.push(...COUNTRY_PAGES); // /export and /export/<country> (one version each)
   for (const s of SOLUTIONS) {
     if (!pages.some((p) => p.path === `/solutions/${s.slug}`)) pages.push({ path: `/solutions/${s.slug}`, title: s.title, description: s.intro });
   }
@@ -313,6 +315,36 @@ export async function seoForPath(segments = []) {
         lines: [page.description, state.pharma, `${state.name} is known for ${state.food}.`].filter(Boolean),
         list: stateLines(state).map((l) => `${l.form}: ${l.line}`),
         links: [['/machinery-supplier', 'All states'], ['/pharma-machinery', 'Pharma machinery'], ['/food-machinery', 'Food machinery'], ['/bulk-quote', 'Request a quote']],
+      },
+    };
+  }
+
+  // ── Country export pages (/export/<country>): one version, with their questions as FAQ data ──
+  const countryPath = path.match(/^\/export\/([^/]+)$/);
+  if (countryPath) {
+    const c = exportCountry(countryPath[1]);
+    if (!c) return { notFound: true };
+    const page = COUNTRY_PAGES.find((p) => p.path === path);
+    const crumbs = [['Home', '/'], ['Export', '/export'], [c.name, null]];
+    return {
+      title: fullTitle(page.title),
+      description: page.description,
+      canonical: `${SITE_URL}${path}`,
+      indiaOnly: true,
+      jsonLd: [
+        breadcrumbLd(crumbs),
+        {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: countryFaqs(c).map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
+        },
+      ],
+      summary: {
+        crumbs,
+        heading: page.title,
+        lines: [page.description, `Mains supply: ${countrySupply(c)}.`, countryRoute(c), c.regulator && `Medicines regulator: ${c.regulator}.`].filter(Boolean),
+        list: REGIONS[c.region].lines.map((l) => stateLines({ lines: [l] })[0]).map((l) => `${l.form}: ${l.line}`),
+        links: [['/export', 'All countries'], ['/pharma-machinery', 'Pharma machinery'], ['/food-machinery', 'Food machinery'], ['/bulk-quote', 'Request a quote']],
       },
     };
   }

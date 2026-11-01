@@ -31,7 +31,7 @@ export default function StateIndex() {
         <Group title="States" list={INDIA_STATES.filter((s) => s.kind === 'state')} />
         <Group title="Union territories" list={INDIA_STATES.filter((s) => s.kind !== 'state')} />
         <p className="mt-8 text-sm text-slate-600">
-          Pharma hub pages: <Link to="/pharma-machinery-supplier" className="font-semibold text-blue-600 hover:underline">Baddi, Ahmedabad, Hyderabad and more</Link>
+          Pharma hub pages: <Link to="/pharma-machinery-supplier" className="font-semibold text-blue-600 hover:underline">Baddi, Ahmedabad, Hyderabad and more</Link> · Outside India: <Link to="/export" className="font-semibold text-blue-600 hover:underline">export by country</Link>
         </p>
       </div>
     </div>

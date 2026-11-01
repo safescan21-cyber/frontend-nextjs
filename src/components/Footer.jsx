@@ -93,6 +93,7 @@ const NAV_COMPANY = [
   { label: "Customer Testimonials", to: "/testimonials" },
   { label: "Our Factory & Installations", to: "/factory" },
   { label: "Areas We Serve", to: "/pharma-machinery-supplier" },
+  { label: "Export by Country", to: "/export" },
   { label: "Free Plant Setup Checklist", to: "/pharma-plant-checklist" },
 ];
 
