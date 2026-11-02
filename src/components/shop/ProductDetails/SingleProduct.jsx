@@ -387,7 +387,7 @@ const SingleProduct = () => {
     { label: t('Category'), value: product.category ? t(product.category.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())) : 'N/A', icon: '🏭' },
     { label: t('Color'), value: product.color || 'N/A', icon: '🎨' },
     { label: t('Rating'), value: product.rating ? `${product.rating}/5` : 'N/A', icon: '⭐' },
-    { label: t('Stock'), value: t('In Stock'), icon: '✅' },
+    { label: t('Stock'), value: Number(product.stock) > 0 ? t('In Stock') : t('Made to order'), icon: Number(product.stock) > 0 ? '✅' : '🛠️' },
   ];
 
   const documents = Array.isArray(product?.documents) ? product.documents.filter((d) => d && d.file) : [];
