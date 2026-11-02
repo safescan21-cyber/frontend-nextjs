@@ -453,13 +453,6 @@ const ShopPage = ({ embedded = false }) => {
                                 SAVE {Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}%
                               </span>
                             )}
-                            {!isInStock && (
-                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                                <span className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-sm">
-                                  {t("Out of Stock")}
-                                </span>
-                              </div>
-                            )}
                             {addedProductId === product._id && (
                               <div className="absolute inset-0 bg-green-500 bg-opacity-20 flex items-center justify-center animate-pulse">
                                 <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -495,9 +488,10 @@ const ShopPage = ({ embedded = false }) => {
                                 {t('In Stock ({n})', { n: stockCount })}
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 text-xs font-medium text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
-                                <span className="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
-                                {t("Out of Stock")}
+                              // no stock count = built to order (machines), not unavailable
+                              <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">
+                                <span className="w-1.5 h-1.5 bg-amber-500 rounded-full"></span>
+                                {t("Made to order")}
                               </span>
                             )}
 
@@ -557,7 +551,7 @@ const ShopPage = ({ embedded = false }) => {
                               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6M17 13l1.5 6M9 21h6M12 15v6" />
                               </svg>
-                              {!isInStock ? t('Out of Stock') : t('Add to Cart')}
+                              {!isInStock ? t('Made to order') : t('Add to Cart')}
                             </button>
                           ) : (
                             <div className="flex items-center justify-between gap-2">

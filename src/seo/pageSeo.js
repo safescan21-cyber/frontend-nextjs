@@ -142,7 +142,7 @@ export async function seoForPath(segments = []) {
         image: images[0],
         lines: [
           price && `₹${price.toLocaleString('en-IN')}`,
-          `${categoryName} · ${inStock ? 'In stock' : 'Out of stock'}`,
+          `${categoryName} · ${inStock ? 'In stock' : 'Made to order'}`,
           text,
         ].filter(Boolean),
         list: (p.specifications || []).filter((s) => s?.key && s?.value).map((s) => `${s.key}: ${s.value}`),

@@ -198,7 +198,7 @@ const SingleProduct = () => {
     ...customSpecs.slice(0, 4).map((sp) => `${sp.key}: ${sp.value}`),
     warrantyText && `${warrantyText} warranty`,
     product.readyToDispatch && 'Ready to dispatch',
-    Number(product.stock) > 0 ? 'In stock' : 'Currently out of stock — ask for lead time',
+    Number(product.stock) > 0 ? 'In stock' : 'Made to order — available, ask for delivery time',
     product.manufacturer && `Manufacturer: ${product.manufacturer}`,
     originText && `Origin: ${originText}`,
   ].filter(Boolean);
