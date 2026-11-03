@@ -12,7 +12,7 @@ export default async function Page({ params }) {
   const { locale } = await params;
   const [seo, list] = await Promise.all([getSeo(locale, ['pharma-machinery']), productList()]);
   // Only what the cards show
-  const products = realMachines(list.value?.products, hub.categories).map(({ _id, name, category, price, images }) => ({ _id, name, category, price, images: (images || []).slice(0, 1) }));
+  const products = realMachines(list.value?.products, hub.categories, hub.notFor).map(({ _id, name, category, price, images }) => ({ _id, name, category, price, images: (images || []).slice(0, 1) }));
   return (
     <SitePage seo={seo}>
       <MachineryHubPage hub="pharma" products={products} />

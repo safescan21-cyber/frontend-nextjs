@@ -23,7 +23,7 @@ export default function MachineryHubPage({ hub: hubKey = 'pharma', products = []
   const factoryReady = useFactoryReady(); // /factory is noindex until it has photos
   const hub = MACHINERY_HUBS[hubKey] || MACHINERY_HUBS.pharma;
   const t = THEMES[hub.theme] || THEMES.blue;
-  const machines = realMachines(products, hub.categories);
+  const machines = realMachines(products, hub.categories, hub.notFor);
   const faqs = hub.faqs(machines);
   const a = `font-semibold ${t.link} hover:underline`;
   return (

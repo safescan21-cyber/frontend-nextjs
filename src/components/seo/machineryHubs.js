@@ -3,8 +3,9 @@
 // types only; prices and models come from the real products in the shop. Google gets the
 // same FAQs as FAQPage data (seo/pageSeo.js).
 
-export const realMachines = (products = [], categories = null) =>
-  products.filter((p) => p?._id && p.name && p.active !== false &&(!categories || categories.includes(p.category)));
+// (notFor: names of models that don't belong on the page, e.g. pharma-only ones on the food page)
+export const realMachines = (products = [], categories = null, notFor = null) =>
+  products.filter((p) => p?._id && p.name && p.active !== false && (!categories || categories.includes(p.category)) && !notFor?.test(p.name));
 
 const lakh = (n) => `Rs. ${(n / 100000).toLocaleString('en-IN', { maximumFractionDigits: 2 })} lakh`;
 
@@ -51,7 +52,7 @@ export const PHARMA_HUB = {
     { slug: 'cleanroom', name: 'Clean room equipment', text: 'Pass boxes, laminar air flow units, dispensing booths and other clean room equipment.' },
   ],
   categories: null, // every real machine in the shop
-  machinesTitle: 'Pharma machines with prices',
+  machinesTitle: 'Pharma machines in our shop',
   linesTitle: 'Which machines does your plant need?',
   lines: [
     { form: 'Tablets', line: 'Sifter → mixer / granulator → fluid bed dryer → blender → tablet press → coater → blister packing → cartoning', to: '/solutions/solid-dosage' },
@@ -111,8 +112,10 @@ export const FOOD_HUB = {
     { slug: 'inspection', name: 'Checkweighing & metal detection', text: 'Checkweighers and metal detectors that reject under-weight packs and packs with metal contamination.' },
     { slug: 'conveying', name: 'Conveyors & material handling', text: 'Conveyors, screw feeders and elevators that move product and packs between machines.' },
   ],
-  categories: ['mixing', 'milling', 'powder-filling', 'liquid-filling', 'inspection', 'material-handling', 'packaging-accessories'],
-  machinesTitle: 'Food machines with prices',
+  categories: ['mixing', 'milling', 'powder-filling', 'liquid-filling', 'inspection', 'metal-detector', 'checkweigher', 'conveyor', 'material-handling', 'packaging-accessories'],
+  // models made for medicines only (capsule and tablet metal detectors, pharma checkweighers)
+  notFor: /\b(capsules?|tablets?|pharma\w*)\b/i,
+  machinesTitle: 'Food machines in our shop',
   linesTitle: 'Which machines does your food plant need?',
   lines: [
     { form: 'Spices & masala', line: 'Cleaning → pulveriser → sifter → ribbon blender → pouch packing (FFS) → checkweigher → case packing', to: '/solutions/packaging' },

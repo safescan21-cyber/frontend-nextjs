@@ -258,7 +258,7 @@ export async function seoForPath(segments = []) {
   const hub = Object.values(MACHINERY_HUBS).find((h) => h.page.path === path);
   if (hub) {
     const { data } = await getJson('/api/products/?category=&color=&minPrice=0&maxPrice=&page=1&limit=1000');
-    const products = realMachines(data?.products, hub.categories);
+    const products = realMachines(data?.products, hub.categories, hub.notFor);
     const faqs = hub.faqs(products);
     const crumbs = [['Home', '/'], [hub.crumb, null]];
     return {
