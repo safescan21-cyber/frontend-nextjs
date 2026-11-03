@@ -444,7 +444,8 @@ function LiveChat() {
           to   { opacity: 1; transform: translateX(0)    scale(1);    }
         }
         .chat-panel { animation: chatSlideUp 0.3s cubic-bezier(0.34,1.2,0.64,1) both; }
-        .fab-pulse  { animation: pulseRing 2s ease-in-out infinite; }
+        /* a few pulses, not forever: an endless shadow animation makes phones redraw while scrolling */
+        .fab-pulse  { animation: pulseRing 2s ease-in-out 3; }
         .welcome-popup { animation: slideInLeft 0.4s cubic-bezier(0.34,1.2,0.64,1) both; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }

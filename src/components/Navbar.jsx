@@ -449,7 +449,7 @@ const Navbar = () => {
         }`}
       >
         {/* Top bar */}
-        <div className="hidden xl:block border-b border-slate-600/50 bg-slate-900/50 backdrop-blur-sm">
+        <div className="hidden xl:block border-b border-slate-600/50 bg-slate-900/50">
           <div className="max-w-7xl 2xl:max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-12 text-xs">
               <div className="flex items-center space-x-4 2xl:space-x-6">
@@ -892,7 +892,7 @@ const Navbar = () => {
         </div>
 
         {/* Search Row (desktop) */}
-        <div className="hidden xl:block bg-slate-800/50 backdrop-blur-sm py-4 border-b border-slate-600/30">
+        <div className="hidden xl:block bg-slate-800/50 py-4 border-b border-slate-600/30">
           <div className="max-w-7xl 2xl:max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
             <form {...formTool('search')} onSubmit={(e) => handleSearchSubmit(e, searchQuery)} className="flex gap-4 items-center" role="search">
               <div className="relative flex-1">

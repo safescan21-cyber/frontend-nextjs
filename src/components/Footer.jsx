@@ -288,11 +288,11 @@ export default function PharmaMachineFooter() {
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute -top-40 -left-32 w-[480px] h-[480px] rounded-full bg-orange-600/15 blur-[120px]"
+        className="pointer-events-none absolute -top-40 -left-32 w-[720px] h-[720px] bg-[radial-gradient(circle,rgba(234,88,12,0.15),transparent_65%)]"
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute bottom-0 -right-32 w-[420px] h-[420px] rounded-full bg-amber-500/10 blur-[120px]"
+        className="pointer-events-none absolute bottom-0 -right-32 w-[660px] h-[660px] bg-[radial-gradient(circle,rgba(245,158,11,0.10),transparent_65%)]"
         aria-hidden="true"
       />
 
@@ -495,7 +495,7 @@ export default function PharmaMachineFooter() {
 
         {/* Newsletter + Company + Press */}
         <div className="lg:col-span-3">
-          <div className="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900/80 to-slate-900/30 p-5 backdrop-blur">
+          <div className="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900/80 to-slate-900/30 p-5">
             <ColHeading>{t("Newsletter")}</ColHeading>
             <p className="text-[13.5px] text-slate-400 leading-relaxed mb-4 -mt-2">
               {t("Regulatory updates, new machines and pharma tech news — straight to your inbox.")}
@@ -714,7 +714,7 @@ export default function PharmaMachineFooter() {
         <button
           type="button"
           onClick={scrollToTop}
-          className="w-11 h-11 rounded-full bg-slate-800/90 hover:bg-orange-600 text-white border border-slate-600 flex items-center justify-center shadow-lg backdrop-blur transition-colors"
+          className="w-11 h-11 rounded-full bg-slate-800/90 hover:bg-orange-600 text-white border border-slate-600 flex items-center justify-center shadow-lg transition-colors"
           aria-label={t("Back to top")}
         >
           <IconUp />

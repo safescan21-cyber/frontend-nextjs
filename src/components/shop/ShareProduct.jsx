@@ -136,7 +136,7 @@ const ShareProduct = ({ product, variant = 'icon', className = '' }) => {
       <button
         type="button"
         onClick={openSheet}
-        className={`inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-slate-700 shadow-md backdrop-blur transition hover:scale-110 hover:text-blue-600 ${className}`}
+        className={`inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-slate-700 shadow-md transition hover:scale-110 hover:text-blue-600 ${className}`}
         aria-label={`Share ${title}`}
         title="Share"
       >

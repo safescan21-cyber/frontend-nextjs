@@ -250,7 +250,7 @@ const Home = () => {
                 </p>
                 {image.offer?.details && (
                   <div className="mb-4 sm:mb-6 animate-fade-in-delay-2">
-                    <p className="text-xs sm:text-sm bg-black/30 backdrop-blur-sm inline-block px-3 sm:px-4 py-1 sm:py-2 rounded-full">
+                    <p className="text-xs sm:text-sm bg-black/40 inline-block px-3 sm:px-4 py-1 sm:py-2 rounded-full">
                       {t(image.offer.details)}
                     </p>
                   </div>
@@ -299,7 +299,7 @@ const Home = () => {
         <div className="absolute top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-4 z-20 flex justify-between items-center">
           <div className="flex space-x-1 sm:space-x-2">
             {/* Slide grid and speed controls are desktop-only; on phones they crowd the offer badge */}
-            <button onClick={() => setShowThumbnails(!showThumbnails)} aria-label={t("Show all slides")} className="hidden md:block bg-black/50 backdrop-blur-sm text-white px-2 sm:px-3 py-1 sm:py-2 rounded-lg">
+            <button onClick={() => setShowThumbnails(!showThumbnails)} aria-label={t("Show all slides")} className="hidden md:block bg-black/60 text-white px-2 sm:px-3 py-1 sm:py-2 rounded-lg">
               <Grid size={14} className="sm:w-4 sm:h-4" />
             </button>
           </div>
@@ -309,7 +309,7 @@ const Home = () => {
                 value={slideDuration}
                 onChange={(e) => setSlideDuration(parseInt(e.target.value))}
                 aria-label={t("Slide speed")}
-                className="hidden md:block bg-black/50 backdrop-blur-sm text-white px-2 sm:px-3 py-1 sm:py-2 rounded-lg text-xs sm:text-sm"
+                className="hidden md:block bg-black/60 text-white px-2 sm:px-3 py-1 sm:py-2 rounded-lg text-xs sm:text-sm"
               >
                 {speedOptions.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -317,7 +317,7 @@ const Home = () => {
               </select>
             )}
             {images.length > 1 && (
-              <button onClick={() => setIsAutoPlaying(!isAutoPlaying)} aria-label={isAutoPlaying ? 'Pause slideshow' : 'Play slideshow'} className="bg-black/50 backdrop-blur-sm text-white p-1.5 sm:p-2 rounded-lg">
+              <button onClick={() => setIsAutoPlaying(!isAutoPlaying)} aria-label={isAutoPlaying ? 'Pause slideshow' : 'Play slideshow'} className="bg-black/60 text-white p-1.5 sm:p-2 rounded-lg">
                 {isAutoPlaying ? <Pause size={14} className="sm:w-4 sm:h-4" /> : <Play size={14} className="sm:w-4 sm:h-4" />}
               </button>
             )}
@@ -325,7 +325,7 @@ const Home = () => {
         </div>
 
         {showThumbnails && (
-          <div className="absolute bottom-16 sm:bottom-24 left-0 right-0 z-30 overflow-x-auto py-2 sm:py-4 px-4 sm:px-8 bg-black/50 backdrop-blur-sm">
+          <div className="absolute bottom-16 sm:bottom-24 left-0 right-0 z-30 overflow-x-auto py-2 sm:py-4 px-4 sm:px-8 bg-black/60">
             <div className="flex space-x-2 justify-center">
               {images.map((image, idx) => (
                 <button
