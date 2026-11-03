@@ -84,7 +84,7 @@ const liveFacts = async () => {
       specs && `Specifications: ${specs}`,
       clip(plain(p.description), 300),
     ].filter(Boolean).join('. ');
-    out.push({ title: `Machine: ${p.name}`, text: facts, url: `${SITE}/shop/${p._id}`, product: { id: String(p._id), name: p.name, price: Number(p.price) > 0 ? Number(p.price) : 0 }, nameWords: new Set(words(p.name)) });
+    out.push({ title: `Machine: ${p.name}`, text: facts, url: `${SITE}/shop/${p._id}`, product: { id: String(p._id), name: p.name, price: Number(p.price) > 0 ? Number(p.price) : 0 }, nameWords: new Set(words(p.name)), head: headWord(p.name) });
   }
   const apis = (await getJson('/api/pharma-apis?limit=500'))?.items || [];
   for (const a of apis) {
@@ -128,6 +128,10 @@ const getIndex = async () => {
 
 // Share of the question's own words (not "machine", "price"…) found in a machine's name
 const GENERIC = new Set(['machine', 'price', 'quotation', 'buy', 'purchase', 'order', 'invoice', 'proforma', 'manufacture', 'manufacturer', 'supplier', 'india']);
+// What kind of machine a name is: its last word before "for" / "(" / " – " ("SGWEIGH Tablet Press
+// Metal Detector" is a detector, "D Tooling for Press Machine" is tooling, "Rotary Tablet Press –
+// 16 Station" a press)
+const headWord = (name) => words(String(name).split(/\s+for\s+|\(|\s[–—-]\s/i)[0]).filter((w) => !GENERIC.has(w) && !/\d/.test(w)).pop();
 const nameMatch = (q, nameWords) => {
   const own = q.filter((w) => !GENERIC.has(w));
   return own.length ? own.filter((w) => nameWords.has(w)).length / own.length : 0;
@@ -166,7 +170,11 @@ export const findFacts = async (question, limit = 6) => {
       // shop machine over a general description of its kind ("aerosol filling machine")
       // (the machine's NAME must match: "D Tooling for Press Machine" is in the tablet press
       // category, but it is not the answer to "do you make tablet press machines?")
-      const named = f.nameWords ? nameMatch(q, f.nameWords) : 0;
+      // A different kind of machine that only mentions the asked one ("Do you sell tablet presses?"
+      // is not about the "Tablet Press Metal Detector") doesn't count as named, unless its model
+      // number was asked ("SG-150H price")
+      const other = f.head && !q.includes(f.head) && !q.some((w) => /\d/.test(w) && f.nameWords.has(w));
+      const named = f.nameWords ? (other ? Math.min(nameMatch(q, f.nameWords), 0.5) : nameMatch(q, f.nameWords)) : 0;
       if (f.admin || named >= 0.6) score *= 1.3;
       // a machine that only shares its category with the question ranks below the category itself
       else if (f.nameWords) score *= 0.7;
@@ -178,8 +186,9 @@ export const findFacts = async (question, limit = 6) => {
 };
 
 // Facts as a block for the AI's instructions
+// (each fact clipped: on the server's 2 CPU cores every 100 words of prompt add ~2 s to the answer)
 export const factsBlock = (facts) =>
-  facts.map((f, i) => `[${i + 1}] ${f.title}: ${f.text}${f.url ? ` (link: ${f.url})` : ''}`).join('\n');
+  facts.map((f, i) => `[${i + 1}] ${f.title}: ${clip(f.text, 400)}${f.url ? ` (link: ${f.url})` : ''}`).join('\n');
 
 // A question with no good fact goes on the admin's list (Dashboard → Chatbot Training), so
 // someone can write the answer. Needs CHAT_LOG_KEY here and in the API's .env; never blocks the chat.

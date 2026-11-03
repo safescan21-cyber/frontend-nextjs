@@ -79,7 +79,7 @@ export async function POST(request) {
   const facts = await findFacts(asked, 6).catch(() => []);
   const prompt = [
     { role: 'system', content: SYSTEM },
-    { role: 'system', content: facts.length ? `FACTS from our website and database:\n${factsBlock(facts)}` : 'FACTS: nothing found for this question. Do not guess specifics; offer WhatsApp or the quote form.' },
+    { role: 'system', content: facts.length ? `FACTS from our website and database:\n${factsBlock(facts.slice(0, 4))}` : 'FACTS: nothing found for this question. Do not guess specifics; offer WhatsApp or the quote form.' },
     ...messages,
   ];
 
