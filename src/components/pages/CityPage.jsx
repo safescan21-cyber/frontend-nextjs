@@ -34,7 +34,7 @@ export default function CityPage({ hub, installations = [] }) {
             {Object.entries(PRODUCT_DATA).map(([slug, c]) => (
               <Link key={slug} to={`/products/${slug}`} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm hover:border-orange-400">
                 <span className="font-semibold text-slate-900">{c.title || label(slug)}</span>
-                <span className="mt-1 block text-xs text-slate-500">{c.products?.length || 0} models</span>
+                <span className="mt-1 block text-xs text-slate-500">{c.description}</span>
               </Link>
             ))}
           </div>

@@ -11,15 +11,7 @@ import ProductFaqs from '../shop/ProductDetails/ProductFaqs';
 import { CITY_HUBS } from '../seo/cityHubs';
 import { MACHINERY_HUBS, realMachines } from '../seo/machineryHubs';
 import { PRODUCT_DATA } from './productCategoryData';
-
-const label = (slug) => String(slug || '').replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-const rs = (n) => `₹${Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
-// Cloudinary photo (or a video's first frame) at card size
-const thumb = (url) => {
-  if (typeof url !== 'string' || !url.includes('res.cloudinary.com')) return null;
-  if (url.includes('/video/upload/')) return url.replace('/video/upload/', '/video/upload/so_1,w_480,h_360,c_pad,b_white/').replace(/\.\w+(\?.*)?$/, '.jpg');
-  return url.replace('/image/upload/', '/image/upload/w_480,h_360,c_pad,b_white,f_auto,q_auto/');
-};
+import MachineCards from './MachineCards';
 
 // Full class names (Tailwind only keeps classes it can see written out)
 const THEMES = {
@@ -73,21 +65,7 @@ export default function MachineryHubPage({ hub: hubKey = 'pharma', products = []
             <section aria-labelledby="machines">
               <h2 id="machines" className="text-2xl font-bold text-slate-900">{hub.machinesTitle}</h2>
               <p className="mt-1 text-sm text-slate-500">Ex-works prices; taxes, freight and installation are quoted separately.</p>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {machines.map((p) => {
-                  const img = thumb(p.images?.[0]);
-                  return (
-                    <Link key={p._id} to={`/shop/${p._id}`} className={`overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm ${t.hover}`}>
-                      {img ? <img src={img} alt={p.name} loading="lazy" width="480" height="360" className="aspect-[4/3] w-full bg-white object-contain" /> : <div className="aspect-[4/3] bg-slate-100" />}
-                      <span className="block p-3">
-                        <span className="block text-xs font-medium uppercase text-slate-500">{label(p.category)}</span>
-                        <span className="mt-0.5 block font-semibold text-slate-900">{p.name}</span>
-                        <span className={`mt-1 block font-bold ${t.price}`}>{Number(p.price) > 0 ? rs(p.price) : 'Price on request'}</span>
-                      </span>
-                    </Link>
-                  );
-                })}
-              </div>
+              <MachineCards machines={machines} hover={t.hover} price={t.price} />
               <Link to="/shop" className={`mt-4 inline-flex items-center gap-1 ${a}`}>All machines in the shop <ArrowRight className="h-4 w-4" /></Link>
             </section>
           )}

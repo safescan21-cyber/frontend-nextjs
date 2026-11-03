@@ -1,27 +1,33 @@
 'use client';
-// src/pages/ProductCategoryPage.jsx
+// /products (all categories) and /products/:category. The machines shown are the real ones in
+// the shop (the page's server part passes them: app/[locale]/products/…), never sample models.
 import { useLocale } from '../../i18n/LocaleContext';
 import { useParams, Link } from '../../shell/router';
 import Seo from "../Seo";
 import { seoPages } from "./seoPages";
 import NotFound from "../seo/NotFound";
-import { PRODUCT_DATA } from "./productCategoryData";
+import { PRODUCT_DATA, categoryMachines } from "./productCategoryData";
+import MachineCards from "./MachineCards";
 import QuickQuote from "../quote/QuickQuote";
+
+const SITE = "https://www.foodpharmamachinery.com";
 
 /* ─── Helper: WhatsApp link generator ───────────────────── */
 const getWhatsAppLink = (productName) => {
   const phone = "918700792607"; // +91 87007 92607
-  const message = encodeURIComponent(`Hi Food Pharma Machinery, I'm interested in the ${productName}. Please send more details.`);
+  const message = encodeURIComponent(`Hi Food Pharma Machinery, I'm interested in ${productName}. Please send more details.`);
   return `https://wa.me/${phone}?text=${message}`;
 };
 
+const machinesText = (n) => `${n} ${n === 1 ? "machine" : "machines"}`;
+
 /* ─── Page Component ─── */
-export default function ProductCategoryPage() {
+export default function ProductCategoryPage({ products = [] }) {
   const { t } = useLocale();
   const { category } = useParams();
   const data = PRODUCT_DATA[category];
 
-  // /products — overview of every category
+  // /products — the machines in the shop, then every category
   if (!category) {
     return (
       <div className="min-h-screen bg-[#0d1017] pb-24">
@@ -34,7 +40,7 @@ export default function ProductCategoryPage() {
               "@type": "ListItem",
               position: i + 1,
               name: c.title,
-              url: `https://www.foodpharmamachinery.com/products/${slug}`,
+              url: `${SITE}/products/${slug}`,
             })),
           }}
         />
@@ -44,22 +50,36 @@ export default function ProductCategoryPage() {
             <p className="mt-3 text-lg text-white/80 max-w-2xl">{seoPages.products.description}</p>
           </div>
         </section>
-        <section className="max-w-6xl mx-auto px-5 sm:px-8 py-12">
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {Object.entries(PRODUCT_DATA).map(([slug, c]) => (
-              <li key={slug}>
-                <Link
-                  to={`/products/${slug}`}
-                  className="flex h-full flex-col rounded-lg border border-slate-800 bg-slate-900 p-5 transition-all hover:border-orange-500/60 hover:-translate-y-0.5"
-                >
-                  <h2 className="font-barlowC font-bold text-xl text-white">{t(c.title)}</h2>
-                  <p className="mt-2 flex-1 text-sm text-slate-400">{t(c.description)}</p>
-                  <span className="mt-4 text-sm font-semibold text-orange-400">
-                    {c.products.length} {c.products.length === 1 ? "model" : "models"} &rarr;
-                  </span>
-                </Link>
-              </li>
-            ))}
+
+        {products.length > 0 && (
+          <section className="max-w-6xl mx-auto px-5 sm:px-8 pt-12" aria-labelledby="available">
+            <h2 id="available" className="font-barlowC font-bold text-3xl text-white">{t("Machines available now")} ({products.length})</h2>
+            <p className="mt-1 text-sm text-slate-400">{t("Ex-works prices; taxes, freight and installation are quoted separately.")}</p>
+            <MachineCards machines={products} />
+            <Link to="/shop" className="mt-4 inline-block text-sm font-semibold text-orange-400 hover:underline">{t("All machines in the shop")} &rarr;</Link>
+          </section>
+        )}
+
+        <section className="max-w-6xl mx-auto px-5 sm:px-8 py-12" aria-labelledby="categories">
+          <h2 id="categories" className="font-barlowC font-bold text-3xl text-white">{t("Machine categories")}</h2>
+          <ul className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {Object.entries(PRODUCT_DATA).map(([slug, c]) => {
+              const n = categoryMachines(products, slug).length;
+              return (
+                <li key={slug}>
+                  <Link
+                    to={`/products/${slug}`}
+                    className="flex h-full flex-col rounded-lg border border-slate-800 bg-slate-900 p-5 transition-all hover:border-orange-500/60 hover:-translate-y-0.5"
+                  >
+                    <h3 className="font-barlowC font-bold text-xl text-white">{t(c.title)}</h3>
+                    <p className="mt-2 flex-1 text-sm text-slate-400">{t(c.description)}</p>
+                    <span className="mt-4 text-sm font-semibold text-orange-400">
+                      {n ? `${machinesText(n)} listed` : t("Made to order – ask for a quote")} &rarr;
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </section>
       </div>
@@ -70,16 +90,15 @@ export default function ProductCategoryPage() {
 
   return (
     <div className="min-h-screen bg-[#0d1017] text-slate-300 font-barlow">
-      {/* Hero */}
       <Seo
-        title={t(data.title)}
+        title={t(data.seoTitle || data.title)}
         description={`${t(data.description)} Compare models, specifications and get a quote from Food Pharma Machinery.`}
         path={`/products/${category}`}
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "ItemList",
           name: data.title,
-          itemListElement: data.products.map((p, i) => ({ "@type": "ListItem", position: i + 1, name: p.name })),
+          itemListElement: products.map((p, i) => ({ "@type": "ListItem", position: i + 1, name: p.name, url: `${SITE}/shop/${p._id}` })),
         }}
       />
       <section className="bg-gradient-to-r from-orange-600 to-amber-700 px-5 sm:px-8 py-12">
@@ -99,83 +118,36 @@ export default function ProductCategoryPage() {
         </div>
       </section>
 
-      {/* Product Grid */}
       <section className="max-w-6xl mx-auto px-5 sm:px-8 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {data.products.map((product) => (
-            <div
-              key={product.name}
-              className="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden hover:border-orange-500/50 transition-all group"
-            >
-              {/* Image Gallery (first image as cover + small thumbnails) */}
-              <div className="relative">
-                <img
-                  src={product.images?.[0] || "https://placehold.co/400x300?text=No+Image"}
-                  alt={product.name}
-                  className="w-full h-48 object-cover bg-slate-800 group-hover:opacity-90 transition"
-                />
-                {product.images?.length > 1 && (
-                  <div className="absolute bottom-2 right-2 flex gap-1">
-                    {product.images.slice(1, 3).map((img, idx) => (
-                      <img
-                        key={idx}
-                        src={img}
-                        alt={`${product.name} view ${idx + 2}`}
-                        className="w-10 h-10 object-cover rounded border border-slate-600 opacity-80 hover:opacity-100 transition"
-                      />
-                    ))}
-                  </div>
-                )}
-
-                {/* Video play button overlay (if video exists) */}
-                {product.video && (
-                  <a
-                    href={product.video}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="absolute top-2 left-2 bg-black/60 text-white p-1.5 rounded-full hover:bg-orange-600 transition"
-                    title={t("Watch demo video")}
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      className="w-5 h-5"
-                    >
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </a>
-                )}
-              </div>
-
-              {/* Info */}
-              <div className="p-4">
-                <h2 className="font-barlowC font-bold text-xl text-white">
-                  {product.name}
-                </h2>
-                <p className="text-sm text-slate-400 mt-1">
-                  {product.spec}
-                </p>
-
-                {/* WhatsApp CTA */}
-                <a
-                  href={getWhatsAppLink(product.name)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-500 text-white font-barlowC font-bold text-xs tracking-widest uppercase py-2 rounded transition"
-                >
-                  {/* WhatsApp icon */}
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                    <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.862L.057 23.486a.5.5 0 00.613.601l5.76-1.508A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.6a9.574 9.574 0 01-4.895-1.345l-.351-.208-3.62.948.972-3.51-.228-.362A9.555 9.555 0 012.4 12C2.4 6.698 6.698 2.4 12 2.4S21.6 6.698 21.6 12 17.302 21.6 12 21.6z"/>
-                  </svg>
-                  {t("Request Info via WhatsApp")}
-                </a>
-              </div>
+        {products.length > 0 ? (
+          <>
+            <h2 className="font-barlowC font-bold text-2xl text-white">{machinesText(products.length)} {t("available")}</h2>
+            <p className="mt-1 text-sm text-slate-400">{t("Ex-works prices; taxes, freight and installation are quoted separately.")}</p>
+            <MachineCards machines={products} />
+          </>
+        ) : (
+          <div className="rounded-lg border border-slate-800 bg-slate-900 p-6">
+            <h2 className="font-barlowC font-bold text-2xl text-white">{t("Made to order")}</h2>
+            <p className="mt-2 max-w-2xl text-slate-400">
+              {t("No models of this type are listed online right now. Tell us your product, output and budget and we will send suitable options with a quotation.")}
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <a
+                href={getWhatsAppLink(data.title.toLowerCase())}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded bg-green-600 px-4 py-2 font-barlowC text-xs font-bold uppercase tracking-widest text-white transition hover:bg-green-500"
+              >
+                {t("Request Info via WhatsApp")}
+              </a>
+              <Link to="/shop" className="inline-flex items-center rounded border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-orange-500">
+                {t("See machines in the shop")}
+              </Link>
             </div>
-          ))}
-        </div>
+          </div>
+        )}
         <div className="mx-auto mt-10 max-w-2xl">
-          <QuickQuote id="quick-quote" machines={data.products.map((p) => p.name)} />
+          <QuickQuote id="quick-quote" machines={products.length ? products.map((p) => p.name) : [data.title]} />
         </div>
       </section>
     </div>

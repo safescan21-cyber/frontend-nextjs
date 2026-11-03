@@ -6,7 +6,7 @@
 // product and press pages are looked up from the API.
 import { seoPages } from '../components/pages/seoPages';
 import { SOLUTIONS, RESOURCES } from '../components/seo/solutionsData';
-import { PRODUCT_DATA } from '../components/pages/productCategoryData';
+import { PRODUCT_DATA, categoryMachines } from '../components/pages/productCategoryData';
 import { SITE_URL, SITE_NAME } from '../components/seo/organization';
 import { brandTitle } from '../i18n/seoText';
 import { CITY_PAGES } from '../components/seo/cityHubs';
@@ -407,6 +407,7 @@ export async function seoForPath(segments = []) {
     const c = Object.hasOwn(PRODUCT_DATA, category[1]) ? PRODUCT_DATA[category[1]] : null;
     if (!c) return { notFound: true };
     const description = `${c.description} Compare models, specifications and get a quote from ${SITE_NAME}.`;
+    const { data } = await getJson('/api/products/?category=&color=&minPrice=0&maxPrice=&page=1&limit=1000');
     return {
       title: fullTitle(c.seoTitle || c.title),
       description,
@@ -416,7 +417,7 @@ export async function seoForPath(segments = []) {
         crumbs: [['Home', '/'], ['Products', '/products'], [c.title, null]],
         heading: c.title,
         lines: [description],
-        list: (c.products || []).map((m) => [m.name, m.spec].filter(Boolean).join(' – ')),
+        list: categoryMachines(data?.products, category[1]).map((m) => m.name),
         links: [['/shop', 'Shop machinery'], ['/bulk-quote', 'Request a quote'], ['/products', 'All categories']],
       },
     };
