@@ -41,6 +41,15 @@ export const localePath = (locale, path = '/') => {
   return p === '/' ? `/${locale}` : `/${locale}${p}`;
 };
 
+// Pages with one version, the India one (states, industrial areas, export countries):
+// links to them go there from every country version, so search engines don't crawl
+// country copies that only point back to it (Search Console: "Alternative page with
+// proper canonical tag")
+const INDIA_ONLY_RE = /^\/(?:export|machinery-supplier|industrial-areas)(?:[/?#]|$)/;
+
+// A site link in a country version: ('fr', '/shop') -> '/fr/shop', ('fr', '/export/japan') -> '/export/japan'
+export const linkPath = (locale, path = '/') => (INDIA_ONLY_RE.test(path) ? path : localePath(locale, path));
+
 // hreflang alternates for one page: { 'en-in': url, 'en-us': url, …, 'x-default': url }
 export const alternateUrls = (siteUrl, path) => {
   const out = { [DEFAULT_LOCALE.hreflang]: `${siteUrl}${path === '/' ? '/' : path}` };

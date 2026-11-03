@@ -6,7 +6,7 @@
 //   const { t, locale, info, formatLocal } = useLocale();
 //   <h2>{t('Featured products')}</h2>
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { localeInfo, localePath } from './locales';
+import { linkPath, localeInfo } from './locales';
 import { MESSAGES } from './messages';
 import { convertFromInr, formatMoney, setRates } from './currency';
 
@@ -47,7 +47,7 @@ export function LocaleProvider({ locale = '', children }) {
       const v = convertFromInr(inr, info.currency);
       return v == null ? null : formatMoney(v, info.currency, info.lang);
     };
-    return { locale, info, t, formatLocal, href: (path) => localePath(locale, path) };
+    return { locale, info, t, formatLocal, href: (path) => linkPath(locale, path) };
   }, [locale, ratesVersion]); // eslint-disable-line react-hooks/exhaustive-deps
   return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
 }
