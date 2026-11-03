@@ -197,7 +197,7 @@ const ROWS = {
   'Back to top': ['Haut de page', 'ページの先頭へ', '맨 위로'],
 
   // ── Home ──
-  'Food Pharma Machinery — pharma and food processing machinery, pharma APIs and spares from India': ['Food Pharma Machinery — machines pharmaceutiques et agroalimentaires, API et pièces détachées fabriqués en Inde', 'Food Pharma Machinery — インド製の製薬・食品加工機械、医薬品原薬、スペアパーツ', 'Food Pharma Machinery — 인도산 제약 및 식품 가공 기계, 원료의약품, 예비 부품'],
+  'Food Pharma Machinery — pharma machinery suppliers: pharmaceutical machinery, pharma packaging and food filling machines from India': ['Food Pharma Machinery — machines pharmaceutiques et agroalimentaires, API et pièces détachées fabriqués en Inde', 'Food Pharma Machinery — インド製の製薬・食品加工機械、医薬品原薬、スペアパーツ', 'Food Pharma Machinery — 인도산 제약 및 식품 가공 기계, 원료의약품, 예비 부품'],
   'GMP-Ready Machinery for Pharma & Food': ['Machines prêtes BPF pour la pharmacie et l’agroalimentaire', '製薬・食品向けGMP対応機械', '제약·식품용 GMP 대응 기계'],
   'Industry-Leading Quality Guaranteed': ['Qualité de premier plan garantie', '業界トップクラスの品質を保証', '업계 최고 수준의 품질 보장'],
   'New Arrivals Every Week': ['Nouveautés chaque semaine', '毎週新製品を追加', '매주 신제품 입고'],

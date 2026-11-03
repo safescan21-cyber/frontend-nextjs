@@ -190,7 +190,7 @@ export const UR = {
   'Back to top': 'اوپر جائیں',
 
   // ── Home ──
-  'Food Pharma Machinery — pharma and food processing machinery, pharma APIs and spares from India': 'فوڈ فارما مشینری — بھارت سے فارما اور فوڈ پروسیسنگ مشینری، فارما APIs اور پرزے',
+  'Food Pharma Machinery — pharma machinery suppliers: pharmaceutical machinery, pharma packaging and food filling machines from India': 'فوڈ فارما مشینری — بھارت سے فارما اور فوڈ پروسیسنگ مشینری، فارما APIs اور پرزے',
   'GMP-Ready Machinery for Pharma & Food': 'فارما اور فوڈ کے لیے GMP کے مطابق مشینری',
   'Industry-Leading Quality Guaranteed': 'اعلیٰ ترین معیار کی ضمانت',
   'New Arrivals Every Week': 'ہر ہفتے نئی مصنوعات',

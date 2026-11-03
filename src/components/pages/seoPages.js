@@ -10,9 +10,9 @@
 export const seoPages = {
   home: {
     path: '/',
-    title: 'Food Pharma Machinery | Pharma & Food Machinery Suppliers',
+    title: 'Food Pharma Machinery | Pharma Machinery Suppliers in India',
     description:
-      'Pharmaceutical and food machinery suppliers in India: tablet presses, capsule fillers, pharma packaging and filling machines, mixers and spares.',
+      'Pharma machinery suppliers in India: pharmaceutical machinery, pharma packaging machinery, filling machines, food packaging machinery and spares.',
   },
   shop: {
     path: '/shop',
@@ -72,7 +72,7 @@ export const seoPages = {
     path: '/solutions/packaging',
     title: 'Pharma Packaging Machinery Manufacturers in India',
     description:
-      'Pharmaceutical packaging machinery and food packaging machines made in India: blister and strip packing, bottle filling, labelling and cartoning.',
+      'Pharma packaging machinery manufacturers in India: pharmaceutical packaging machinery and food packaging machinery for blister, strip, bottles and cartons.',
   },
   sterile: {
     path: '/solutions/sterile',
