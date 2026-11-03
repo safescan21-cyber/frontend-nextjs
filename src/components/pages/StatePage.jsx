@@ -8,7 +8,7 @@ import { Link } from '../../shell/router';
 import { INDIA_STATES, stateLines, stateFaqs } from '../seo/indiaStates';
 import { cityHub } from '../seo/cityHubs';
 import QuickQuote from '../quote/QuickQuote';
-import MachineCards from './MachineCards';
+import AvailableMachines from './AvailableMachines';
 
 export default function StatePage({ state, installations = [], machines = [] }) {
   const lines = stateLines(state);
@@ -56,14 +56,7 @@ export default function StatePage({ state, installations = [], machines = [] }) 
             See all <Link to="/pharma-machinery" className="font-semibold text-blue-600 hover:underline">pharma machinery</Link> and <Link to="/food-machinery" className="font-semibold text-blue-600 hover:underline">food machinery</Link>, or every machine in the <Link to="/shop" className="font-semibold text-blue-600 hover:underline">shop</Link>.
           </p>
 
-          {machines.length > 0 && (
-            <>
-              <h2 className="mt-10 text-xl font-bold text-slate-900">Machines available for {state.name}</h2>
-              <p className="mt-1 text-sm text-slate-500">In our shop now, delivered from Haridwar with installation support. Taxes and freight are quoted separately.</p>
-              <MachineCards machines={machines} />
-              <Link to="/products" className="mt-3 inline-block text-sm font-semibold text-blue-600 hover:underline">All products by category &rarr;</Link>
-            </>
-          )}
+          <AvailableMachines place={state.name} machines={machines} />
 
           {cities.length > 0 && (
             <>

@@ -7,8 +7,9 @@ import { INDUSTRIAL_AREAS, areaFaqs } from '../seo/industrialAreas';
 import { INDIA_STATES, stateLines } from '../seo/indiaStates';
 import { cityHub } from '../seo/cityHubs';
 import QuickQuote from '../quote/QuickQuote';
+import AvailableMachines from './AvailableMachines';
 
-export default function AreaPage({ area: a }) {
+export default function AreaPage({ area: a, machines = [] }) {
   const lines = stateLines({ lines: a.lines });
   const faqs = areaFaqs(a);
   const state = INDIA_STATES.find((s) => s.name === a.state);
@@ -47,8 +48,10 @@ export default function AreaPage({ area: a }) {
             ))}
           </div>
           <p className="mt-3 text-sm text-slate-600">
-            See all <Link to="/pharma-machinery" className="font-semibold text-blue-600 hover:underline">pharma machinery</Link> and <Link to="/food-machinery" className="font-semibold text-blue-600 hover:underline">food machinery</Link>, or the machines with prices in the <Link to="/shop" className="font-semibold text-blue-600 hover:underline">shop</Link>.
+            See all <Link to="/pharma-machinery" className="font-semibold text-blue-600 hover:underline">pharma machinery</Link> and <Link to="/food-machinery" className="font-semibold text-blue-600 hover:underline">food machinery</Link>, or every machine in the <Link to="/shop" className="font-semibold text-blue-600 hover:underline">shop</Link>.
           </p>
+
+          <AvailableMachines place={a.name} machines={machines} />
 
           <h2 className="mt-10 text-xl font-bold text-slate-900">How we work with plants in {a.name}</h2>
           <ol className="mt-4 space-y-3">

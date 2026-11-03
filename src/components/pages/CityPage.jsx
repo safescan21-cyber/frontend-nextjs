@@ -7,12 +7,13 @@ import { PRODUCT_DATA } from './productCategoryData';
 import { CITY_HUBS } from '../seo/cityHubs';
 import { INDIA_STATES } from '../seo/indiaStates';
 import QuickQuote from '../quote/QuickQuote';
+import AvailableMachines from './AvailableMachines';
 import { useLocale } from '../../i18n/LocaleContext';
 import useFactoryReady from '../../utlis/useFactoryReady';
 
 const label = (slug) => slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
-export default function CityPage({ hub, installations = [] }) {
+export default function CityPage({ hub, installations = [], machines = [] }) {
   const { t } = useLocale();
   const factoryReady = useFactoryReady(); // /factory is noindex until it has photos
   const others = CITY_HUBS.filter((c) => c.slug !== hub.slug);
@@ -38,6 +39,8 @@ export default function CityPage({ hub, installations = [] }) {
               </Link>
             ))}
           </div>
+
+          <AvailableMachines place={hub.city} machines={machines} />
 
           <h2 className="mt-10 text-xl font-bold text-slate-900">How we work with plants in {hub.city}</h2>
           <ol className="mt-4 space-y-3">
