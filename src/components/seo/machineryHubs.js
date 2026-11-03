@@ -152,7 +152,6 @@ export const FOOD_HUB = {
 export const MACHINERY_HUBS = { pharma: PHARMA_HUB, food: FOOD_HUB };
 export const HUB_PAGES = [PHARMA_HUB.page, FOOD_HUB.page];
 
-// Shop machines for a place page (state, industrial area, pharma hub): all of them where there
-// is pharma manufacturing, otherwise only the ones for food plants
-export const machinesFor = (products, foodOnly) =>
-  foodOnly ? realMachines(products, FOOD_HUB.categories, FOOD_HUB.notFor) : realMachines(products);
+// Shop machines for a place page (state, industrial area, pharma hub): every machine in the
+// shop, in every state (the owner sells all of them everywhere)
+export const machinesFor = (products) => realMachines(products);

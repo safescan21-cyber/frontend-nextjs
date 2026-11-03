@@ -15,8 +15,7 @@ export default async function Page({ params }) {
   const area = industrialArea(slug);
   if (!area) notFound();
   const [seo, list] = await Promise.all([getSeo(locale, ['industrial-areas', slug]), productList()]);
-  // food parks get the machines for food plants; pharma and mixed areas every machine
-  const machines = machinesFor(list.value?.products, area.kind === 'food').map(cardFields);
+  const machines = machinesFor(list.value?.products).map(cardFields);
   return (
     <SitePage seo={seo}>
       <AreaPage area={area} machines={machines} />

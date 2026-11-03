@@ -16,8 +16,7 @@ export default async function Page({ params }) {
   if (!state) notFound();
   const [seo, clients, list] = await Promise.all([getSeo(locale, ['machinery-supplier', slug]), getJson('/api/showcase?kind=client', 300), productList()]);
   const installations = (clients?.items || []).filter((c) => String(c.state || '').toLowerCase() === state.name.toLowerCase()).slice(0, 20);
-  // Every shop machine where there is pharma manufacturing; elsewhere the ones for food plants
-  const machines = machinesFor(list.value?.products, !state.pharma).map(cardFields);
+  const machines = machinesFor(list.value?.products).map(cardFields);
   return (
     <SitePage seo={seo}>
       <StatePage state={state} installations={installations} machines={machines} />

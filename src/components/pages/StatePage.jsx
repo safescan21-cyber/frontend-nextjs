@@ -1,8 +1,8 @@
 'use client';
 // /machinery-supplier/<state>: pharma and food machinery for one Indian state or union
 // territory (components/seo/indiaStates.js). The installations list is real data from admin
-// (clients in this state), shown when present, and so are the shop machines (the server part
-// passes them: food-only machines for a state without a pharma cluster).
+// (clients in this state), shown when present, and so are all the shop machines (the server
+// part passes them).
 import { MapPin, Truck, Wrench, ShieldCheck, FileText, Factory, Wheat, Building2, ClipboardCheck } from 'lucide-react';
 import { Link } from '../../shell/router';
 import { INDIA_STATES, stateLines, stateFaqs } from '../seo/indiaStates';
