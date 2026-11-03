@@ -113,7 +113,7 @@ const ko = {
   '/products/coating': ['코팅 시스템', '필름 코팅, 당의 코팅, 전면 다공 팬 시스템.'],
   '/products/granulation': ['과립 및 혼합', '고전단 과립기, 유동층 건조기, 고속 혼합 과립기.'],
   '/products/inspection': ['검사 및 중량 선별', '비전 검사, 금속 검출기, 고정밀 중량 선별기.'],
-  '/products/aseptic-filling': ['무균 충전 라인', '주사제 및 바이오의약품용 아이솔레이터·RABS 충전 시스템.'],
+  '/products/aseptic-filling': ['무균 충전 기계 및 충전 라인', '주사제 및 바이오의약품용 무균 충전 기계: 아이솔레이터·RABS 충전 시스템.'],
   '/products/cleanroom': ['클린룸 설비', '층류 장치, 패스박스, 환경 모니터링 솔루션.'],
 };
 

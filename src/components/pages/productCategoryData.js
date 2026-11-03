@@ -110,7 +110,9 @@ export const PRODUCT_DATA = {
   },
   "coating": {
     title: "Coating Systems",
-    description: "Film coating, sugar coating, and fully perforated pan systems.",
+    // Search title (Search Console: "food machinery coating companies")
+    seoTitle: "Coating Machines for Pharma & Food Companies",
+    description: "Coating machines for pharma and food companies: film coating, sugar coating and fully perforated coating pans for tablets and confectionery.",
     products: [
       { name: "CoataPan 600", images: ["https://placehold.co/400x300?text=CoataPan+600"], video: "", spec: "600 kg batch" },
     ],
@@ -138,7 +140,9 @@ export const PRODUCT_DATA = {
   },
   "cleanroom": {
     title: "Cleanroom Equipment",
-    description: "Laminar flow units, pass‑boxes, and environmental monitoring solutions.",
+    // Search titles (Search Console: "food processing cleanroom", "pharmaceutical cleanroom mixing machine")
+    seoTitle: "Pharmaceutical & Food Processing Cleanroom Equipment",
+    description: "Pharmaceutical and food processing cleanroom equipment: laminar flow units, pass boxes and environmental monitoring.",
     products: [
       { name: "LaminarFlow 2400", images: ["https://placehold.co/400x300?text=LaminarFlow+2400"], video: "", spec: "ISO 5 (Class 100)" },
     ],

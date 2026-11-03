@@ -27,7 +27,7 @@ export const PHARMA_HUB = {
     path: '/pharma-machinery',
     title: 'Pharmaceutical Machinery Manufacturer & Supplier, India',
     description:
-      'Pharmaceutical machinery made in Haridwar, India: tablet presses, capsule fillers, pharma packaging machinery, pharmaceutical filling machines and more.',
+      'Pharma machine manufacturer in Haridwar, India: pharmaceutical machinery such as tablet presses, capsule fillers, pharma packaging and filling machines.',
   },
   crumb: 'Pharma machinery',
   theme: 'blue',

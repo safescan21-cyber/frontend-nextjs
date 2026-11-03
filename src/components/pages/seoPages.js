@@ -94,9 +94,9 @@ export const seoPages = {
   },
   turnkey: {
     path: '/solutions/turnkey',
-    title: 'Turnkey Plant Projects',
+    title: 'Turnkey Plant Projects & Special Purpose Machines',
     description:
-      'End-to-end turnkey pharma and food plants, from design and machinery supply to installation, validation and training.',
+      'Turnkey pharma and food plants and special purpose machines for pharma, from design and machinery supply to installation, validation and training.',
   },
   compliance: {
     path: '/solutions/compliance',
