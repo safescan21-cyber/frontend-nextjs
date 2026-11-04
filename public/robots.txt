@@ -14,7 +14,9 @@ Disallow: /resetpassword
 
 # Same pages in the country versions (/fr/cart, /ja/login…)
 Disallow: /*/dashboard
-Disallow: /*/cart
+# ($ so this does not also block /products/cartoning)
+Disallow: /*/cart$
+Disallow: /*/cart/
 Disallow: /*/login
 Disallow: /*/register
 Disallow: /*/wishlist
