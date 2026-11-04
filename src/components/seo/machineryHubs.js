@@ -5,7 +5,7 @@
 
 // (notFor: names of models that don't belong on the page, e.g. pharma-only ones on the food page)
 export const realMachines = (products = [], categories = null, notFor = null) =>
-  products.filter((p) => p?._id && p.name && p.active !== false && (!categories || categories.includes(p.category)) && !notFor?.test(p.name));
+  products.filter((p) => p?._id && p.name && p.active !== false && p.category !== 'spares' && (!categories || categories.includes(p.category)) && !notFor?.test(p.name));
 
 const lakh = (n) => `Rs. ${(n / 100000).toLocaleString('en-IN', { maximumFractionDigits: 2 })} lakh`;
 

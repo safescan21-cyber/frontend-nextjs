@@ -14,6 +14,7 @@ export const CATEGORIES = [
   { label: 'Milling & Sizing', value: 'milling' },
   { label: 'Mixing & Blending', value: 'mixing' },
   { label: 'Compression Tooling', value: 'tooling' },
+  { label: 'Spare Parts (shown under Spare Parts in the menu)', value: 'spares' },
   { label: 'Inspection & Detection', value: 'inspection' },
   { label: 'Metal Detectors (tunnel, pipeline, free fall)', value: 'metal-detector' },
   { label: 'Checkweighers', value: 'checkweigher' },

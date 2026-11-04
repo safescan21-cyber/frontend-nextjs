@@ -12,6 +12,7 @@ import { CITY_NAME_HI, STATE_HI, stateCopyHi } from '../seo/indiaStatesHi';
 import QuickQuote from '../quote/QuickQuote';
 import AvailableMachines from './AvailableMachines';
 import LocationMap from './LocationMap';
+import { stateLocalNote } from '../seo/stateLanguages';
 
 export default function StatePage({ state, installations = [], machines = [] }) {
   const { t, info } = useLocale();
@@ -50,6 +51,7 @@ export default function StatePage({ state, installations = [], machines = [] }) 
     others: 'Other states',
   };
   const stepIcons = [FileText, Truck, Wrench, ShieldCheck, ClipboardCheck];
+  const local = stateLocalNote(state.slug);
 
   return (
     <div className="min-h-screen bg-slate-50 pb-28">
@@ -60,6 +62,7 @@ export default function StatePage({ state, installations = [], machines = [] }) 
           <p className="mt-3 max-w-3xl text-orange-50">
             {c.intro} {c.pharma}
           </p>
+          {local && <p lang={local.lang} dir={local.dir} className="mt-3 max-w-3xl rounded-lg bg-white/15 p-3 text-orange-50"><strong>{local.label}:</strong> {local.text}</p>}
         </div>
       </section>
 

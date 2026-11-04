@@ -28,6 +28,7 @@ import { logout } from '../components/store/authSlice';
 import { selectCartTotalQuantity, clearCart } from '../components/store/cartSlice';
 import { useFetchAllProductsQuery } from '../components/store/products/productsApi';
 import { CATEGORIES } from './pages/dashboard/admin/addProduct/productOptions';
+import { spareCompanies, isSpare } from '../utlis/spares';
 
 // ── SEO constants ──
 const SITE_URL = 'https://www.foodpharmamachinery.com';
@@ -238,6 +239,8 @@ const Navbar = () => {
   // The server draws the header before the page's product data is in the store, so its HTML
   // says "Loading". The browser's first render must say the same (or React reports a
   // hydration error and redraws the page); the product menus fill in right after.
+  const [sparesDropdown, setSparesDropdown] = useState(false);
+  const sparesTimeoutRef = useRef(null);
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => { setHydrated(true); }, []);
   const productsLoading = productsQueryLoading || !hydrated;
@@ -432,7 +435,8 @@ const Navbar = () => {
 
   // Display product names list (limited for performance, but will scroll)
   // Products menu: the product types in the shop (follows what the admin adds), most products first
-  const productTypes = Object.entries(allProducts.reduce((n, p) => (p.category ? { ...n, [p.category]: (n[p.category] || 0) + 1 } : n), {}))
+  const companies = spareCompanies(allProducts);
+  const productTypes = Object.entries(allProducts.filter((p) => !isSpare(p)).reduce((n, p) => (p.category ? { ...n, [p.category]: (n[p.category] || 0) + 1 } : n), {}))
     .map(([value, count]) => ({ value, count, label: (CATEGORIES.find((c) => c.value === value)?.label || value.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())).replace(/ \(.*\)$/, '') }))
     .sort((a, b) => b.count - a.count);
 
@@ -594,6 +598,21 @@ const Navbar = () => {
                         </div>
                       </>
                     )}
+                  </HoverDropdown>
+
+                  {/* Spare parts by company, and PCB repair */}
+                  <HoverDropdown label={<strong className="font-bold text-amber-300">{t("Spare Parts")}</strong>} open={sparesDropdown} setOpen={setSparesDropdown} timeoutRef={sparesTimeoutRef} id="spares">
+                    <ul className="px-2">
+                      <li><Link to="/pcb-repair" onClick={handleLinkClick} className="block rounded-lg px-3 py-2 text-sm font-bold text-amber-300 hover:bg-slate-700/50">{t("PCB Repair Service")}</Link></li>
+                      {companies.map((c) => (
+                        <li key={c.name}>
+                          <Link to={`/spares?company=${encodeURIComponent(c.name)}`} onClick={handleLinkClick} className="flex items-center justify-between gap-6 rounded-lg px-3 py-2 text-sm text-slate-300 hover:bg-slate-700/50 hover:text-amber-400">
+                            <span>{c.name}</span><span className="text-xs text-slate-500">{c.count}</span>
+                          </Link>
+                        </li>
+                      ))}
+                      <li><Link to="/spares" onClick={handleLinkClick} className="block rounded-lg px-3 py-2 text-sm text-amber-400 hover:bg-slate-700/50">{t("All spare parts")} →</Link></li>
+                    </ul>
                   </HoverDropdown>
 
                   {/* Pharma APIs: active pharmaceutical ingredients catalogue */}
@@ -1037,6 +1056,8 @@ const Navbar = () => {
 
                 {/* Mobile Products - now showing product names */}
                 <li>
+                  <Link to="/spares" onClick={handleLinkClick} className="block px-3 py-3 text-base font-bold text-amber-300">{t("Spare Parts")}</Link>
+                  <Link to="/pcb-repair" onClick={handleLinkClick} className="block px-3 py-3 text-base font-bold text-amber-300">{t("PCB Repair Service")}</Link>
                   <button
                     type="button"
                     onClick={() => setProductsDropdown(!productsDropdown)}

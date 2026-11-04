@@ -158,6 +158,12 @@ export const seoPages = {
     description:
       'AMC plans for pharma and food processing machines: planned preventive maintenance visits and priority breakdown support. Request a plan for your machines.',
   },
+  pcbRepair: {
+    path: '/pcb-repair',
+    title: 'PCB Repair Service for Pharma & Food Machines',
+    description: 'Send photos of your faulty PCB from a pharma or food machine and tell us the problem. Our team will check them and contact you.',
+    indiaOnly: true,
+  },
   serviceRequest: {
     path: '/service-request',
     title: 'Service Request – Machine Repair & Support',

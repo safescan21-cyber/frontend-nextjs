@@ -56,7 +56,7 @@ const RequestCard = ({ r, onSaved }) => {
       <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="flex w-full flex-wrap items-center gap-2 p-4 text-left">
         <span className="font-mono text-sm font-bold text-slate-700">{r.number}</span>
         <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${info[r.status]?.cls}`}>{info[r.status]?.label}</span>
-        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">{r.type === 'amc' ? 'AMC' : 'Service'}</span>
+        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">{r.type === 'pcb' ? 'PCB' : r.type === 'amc' ? 'AMC' : 'Service'}</span>
         {r.urgency === 'machine_down' && <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700"><AlertTriangle className="h-3 w-3" /> Machine stopped</span>}
         <span className="min-w-0 flex-1 truncate text-sm text-slate-700"><strong>{c.name}</strong>{c.company ? ` · ${c.company}` : ''} — {r.type === 'amc' ? (r.amc?.planName || 'AMC') : r.machine?.name}</span>
         <span className="text-xs text-slate-400">{when(r.createdAt)}</span>
@@ -135,7 +135,7 @@ export default function ManageServiceRequests() {
           <button key={v || 'all'} type="button" onClick={() => setStatus(v)} className={`rounded-full px-3 py-1.5 text-sm font-medium ${c} ${status === v ? 'ring-2 ring-blue-500 ring-offset-1' : 'opacity-80 hover:opacity-100'}`}>{l} <span className="ml-1 font-bold">{n}</span></button>
         ))}
         <select value={type} onChange={(e) => setType(e.target.value)} aria-label="Type" className="rounded-full border border-gray-300 px-3 py-1.5 text-sm">
-          <option value="">Service + AMC</option><option value="service">Service only</option><option value="amc">AMC only</option>
+          <option value="">Service + AMC</option><option value="service">Service only</option><option value="amc">AMC only</option><option value="pcb">PCB repair only</option>
         </select>
       </div>
       <form onSubmit={(e) => { e.preventDefault(); setQuery(search.trim()); }} className="mb-5 flex max-w-xl items-center rounded-lg border border-gray-300 bg-white">

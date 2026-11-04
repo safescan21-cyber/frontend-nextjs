@@ -11,26 +11,29 @@ import { rankProducts } from '../../utlis/productSearch';
 import QuickQuote from '../quote/QuickQuote';
 import LocalPrice from '../../i18n/LocalPrice';
 import { useLocale } from '../../i18n/LocaleContext';
+import { isSpare, spareCompanies, spareCompany } from '../../utlis/spares';
 
 const API_PARAMS = { page: 1, limit: 1000 }; // same list as the shop (shared cache)
-const isSpare = (p) => p.category === 'spares' || (Array.isArray(p.fitsModels) && p.fitsModels.length > 0);
 const inr = (n) => `₹${Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
 
 export default function SparesPage() {
   const { t } = useLocale();
   const [params, setParams] = useSearchParams();
   const model = params.get('model') || '';
+  const company = params.get('company') || '';
   const [q, setQ] = useState(params.get('q') || '');
   const { data, isLoading } = useFetchAllProductsQuery(API_PARAMS);
 
   const spares = useMemo(() => (data?.products || []).filter(isSpare), [data]);
   const models = useMemo(() => [...new Set(spares.flatMap((p) => p.fitsModels || []))].sort((a, b) => a.localeCompare(b)), [spares]);
+  const companies = useMemo(() => spareCompanies(spares), [spares]);
   const shown = useMemo(() => {
-    let list = model ? spares.filter((p) => (p.fitsModels || []).some((m) => m.toLowerCase() === model.toLowerCase())) : spares;
+    let list = company ? spares.filter((p) => spareCompany(p) === company) : spares;
+    list = model ? spares.filter((p) => (p.fitsModels || []).some((m) => m.toLowerCase() === model.toLowerCase())) : list;
     const term = q.trim();
     if (term) list = rankProducts(list.map((p) => ({ ...p, description: `${p.description || ''} ${(p.fitsModels || []).join(' ')}` })), term);
     return list;
-  }, [spares, model, q]);
+  }, [spares, model, company, q]);
 
   const pickModel = (m) => {
     const next = new URLSearchParams(params);
@@ -63,6 +66,12 @@ export default function SparesPage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-8">
+        {companies.length > 0 && (
+          <div className="mb-5 flex flex-wrap gap-2">
+            <Link to="/spares" className={`rounded-full px-3 py-1.5 text-sm font-semibold ${company ? 'bg-white text-slate-700' : 'bg-slate-900 text-white'}`}>{t('All')}</Link>
+            {companies.map((c) => <Link key={c.name} to={`/spares?company=${encodeURIComponent(c.name)}`} className={`rounded-full px-3 py-1.5 text-sm font-semibold ${company === c.name ? 'bg-slate-900 text-white' : 'bg-white text-slate-700'}`}>{c.name} ({c.count})</Link>)}
+          </div>
+        )}
         {isLoading ? (
           <p className="text-slate-500">{t('Loading parts…')}</p>
         ) : shown.length === 0 ? (
@@ -77,6 +86,7 @@ export default function SparesPage() {
                   {p.images?.[0] && <img src={sizedImage(p.images[0], 480)} alt={p.name} loading="lazy" className="h-full w-full object-cover transition group-hover:scale-105" />}
                 </div>
                 <div className="p-4">
+                  <p className="text-xs font-medium uppercase text-slate-500">{spareCompany(p)}</p>
                   <h2 className="font-bold text-slate-900 group-hover:text-blue-700">{p.name}</h2>
                   {(p.fitsModels || []).length > 0 && (
                     <p className="mt-1 text-xs text-slate-500">{t('Fits')}: {p.fitsModels.slice(0, 6).join(', ')}{p.fitsModels.length > 6 ? '…' : ''}</p>
