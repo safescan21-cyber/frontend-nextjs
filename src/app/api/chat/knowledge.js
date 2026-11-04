@@ -33,7 +33,9 @@ const SAME = { cost: 'price', rate: 'price', rates: 'price', pricing: 'price', p
 // Plural to singular: presses -> press, batteries -> battery, machines -> machine
 const singular = (w) => (w.length <= 3 ? w : w.endsWith('sses') ? w.slice(0, -2) : w.endsWith('ies') ? `${w.slice(0, -3)}y` : w.endsWith('s') && !w.endsWith('ss') && !w.endsWith('us') ? w.slice(0, -1) : w);
 // "tablet machine" / "tablet making machine" is what buyers call a tablet press
-const words = (s) => String(s || '').toLowerCase().replace(/\btablets? (?:making |banane (?:ki |wali )?)?(?:machines?|mashines?)\b/g, 'tablet press machine').normalize('NFKD').replace(/[^a-z0-9\s-]/g, ' ').split(/[\s-]+/)
+const HINDI_WORDS = [['चेकवेयर', 'checkweigher'], ['चेक वेयर', 'checkweigher'], ['मेटल', 'metal'], ['डिटेक्टर', 'detector'], ['टैबलेट', 'tablet'], ['टेबलेट', 'tablet'], ['प्रेस', 'press'], ['कैप्सूल', 'capsule'], ['फिलिंग', 'filling'], ['फिलर', 'filler'], ['ब्लिस्टर', 'blister'], ['पैकिंग', 'packing'], ['पैकेजिंग', 'packaging'], ['मिक्सर', 'mixer'], ['कोटिंग', 'coating'], ['लेबलिंग', 'labelling'], ['कन्वेयर', 'conveyor'], ['पाइपलाइन', 'pipeline'], ['बोतल', 'bottle'], ['सैशे', 'sachet'], ['मशीनें', 'machine'], ['मशीन', 'machine'], ['कीमत', 'price'], ['दाम', 'price'], ['रेट', 'price'], ['कोटेशन', 'quotation'], ['वीडियो', 'video'], ['दिखाओ', 'dikhao'], ['दिखाइए', 'dikhao'], ['स्पेयर', 'spare'], ['पार्ट्स', 'parts']];
+const fromHindi = (s) => (/[\u0900-\u097F]/.test(s) ? HINDI_WORDS.reduce((t, [hi, en]) => t.split(hi).join(` ${en} `), s) : s);
+const words = (s) => fromHindi(String(s || '')).toLowerCase().replace(/\btablets? (?:making |banane (?:ki |wali )?)?(?:machines?|mashines?)\b/g, 'tablet press machine').normalize('NFKD').replace(/[^a-z0-9\s-]/g, ' ').split(/[\s-]+/)
   .filter((w) => w.length > 1 && !STOP.has(w))
   .map((w) => SAME[w] || singular(w));
 

@@ -84,7 +84,11 @@ export async function POST(request) {
   ];
 
   // A machine with a listed price the visitor asked about: the chat shows an instant quotation form
-  const quote = quoteOffer(facts, asked);
+  // The machine the visitor named, if it is in the shop. With a listed price the chat offers the
+  // instant quotation at once; without one the chat shows the expert's phone and WhatsApp.
+  const named = facts[0]?.product && facts[0].named >= 0.6 ? facts[0].product : null;
+  const machine = named && { id: named.id, name: named.name, url: facts[0].url, price: named.price };
+  const quote = quoteOffer(facts, asked) || (named?.price > 0 ? named : null);
 
   // Nothing good to answer with: put the question on the admin's list (the latest message only)
   const latest = messages[messages.length - 1].content;
@@ -95,7 +99,7 @@ export async function POST(request) {
   if (isSmallTalk(latest)) return Response.json({ reply: replyFromFacts(facts, latest), source: 'facts' });
   if (isOffTopic(facts, asked)) return Response.json({ reply: replyFromFacts([], asked), source: 'facts' });
   // One of our company questions (or an admin answer): the written answer, at once
-  if (hasExactAnswer(facts)) return Response.json({ reply: withPhone(replyFromFacts(facts, latest), latest), source: 'facts', quote });
+  if (hasExactAnswer(facts)) return Response.json({ reply: withPhone(replyFromFacts(facts, latest), latest), source: 'facts', quote, machine });
   // Every AI reply is checked: unknown prices -> answer from the facts; wrong phone/links fixed
   // The chat shows the quotation form (the machine has a listed price): a reply that asks which
   // machine or says we don't know is replaced by the machine's facts, and it names the button
@@ -121,11 +125,11 @@ export async function POST(request) {
     if (process.env.LLM_BASE_URL && factsCoverQuestion(facts) && !namedMachine) {
       const base = process.env.LLM_BASE_URL.replace(/\/$/, '');
       const reply = await ask(`${base}/chat/completions`, process.env.LLM_API_KEY, process.env.LLM_MODEL || 'foodpharma', prompt).catch(() => null);
-      if (reply) return Response.json({ reply: withQuote(checked(reply)), source: 'own', quote });
+      if (reply) return Response.json({ reply: withQuote(checked(reply)), source: 'own', quote, machine });
     }
   } catch {
     /* answered below */
   }
   // Model slow or down: reply with the best matching fact
-  return Response.json({ reply: withQuote(withPhone(replyFromFacts(facts, latest), latest)), source: 'facts', quote });
+  return Response.json({ reply: withQuote(withPhone(replyFromFacts(facts, latest), latest)), source: 'facts', quote, machine });
 }

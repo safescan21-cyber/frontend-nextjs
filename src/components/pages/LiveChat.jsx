@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { usePathname } from "next/navigation";
-import { BotMessageSquare, Volume2 } from "lucide-react";
+import { BotMessageSquare, Mic, Phone, Volume2 } from "lucide-react";
 import { canSpeak, speak, stopSpeaking } from "../../utlis/speak";
 import getBaseURL from "../../utlis/baseURL";
 import { getLeadOrigin } from "../../utlis/leadOrigin";
@@ -24,6 +24,21 @@ const INIT_MSG = {
   role: "assistant",
   content: "Hey there! 👋 I'm Nova, your Food Pharma Machinery assistant. Ask me about our equipment, or jump to WhatsApp to speak with a real expert.",
   isNew: false,
+};
+
+// Nova's greeting, with the visitor's rough city when we can tell it (the words "looks like":
+// it comes from the internet address and is sometimes only the nearest big city)
+const greeting = (city, hindi) => (hindi
+  ? `फूड फार्मा मशीनरी में आपका स्वागत है${city ? `, लगता है आप ${city} से हैं` : ''}! मैं नोवा हूँ। आप किस तरह की मशीन ढूँढ रहे हैं? लिखिए, या माइक दबाकर बोलिए।`
+  : `Welcome to Food Pharma Machinery${city ? `! Looks like you're visiting from ${city}` : ''}. I'm Nova. Which type of machine are you looking for? Type it, or tap the mic and say it.`);
+
+// What Nova says aloud after a spoken question: short, without the whole machine card
+const spokenReply = (answer, hindi) => {
+  if (answer.machine) {
+    if (hindi) return answer.quote ? `${answer.machine.name} हमारी शॉप में है। नीचे बटन से तुरंत कोटेशन लीजिए।` : `${answer.machine.name} हमारी शॉप में है। कीमत के लिए हमारे एक्सपर्ट को कॉल या WhatsApp कीजिए।`;
+    return answer.quote ? `Yes, we have ${answer.machine.name}. You can get an instant quotation with the button below.` : `Yes, we have ${answer.machine.name}. For the price, please call or WhatsApp our expert.`;
+  }
+  return String(answer.reply).split('\n')[0].slice(0, 240);
 };
 
 // ─── SOUNDS (made with Web Audio, no sound files) ───────────────
@@ -203,6 +218,50 @@ function ChatQuote({ quote }) {
   );
 }
 
+// ─── TALK TO AN EXPERT ──────────────────────────────────────────
+// Under Nova's answer when there is no instant quotation for it
+function ExpertCard({ machine, summary }) {
+  return (
+    <div className="mt-3 space-y-2">
+      <p className="text-xs font-semibold text-amber-300">Discuss with our expert</p>
+      {machine && <a href={machine.url} className="block rounded-xl bg-stone-900/60 px-3 py-2 text-xs font-semibold text-stone-100 hover:text-amber-300">View {machine.name} →</a>}
+      <a href="tel:+918700792607" className="flex items-center gap-2 rounded-xl bg-amber-500 px-3 py-2 text-xs font-bold text-white hover:bg-amber-400"><Phone className="h-4 w-4" aria-hidden="true" /> Call +91 87007 92607</a>
+      <WhatsAppButton aiSummary={summary} />
+    </div>
+  );
+}
+
+// ─── MIC ─────────────────────────────────────────────────────────
+// Browser speech recognition (Chrome, Edge and Safari; the browser's provider hears the audio)
+const Recognition = () => (typeof window === "undefined" ? null : window.SpeechRecognition || window.webkitSpeechRecognition || null);
+
+function MicButton({ hindi, disabled, onText, onError }) {
+  const [listening, setListening] = useState(false);
+  const rec = useRef(null);
+  const [supported, setSupported] = useState(false);
+  useEffect(() => { setSupported(Boolean(Recognition())); return () => rec.current?.abort(); }, []);
+  if (!supported) return null;
+  const toggle = () => {
+    if (listening) { rec.current?.stop(); return; }
+    stopSpeaking();
+    const R = Recognition();
+    const r = new R();
+    r.lang = hindi ? "hi-IN" : "en-IN";
+    r.interimResults = false;
+    r.onresult = (e) => { const said = e.results[0]?.[0]?.transcript?.trim(); if (said) onText(said); };
+    r.onerror = (e) => onError(e.error === "not-allowed" || e.error === "service-not-allowed" ? "Please allow the microphone for this site, or type your question." : e.error === "no-speech" ? "I didn't hear anything. Please try again." : "Voice isn't working right now. Please type your question.");
+    r.onend = () => setListening(false);
+    rec.current = r;
+    setListening(true);
+    r.start();
+  };
+  return (
+    <button type="button" onClick={toggle} disabled={disabled} aria-label={listening ? "Stop listening" : "Speak your question"} aria-pressed={listening} className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 disabled:opacity-40 ${listening ? "bg-rose-600 text-white animate-pulse" : "bg-stone-800 text-amber-300 hover:bg-stone-700"}`}>
+      <Mic className="h-5 w-5" aria-hidden="true" />
+    </button>
+  );
+}
+
 // ─── MESSAGE TEXT ───────────────────────────────────────────────
 // Our site links and our phone number become tappable (long links wrap inside the bubble)
 const LINK_RE = /(https?:\/\/(?:www\.)?foodpharmamachinery\.com[^\s)\]]*[^\s)\].,;:!?]|\+91[\s-]?87007[\s-]?92607)/g;
@@ -262,6 +321,7 @@ function Bubble({ msg, isNew }) {
           </div>
         )}
         {msg.quote && <ChatQuote quote={msg.quote} />}
+        {msg.expert && !msg.quote && <ExpertCard machine={msg.machine} summary={msg.waSummary} />}
       </div>
       {isUser && (
         <div className="w-8 h-8 rounded-full bg-stone-700 flex items-center justify-center flex-shrink-0 mb-0.5">
@@ -309,6 +369,8 @@ function LiveChat() {
   const welcomeTimeout = useRef(null);
 
   const pathname = usePathname() || "/";
+  const hindi = /^\/hi(\/|$)/.test(pathname);
+  const [welcome, setWelcome] = useState(null); // the greeting, once the city is known
   const [soundOn, setSoundOn] = useState(true);
   const autoOpened = useRef(false);
   const touched = useRef(false); // the visitor already used the chat
@@ -329,22 +391,36 @@ function LiveChat() {
     let shown = false;
     try { shown = sessionStorage.getItem("chatWelcomeShown") === "true"; } catch { /* storage blocked */ }
     if (shown) return undefined;
-    const timer = setTimeout(() => {
+    // Sound can only start after a click or tap: until then the greeting waits with the chime
+    const sayHello = (text) => {
+      if (soundOff()) return;
+      if (hasUserGesture()) { speak(text); return; }
+      const chime = pendingSound;
+      pendingSound = () => { chime?.(); speak(text); };
+    };
+    const timer = setTimeout(async () => {
       if (touched.current) return;
       try { sessionStorage.setItem("chatWelcomeShown", "true"); } catch { /* storage blocked */ }
+      const area = await fetch(`${getBaseURL()}/api/geo`).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+      if (touched.current) return;
+      const text = greeting(area?.country === "IN" ? area.city : "", hindi);
+      setWelcome(text);
       if (window.matchMedia("(min-width: 1024px)").matches) {
         autoOpened.current = true;
         setMsgs([]);
         setLoading(true);
         setOpen(true);
         playSound("chime", { wait: true });
+        sayHello(text);
         welcomeTimeout.current = setTimeout(() => {
           setLoading(false);
-          setMsgs([{ ...INIT_MSG, isNew: true }]);
+          setMsgs([{ ...INIT_MSG, content: text, isNew: true }]);
         }, 1400);
       } else {
+        setMsgs([{ ...INIT_MSG, content: text }]);
         setShowWelcome(true);
         playSound("chime", { wait: true });
+        sayHello(text);
         welcomeTimeout.current = setTimeout(() => {
           setShowWelcome(false);
           cancelPendingSound();
@@ -352,7 +428,7 @@ function LiveChat() {
       }
     }, 500);
     return () => clearTimeout(timer);
-  }, [pathname]);
+  }, [pathname, hindi]);
 
   useEffect(() => {
     return () => {
@@ -394,7 +470,7 @@ function LiveChat() {
   };
 
   // ─── Send message ──────────────────────────────────────────────
-  const sendMessage = useCallback(async (text) => {
+  const sendMessage = useCallback(async (text, { spoken = false } = {}) => {
     const content = (text || input).trim();
     if (!content || loading) return;
     setInput("");
@@ -416,11 +492,14 @@ function LiveChat() {
       const wantsWA = detectWhatsApp(content) || detectWhatsApp(reply);
       const summary = chatHistory.current.slice(-3).map(m => m.content).join(" | ");
 
-      const botMsg = { role: "assistant", content: reply, isNew: true, showWhatsApp: wantsWA, waSummary: summary, quote: answer.quote || null };
+      // No instant quotation for this question: show how to reach an expert, except after small talk
+      const expert = !answer.quote && (Boolean(answer.machine) || content.split(/\s+/).length > 1);
+      const botMsg = { role: "assistant", content: reply, isNew: true, showWhatsApp: wantsWA && !expert, waSummary: summary, quote: answer.quote || null, machine: answer.machine || null, expert };
       chatHistory.current = [...chatHistory.current, { role: "assistant", content: reply }];
 
       setMsgs(prev => [...prev, botMsg]);
       playSound("message");
+      if (spoken && !soundOff()) speak(spokenReply(answer, hindi));
       if (!open) setUnread(n => n + 1);
     } catch (err) {
       console.error("AI error:", err);
@@ -432,7 +511,7 @@ function LiveChat() {
     } finally {
       setLoading(false);
     }
-  }, [input, loading, open]);
+  }, [input, loading, open, hindi]);
 
   const handleKey = (e) => {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
@@ -481,7 +560,7 @@ function LiveChat() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs lg:text-sm font-bold text-white font-sans">💬 Live chat</p>
-              <p className="text-xs lg:text-sm text-stone-300 font-sans mt-0.5">How can I help you today?</p>
+              <p className="text-xs lg:text-sm text-stone-300 font-sans mt-0.5">{welcome || "How can I help you today?"}</p>
               <div className="mt-1 lg:mt-2 flex items-center gap-2">
                 <span className="text-xs text-amber-400 font-sans font-semibold">Click to start</span>
                 <svg className="w-3 h-3 text-amber-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -611,6 +690,12 @@ function LiveChat() {
               disabled={loading}
               className="flex-1 bg-stone-800/50 border border-white/8 focus:border-amber-500/50 rounded-xl outline-none resize-none text-sm text-stone-100 placeholder-stone-600 font-sans px-3 py-2.5 max-h-24 leading-relaxed transition-all duration-200 disabled:opacity-40"
               style={{ minHeight: 40 }}
+            />
+            <MicButton
+              hindi={hindi}
+              disabled={loading}
+              onText={(said) => sendMessage(said, { spoken: true })}
+              onError={(message) => setMsgs((prev) => [...prev, { role: "assistant", content: message, isNew: true }])}
             />
             <button
               onClick={() => sendMessage()}

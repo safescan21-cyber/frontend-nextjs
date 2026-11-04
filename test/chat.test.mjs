@@ -104,3 +104,14 @@ test('chat API: one visitor is limited to 30 messages per 10 minutes', async () 
   for (let i = 0; i < 31; i++) last = await ask('hello', SITE, 'same-visitor');
   assert.equal(last.status, 429);
 });
+
+test('voice: spoken Hindi machine words find the machine', async () => {
+  const q = 'टैबलेट प्रेस की कीमत';
+  assert.equal(k.quoteOffer(await facts(q), q)?.price, 850000);
+});
+
+test('chat API: a named shop machine comes back with the reply, and a price offers the quotation', async () => {
+  const body = await (await ask('rotary tablet press')).json();
+  assert.match(body.machine?.name || '', /Rotary Tablet Press/);
+  assert.equal(body.quote?.price, 850000);
+});
