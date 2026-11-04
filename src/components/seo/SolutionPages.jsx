@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { Link, useParams } from '../../shell/router';
+import { useLocale } from '../../i18n/LocaleContext';
 import { ArrowRight, CheckCircle, MessageCircle, FileText, ChevronRight } from 'lucide-react';
 import Seo from '../Seo';
 import { seoPages } from '../pages/seoPages';
@@ -33,15 +34,17 @@ const breadcrumbJsonLd = (items) => ({
   itemListElement: items.map((it, i) => ({ '@type': 'ListItem', position: i + 1, name: it.name, item: `${SITE_URL}${it.path}` })),
 });
 
-const QuoteBox = ({ topic }) => (
+const QuoteBox = ({ topic }) => {
+  const { t } = useLocale();
+  return (
   <div className="rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 p-6 text-white md:p-8">
-    <h2 className="text-xl font-bold md:text-2xl">Need help choosing the right machine?</h2>
+    <h2 className="text-xl font-bold md:text-2xl">{t('Need help choosing the right machine?')}</h2>
     <p className="mt-2 text-slate-300">
-      Tell us what you manufacture and your required output. Our team will recommend suitable equipment and send a quote.
+      {t('Tell us what you manufacture and your required output. Our team will recommend suitable equipment and send a quote.')}
     </p>
     <div className="mt-5 flex flex-col gap-3 sm:flex-row">
       <Link to="/contact" className="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 px-5 py-3 font-semibold text-slate-900 hover:bg-amber-400">
-        Request a quote <ArrowRight className="h-4 w-4" />
+        {t('Request a quote')} <ArrowRight className="h-4 w-4" />
       </Link>
       <a
         href={`${WHATSAPP}${encodeURIComponent(`Hello, I'd like to know more about ${topic}.`)}`}
@@ -49,17 +52,19 @@ const QuoteBox = ({ topic }) => (
         rel="noopener noreferrer"
         className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white hover:bg-emerald-500"
       >
-        <MessageCircle className="h-4 w-4" /> Chat on WhatsApp
+        <MessageCircle className="h-4 w-4" /> {t('Chat on WhatsApp')}
       </a>
     </div>
   </div>
-);
+  );
+};
 
 const pageWrap = 'min-h-screen bg-gray-50 px-4 pb-24 pt-6';
 
 // /solutions — overview of all solution areas
 export const SolutionsHub = () => {
-  const crumbs = [{ name: 'Home', path: '/' }, { name: 'Solutions', path: '/solutions' }];
+  const { t } = useLocale();
+  const crumbs = [{ name: t('Home'), path: '/' }, { name: t('Solutions'), path: '/solutions' }];
   return (
     <>
       <Seo
@@ -76,8 +81,8 @@ export const SolutionsHub = () => {
       <div className={pageWrap}>
         <div className="mx-auto max-w-6xl">
           <Breadcrumbs items={crumbs} />
-          <h1 className="text-3xl font-bold text-slate-800 md:text-4xl">Pharma & food processing solutions</h1>
-          <p className="mt-3 max-w-3xl text-lg text-slate-600">{seoPages.solutions.description}</p>
+          <h1 className="text-3xl font-bold text-slate-800 md:text-4xl">{t('Pharma & food processing solutions')}</h1>
+          <p className="mt-3 max-w-3xl text-lg text-slate-600">{t(seoPages.solutions.description)}</p>
           <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {SOLUTIONS.map((s) => (
               <li key={s.slug}>
@@ -85,10 +90,10 @@ export const SolutionsHub = () => {
                   to={`/solutions/${s.slug}`}
                   className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-amber-300 hover:shadow-md"
                 >
-                  <h2 className="font-bold text-slate-800">{s.title}</h2>
-                  <p className="mt-2 flex-1 text-sm text-slate-600">{s.machines.slice(0, 3).join(' · ')}</p>
+                  <h2 className="font-bold text-slate-800">{t(s.title)}</h2>
+                  <p className="mt-2 flex-1 text-sm text-slate-600">{s.machines.slice(0, 3).map((m) => t(m)).join(' · ')}</p>
                   <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-amber-600">
-                    Explore <ArrowRight className="h-4 w-4" />
+                    {t('Explore')} <ArrowRight className="h-4 w-4" />
                   </span>
                 </Link>
               </li>
@@ -103,11 +108,12 @@ export const SolutionsHub = () => {
 
 // /solutions/:slug
 export const SolutionPage = () => {
+  const { t } = useLocale();
   const { slug } = useParams();
   const s = SOLUTIONS.find((x) => x.slug === slug);
   if (!s) return <NotFound />;
   const seo = Object.values(seoPages).find((p) => p.path === `/solutions/${slug}`) || {};
-  const crumbs = [{ name: 'Home', path: '/' }, { name: 'Solutions', path: '/solutions' }, { name: s.name, path: `/solutions/${slug}` }];
+  const crumbs = [{ name: t('Home'), path: '/' }, { name: t('Solutions'), path: '/solutions' }, { name: t(s.name), path: `/solutions/${slug}` }];
   const others = SOLUTIONS.filter((x) => x.slug !== slug).slice(0, 4);
 
   return (
@@ -133,11 +139,11 @@ export const SolutionPage = () => {
       <div className={pageWrap}>
         <div className="mx-auto max-w-6xl">
           <Breadcrumbs items={crumbs} />
-          <h1 className="text-3xl font-bold text-slate-800 md:text-4xl">{s.title}</h1>
-          <p className="mt-3 max-w-3xl text-lg text-slate-600">{s.intro}</p>
+          <h1 className="text-3xl font-bold text-slate-800 md:text-4xl">{t(s.title)}</h1>
+          <p className="mt-3 max-w-3xl text-lg text-slate-600">{t(s.intro)}</p>
 
           <section className="mt-8" aria-labelledby="machines">
-            <h2 id="machines" className="mb-4 text-xl font-bold text-slate-800">Machines & services</h2>
+            <h2 id="machines" className="mb-4 text-xl font-bold text-slate-800">{t('Machines & services')}</h2>
             <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {s.machines.map((m) => (
                 <li key={m}>
@@ -145,7 +151,7 @@ export const SolutionPage = () => {
                     to={`/shop?search=${encodeURIComponent(m)}`}
                     className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 font-medium text-slate-700 transition hover:border-amber-300 hover:text-amber-700"
                   >
-                    {m} <ArrowRight className="h-4 w-4 shrink-0" />
+                    {t(m)} <ArrowRight className="h-4 w-4 shrink-0" />
                   </Link>
                 </li>
               ))}
@@ -153,11 +159,11 @@ export const SolutionPage = () => {
           </section>
 
           <section className="mt-10" aria-labelledby="help">
-            <h2 id="help" className="mb-4 text-xl font-bold text-slate-800">What we can help with</h2>
+            <h2 id="help" className="mb-4 text-xl font-bold text-slate-800">{t('What we can help with')}</h2>
             <ul className="space-y-2">
               {s.points.map((p) => (
                 <li key={p} className="flex items-start gap-2 text-slate-700">
-                  <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" /> {p}
+                  <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" /> {t(p)}
                 </li>
               ))}
             </ul>
@@ -166,12 +172,12 @@ export const SolutionPage = () => {
           <div className="mt-10"><QuoteBox topic={s.title} /></div>
 
           <section className="mt-10" aria-labelledby="related">
-            <h2 id="related" className="mb-4 text-xl font-bold text-slate-800">Related solutions</h2>
+            <h2 id="related" className="mb-4 text-xl font-bold text-slate-800">{t('Related solutions')}</h2>
             <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {others.map((o) => (
                 <li key={o.slug}>
                   <Link to={`/solutions/${o.slug}`} className="block rounded-xl border border-gray-200 bg-white p-4 font-semibold text-slate-700 hover:border-amber-300 hover:text-amber-700">
-                    {o.title}
+                    {t(o.title)}
                   </Link>
                 </li>
               ))}

@@ -6,6 +6,7 @@ import useFactoryReady from '../../utlis/useFactoryReady';
 //   <MachineryHubPage hub="pharma" products={…} />   content: components/seo/machineryHubs.js
 import { Factory, Truck, Wrench, ShieldCheck, FileText, MapPin, ArrowRight } from 'lucide-react';
 import { Link } from '../../shell/router';
+import { useLocale } from '../../i18n/LocaleContext';
 import QuickQuote from '../quote/QuickQuote';
 import ProductFaqs from '../shop/ProductDetails/ProductFaqs';
 import { CITY_HUBS } from '../seo/cityHubs';
@@ -21,21 +22,22 @@ const THEMES = {
 
 export default function MachineryHubPage({ hub: hubKey = 'pharma', products = [] }) {
   const factoryReady = useFactoryReady(); // /factory is noindex until it has photos
+  const { t: tr, info } = useLocale(); // (t is the colour theme here)
   const hub = MACHINERY_HUBS[hubKey] || MACHINERY_HUBS.pharma;
   const t = THEMES[hub.theme] || THEMES.blue;
   const machines = realMachines(products, hub.categories, hub.notFor);
-  const faqs = hub.faqs(machines);
+  const faqs = hub.faqs(machines).map((f) => ({ ...f, q: tr(f.q), a: tr(f.a) }));
   const a = `font-semibold ${t.link} hover:underline`;
   return (
     <div className="min-h-screen bg-slate-50 pb-28">
       <section className={`bg-gradient-to-r ${t.hero} px-4 py-12 text-white`}>
         <div className="mx-auto max-w-6xl">
-          <p className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide"><Factory className="h-3.5 w-3.5" /> Made in Haridwar, India</p>
-          <h1 className="text-3xl font-bold sm:text-4xl lg:text-5xl">{hub.h1}</h1>
-          <p className={`mt-4 max-w-3xl text-lg ${t.heroText}`}>{hub.intro}</p>
+          <p className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide"><Factory className="h-3.5 w-3.5" /> {tr('Made in Haridwar, India')}</p>
+          <h1 className="text-3xl font-bold sm:text-4xl lg:text-5xl">{tr(hub.h1)}</h1>
+          <p className={`mt-4 max-w-3xl text-lg ${t.heroText}`}>{tr(hub.intro)}</p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <a href="#quick-quote" className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white hover:bg-orange-600">Get a quotation <ArrowRight className="h-4 w-4" /></a>
-            <Link to="/shop" className="inline-flex items-center gap-2 rounded-xl bg-white/15 px-5 py-3 font-semibold text-white hover:bg-white/25">See machines &amp; prices</Link>
+            <a href="#quick-quote" className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white hover:bg-orange-600">{tr('Get a quotation')} <ArrowRight className="h-4 w-4" /></a>
+            <Link to="/shop" className="inline-flex items-center gap-2 rounded-xl bg-white/15 px-5 py-3 font-semibold text-white hover:bg-white/25">{tr('See machines & prices')}</Link>
           </div>
         </div>
       </section>
@@ -43,13 +45,13 @@ export default function MachineryHubPage({ hub: hubKey = 'pharma', products = []
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 lg:grid-cols-3">
         <div className="space-y-12 lg:col-span-2">
           <section aria-labelledby="types">
-            <h2 id="types" className="text-2xl font-bold text-slate-900">{hub.typesTitle}</h2>
+            <h2 id="types" className="text-2xl font-bold text-slate-900">{tr(hub.typesTitle)}</h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {hub.types.map((m) => {
                 const card = (
                   <>
-                    <span className="font-semibold text-slate-900">{m.name}</span>
-                    <span className="mt-1 block text-sm leading-relaxed text-slate-600">{m.text}</span>
+                    <span className="font-semibold text-slate-900">{tr(m.name)}</span>
+                    <span className="mt-1 block text-sm leading-relaxed text-slate-600">{tr(m.text)}</span>
                   </>
                 );
                 return PRODUCT_DATA[m.slug] ? (
@@ -63,42 +65,46 @@ export default function MachineryHubPage({ hub: hubKey = 'pharma', products = []
 
           {machines.length > 0 && (
             <section aria-labelledby="machines">
-              <h2 id="machines" className="text-2xl font-bold text-slate-900">{hub.machinesTitle}</h2>
-              <p className="mt-1 text-sm text-slate-500">Ex-works prices; taxes, freight and installation are quoted separately.</p>
+              <h2 id="machines" className="text-2xl font-bold text-slate-900">{tr(hub.machinesTitle)}</h2>
+              <p className="mt-1 text-sm text-slate-500">{tr('Ex-works prices; taxes, freight and installation are quoted separately.')}</p>
               <MachineCards machines={machines} hover={t.hover} price={t.price} />
-              <Link to="/shop" className={`mt-4 inline-flex items-center gap-1 ${a}`}>All machines in the shop <ArrowRight className="h-4 w-4" /></Link>
+              <Link to="/shop" className={`mt-4 inline-flex items-center gap-1 ${a}`}>{tr('All machines in the shop')} <ArrowRight className="h-4 w-4" /></Link>
             </section>
           )}
 
           <section aria-labelledby="lines">
-            <h2 id="lines" className="text-2xl font-bold text-slate-900">{hub.linesTitle}</h2>
+            <h2 id="lines" className="text-2xl font-bold text-slate-900">{tr(hub.linesTitle)}</h2>
             <div className="mt-4 space-y-3">
               {hub.lines.map((d) => (
                 <Link key={d.form} to={d.to} className={`block rounded-xl bg-white p-4 shadow-sm hover:ring-2 ${t.ring}`}>
-                  <span className="font-semibold text-slate-900">{d.form}</span>
-                  <span className="mt-1 block text-sm text-slate-600">{d.line}</span>
+                  <span className="font-semibold text-slate-900">{tr(d.form)}</span>
+                  <span className="mt-1 block text-sm text-slate-600">{tr(d.line)}</span>
                 </Link>
               ))}
             </div>
             <p className="mt-3 text-sm text-slate-600">
-              Planning a new plant? Try the <Link to="/project-cost-calculator" className={a}>plant cost calculator</Link>, see <Link to="/solutions/turnkey" className={a}>turnkey projects</Link> or download the free <Link to="/pharma-plant-checklist" className={a}>plant setup checklist</Link>.
+              {info.language === 'hi' ? (
+                <>{tr('Planning a new plant?')} <Link to="/project-cost-calculator" className={a}>{tr('Try the plant cost calculator')}</Link> · <Link to="/solutions/turnkey" className={a}>{tr('See turnkey projects')}</Link> · <Link to="/pharma-plant-checklist" className={a}>{tr('Download the free plant setup checklist')}</Link></>
+              ) : (
+                <>Planning a new plant? Try the <Link to="/project-cost-calculator" className={a}>plant cost calculator</Link>, see <Link to="/solutions/turnkey" className={a}>turnkey projects</Link> or download the free <Link to="/pharma-plant-checklist" className={a}>plant setup checklist</Link>.</>
+              )}
             </p>
           </section>
 
           <section aria-labelledby="tips">
-            <h2 id="tips" className="text-2xl font-bold text-slate-900">{hub.tipsTitle}</h2>
+            <h2 id="tips" className="text-2xl font-bold text-slate-900">{tr(hub.tipsTitle)}</h2>
             <ul className="mt-4 grid gap-3 sm:grid-cols-2">
               {hub.tips.map(([title, text]) => (
                 <li key={title} className="rounded-xl bg-white p-4 shadow-sm">
-                  <strong className="text-slate-900">{title}</strong>
-                  <span className="mt-1 block text-sm text-slate-600">{text}</span>
+                  <strong className="text-slate-900">{tr(title)}</strong>
+                  <span className="mt-1 block text-sm text-slate-600">{tr(text)}</span>
                 </li>
               ))}
             </ul>
           </section>
 
           <section aria-labelledby="work">
-            <h2 id="work" className="text-2xl font-bold text-slate-900">How we work</h2>
+            <h2 id="work" className="text-2xl font-bold text-slate-900">{tr('How we work')}</h2>
             <ol className="mt-4 space-y-3">
               {[
                 [FileText, 'Quotation', 'Tell us your product, output and budget. We send a written quotation with specifications, delivery time and terms.'],
@@ -109,18 +115,18 @@ export default function MachineryHubPage({ hub: hubKey = 'pharma', products = []
               ].map(([Icon, title, text]) => (
                 <li key={title} className="flex gap-3 rounded-xl bg-white p-4 shadow-sm">
                   <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${t.icon}`} aria-hidden="true" />
-                  <span><strong className="text-slate-900">{title}.</strong> <span className="text-slate-600">{text}</span></span>
+                  <span><strong className="text-slate-900">{tr(title)}.</strong> <span className="text-slate-600">{tr(text)}</span></span>
                 </li>
               ))}
             </ol>
             <p className="mt-3 text-sm text-slate-600">
-              {factoryReady && <><Link to="/factory" className={a}>Our factory</Link> · </>}<Link to="/spares" className={a}>Spare parts</Link> · <Link to="/amc" className={a}>AMC plans</Link> · <Link to="/service-request" className={a}>Service request</Link> · <Link to={hub.other.to} className={a}>{hub.other.label}</Link>
+              {factoryReady && <><Link to="/factory" className={a}>{tr('Our factory')}</Link> · </>}<Link to="/spares" className={a}>{tr('Spare parts')}</Link> · <Link to="/amc" className={a}>{tr('AMC plans')}</Link> · <Link to="/service-request" className={a}>{tr('Service request')}</Link> · <Link to={hub.other.to} className={a}>{tr(hub.other.label)}</Link>
             </p>
           </section>
 
           {hub.showHubs && (
             <section aria-labelledby="hubs">
-              <h2 id="hubs" className="text-2xl font-bold text-slate-900">Pharma machinery across India</h2>
+              <h2 id="hubs" className="text-2xl font-bold text-slate-900">{tr('Pharma machinery across India')}</h2>
               <ul className="mt-4 flex flex-wrap gap-2">
                 {CITY_HUBS.map((c) => (
                   <li key={c.slug}>
@@ -134,7 +140,7 @@ export default function MachineryHubPage({ hub: hubKey = 'pharma', products = []
           )}
 
           <div className="-mx-4">
-            <ProductFaqs faqs={faqs} title={hub.faqTitle} />
+            <ProductFaqs faqs={faqs} title={tr(hub.faqTitle)} />
           </div>
         </div>
 
