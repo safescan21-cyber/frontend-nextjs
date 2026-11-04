@@ -27,6 +27,7 @@ const PharmaLogo = PharmaLogoAsset?.src ?? PharmaLogoAsset;
 import { logout } from '../components/store/authSlice';
 import { selectCartTotalQuantity, clearCart } from '../components/store/cartSlice';
 import { useFetchAllProductsQuery } from '../components/store/products/productsApi';
+import { CATEGORIES } from './pages/dashboard/admin/addProduct/productOptions';
 
 // ── SEO constants ──
 const SITE_URL = 'https://www.foodpharmamachinery.com';
@@ -430,7 +431,10 @@ const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   // Display product names list (limited for performance, but will scroll)
-  const productList = allProducts.slice(0, 50);
+  // Products menu: the product types in the shop (follows what the admin adds), most products first
+  const productTypes = Object.entries(allProducts.reduce((n, p) => (p.category ? { ...n, [p.category]: (n[p.category] || 0) + 1 } : n), {}))
+    .map(([value, count]) => ({ value, count, label: (CATEGORIES.find((c) => c.value === value)?.label || value.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())).replace(/ \(.*\)$/, '') }))
+    .sort((a, b) => b.count - a.count);
 
   return (
     <>
@@ -560,24 +564,19 @@ const Navbar = () => {
                     ) : (
                       <>
                         <div className="max-h-[400px] overflow-y-auto custom-scrollbar px-2">
-                          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-                            {productList.map((product) => (
-                              <li key={product._id}>
+                          <ul className="grid grid-cols-1 gap-1">
+                            {productTypes.map((type) => (
+                              <li key={type.value}>
                                 <Link
-                                  to={`/shop/${product._id}`}
+                                  to={`/shop?category=${type.value}`}
                                   onClick={handleLinkClick}
-                                  title={product.name}
-                                  className="block px-3 py-2 text-sm text-slate-300 hover:text-amber-400 hover:bg-slate-700/50 rounded-lg transition-colors truncate"
+                                  className="flex items-center justify-between gap-6 px-3 py-2 text-sm text-slate-300 hover:text-amber-400 hover:bg-slate-700/50 rounded-lg transition-colors"
                                 >
-                                  {product.name}
+                                  <span>{t(type.label)}</span>
+                                  <span className="text-xs text-slate-500">{type.count}</span>
                                 </Link>
                               </li>
                             ))}
-                            {allProducts.length > 50 && (
-                              <li className="col-span-2 text-center text-xs text-slate-500 py-1">
-                                + {allProducts.length - 50} more products
-                              </li>
-                            )}
                           </ul>
                         </div>
                         <div className="border-t border-slate-700 mt-2 pt-3 px-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
@@ -1059,23 +1058,18 @@ const Navbar = () => {
                         <li className="px-3 py-4 text-sm text-slate-400">{t("No products")}</li>
                       ) : (
                         <>
-                          {allProducts.slice(0, 30).map((product) => (
-                            <li key={product._id}>
+                          {productTypes.map((type) => (
+                            <li key={type.value}>
                               <Link
-                                to={`/shop/${product._id}`}
+                                to={`/shop?category=${type.value}`}
                                 onClick={handleLinkClick}
-                                title={product.name}
-                                className="block px-3 py-2 text-sm text-slate-300 hover:text-amber-400 hover:bg-slate-700 rounded-lg transition-colors truncate"
+                                className="flex items-center justify-between gap-6 px-3 py-2 text-sm text-slate-300 hover:text-amber-400 hover:bg-slate-700 rounded-lg transition-colors"
                               >
-                                {product.name}
+                                <span>{t(type.label)}</span>
+                                <span className="text-xs text-slate-500">{type.count}</span>
                               </Link>
                             </li>
                           ))}
-                          {allProducts.length > 30 && (
-                            <li className="px-3 py-2 text-xs text-slate-500">
-                              + {allProducts.length - 30} more products
-                            </li>
-                          )}
                           <li className="px-3 pt-2 flex gap-4">
                             <Link to="/products" onClick={handleLinkClick} className="text-xs text-amber-400 hover:text-amber-300">
                               {t("Products Overview")}
