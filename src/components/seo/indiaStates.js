@@ -89,6 +89,7 @@ export const STATE_PAGES = [
     title: 'Pharma & Food Machinery Suppliers by State in India',
     description: 'Pharma and food processing machinery for every Indian state and union territory: delivery from our Haridwar factory, installation, AMC and spares.',
     indiaOnly: true,
+    hiVersion: true,
   },
   ...INDIA_STATES.map((s) => ({
     path: `/machinery-supplier/${s.slug}`,
@@ -96,5 +97,6 @@ export const STATE_PAGES = [
     title: s.seoTitle || [`Pharma & Food Machinery Supplier in ${s.name}`, `Pharma & Food Machinery in ${s.short || s.name}`, `Machinery Supplier in ${s.short || s.name}`].find((t) => t.length <= 60) || `Machinery in ${s.short || s.name}`,
     description: s.seoDescription || fitDescription(`Pharma and food processing machines for ${s.name}${s.pharma ? ' pharma plants' : ''} and ${s.food.split(',')[0]} processing: delivery from Haridwar, installation, AMC and spares.`),
     indiaOnly: true,
+    hiVersion: true, // and a Hindi version (/hi/machinery-supplier/…)
   })),
 ];

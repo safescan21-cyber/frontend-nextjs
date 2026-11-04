@@ -48,9 +48,18 @@ export const localePath = (locale, path = '/') => {
 // country copies that only point back to it (Search Console: "Alternative page with
 // proper canonical tag")
 const INDIA_ONLY_RE = /^\/(?:export|machinery-supplier|industrial-areas)(?:[/?#]|$)/;
+// ...except the pages that also have a Hindi version
+const HINDI_TOO_RE = /^\/machinery-supplier(?:[/?#]|$)/;
 
 // A site link in a country version: ('fr', '/shop') -> '/fr/shop', ('fr', '/export/japan') -> '/export/japan'
-export const linkPath = (locale, path = '/') => (INDIA_ONLY_RE.test(path) ? path : localePath(locale, path));
+export const linkPath = (locale, path = '/') => (INDIA_ONLY_RE.test(path) && !(locale === 'hi' && HINDI_TOO_RE.test(path)) ? path : localePath(locale, path));
+
+// The two versions of an India page with a Hindi version
+export const hindiAlternates = (siteUrl, path) => ({
+  [DEFAULT_LOCALE.hreflang]: `${siteUrl}${path}`,
+  hi: `${siteUrl}${localePath('hi', path)}`,
+  'x-default': `${siteUrl}${path}`,
+});
 
 // hreflang alternates for one page: { 'en-in': url, 'en-us': url, …, 'x-default': url }
 export const alternateUrls = (siteUrl, path) => {

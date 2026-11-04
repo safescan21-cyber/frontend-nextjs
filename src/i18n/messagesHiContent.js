@@ -180,6 +180,11 @@ export const HI_CONTENT = {
   "Sending…": "भेजा जा रहा है…",
   "Send Message": "मैसेज भेजें",
   "or use WhatsApp for instant replies": "या तुरंत जवाब के लिए WhatsApp इस्तेमाल करें",
+  // ── State index ──
+  "Pharma & food machinery across India": "पूरे भारत में फार्मा और फूड मशीनरी",
+  "Machines for pharma and food plants in every state and union territory, built and tested at our factory in Haridwar, with installation support, AMC and spares.": "हर राज्य और केंद्र शासित प्रदेश के फार्मा और फूड प्लांट के लिए मशीनें, जो हरिद्वार की हमारी फैक्ट्री में बनती और टेस्ट होती हैं, इंस्टॉलेशन सपोर्ट, AMC और स्पेयर के साथ।",
+  "States": "राज्य",
+  "Union territories": "केंद्र शासित प्रदेश",
   // ── Place pages: shared parts ──
   "In our shop now, delivered from Haridwar with installation support. Taxes and freight are quoted separately.": "अभी हमारी शॉप में, हरिद्वार से डिलीवरी और इंस्टॉलेशन सपोर्ट के साथ। टैक्स और भाड़ा अलग से बताए जाते हैं।",
   "All products by category": "कैटेगरी के अनुसार सभी प्रोडक्ट",

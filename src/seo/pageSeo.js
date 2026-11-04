@@ -315,6 +315,7 @@ export async function seoForPath(segments = []) {
       description: page.description,
       canonical: `${SITE_URL}${path}`,
       indiaOnly: true,
+      hiVersion: true,
       jsonLd: [
         breadcrumbLd(crumbs),
         {
@@ -401,6 +402,7 @@ export async function seoForPath(segments = []) {
       description: page.description || DEFAULT_DESCRIPTION,
       canonical: `${SITE_URL}${path === '/' ? '/' : path}`,
       ...(page.indiaOnly && { indiaOnly: true }),
+      ...(page.hiVersion && { hiVersion: true }),
       summary: {
         heading: path === '/' ? `${SITE_NAME} — pharma & food processing machinery` : page.title,
         lines: [page.description],

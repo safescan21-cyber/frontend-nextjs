@@ -2,7 +2,7 @@
 // its translated title/description, its own canonical, hreflang links to every
 // version, and summary links that stay inside the same country folder.
 import { SITE_URL, SITE_NAME } from '../components/seo/organization';
-import { localePath, alternateUrls } from '../i18n/locales';
+import { localePath, alternateUrls, hindiAlternates } from '../i18n/locales';
 import { seoText, localizedText, brandTitle, fitDescription } from '../i18n/seoText';
 
 const BRAND_SUFFIX = ` | ${SITE_NAME}`;
@@ -15,8 +15,12 @@ export function localizeSeo(seo, locale, path) {
   // India-only pages (the state pages): they have one version, and a country copy such as
   // /en-us/machinery-supplier/kerala names the India page as the original
   if (seo.canonical && !seo.noindex && !seo.indiaOnly) out.alternates = alternateUrls(SITE_URL, path);
+  // (some India pages also have a Hindi version: the state pages)
+  if (seo.canonical && seo.hiVersion) out.alternates = hindiAlternates(SITE_URL, path);
   if (seo.description) out.description = fitDescription(seo.description);
-  if (!locale || seo.indiaOnly) return out;
+  if (!locale || (seo.indiaOnly && !(seo.hiVersion && locale === 'hi'))) return out;
+  // The questions on /hi pages are in Hindi, the FAQ data in English: leave that data out
+  if (locale === 'hi' && Array.isArray(out.jsonLd)) out.jsonLd = out.jsonLd.filter((d) => d?.['@type'] !== 'FAQPage');
 
   // Translated text, or for the US/UK versions their own variant of the English text
   const t = seoText(locale, path);

@@ -2,7 +2,7 @@
 // /sitemap-content.xml, built live by the API).
 import { STATIC_PAGES } from '../seo/pageSeo';
 import { SITE_URL } from '../components/seo/organization';
-import { LOCALE_CODES, localePath, alternateUrls } from '../i18n/locales';
+import { LOCALE_CODES, localePath, alternateUrls, hindiAlternates } from '../i18n/locales';
 import { getJson } from './serverData';
 import { PRODUCT_DATA } from '../components/pages/productCategoryData';
 
@@ -24,7 +24,11 @@ export default async function sitemap() {
   const [photos, clients] = await Promise.all([getJson('/api/showcase?kind=photo', 3600), getJson('/api/showcase?kind=client', 3600)]);
   const factoryReady = Boolean(photos?.items?.length || clients?.items?.length);
   return [...STATIC_PAGES.filter((p) => p.path !== '/factory' || factoryReady), ...CATEGORY_PAGES].flatMap((p) => {
-    // India-only pages (the state pages): one entry, no country versions
+    // India-only pages: one entry, no country versions (the state pages also have a Hindi one)
+    if (p.hiVersion) {
+      const languages = hindiAlternates(SITE_URL, p.path);
+      return [{ url: `${SITE_URL}${p.path}`, priority: 0.6, alternates: { languages } }, { url: `${SITE_URL}${localePath('hi', p.path)}`, priority: 0.5, alternates: { languages } }];
+    }
     if (p.indiaOnly) return [{ url: `${SITE_URL}${p.path}`, priority: 0.6 }];
     const languages = alternateUrls(SITE_URL, p.path);
     return ['', ...LOCALE_CODES].map((locale) => ({
