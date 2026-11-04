@@ -38,7 +38,7 @@ export const INDIA_STATES = [
   { slug: 'telangana', name: 'Telangana', kind: 'state', corp: 'TGIIC (formerly TSIIC)', pharma: 'Hyderabad is often called the bulk drug capital of India: Genome Valley, Jeedimetla, Patancheru and Pashamylaram host many API and formulation plants.', food: 'rice, Nizamabad turmeric and chillies', lines: ['tablets', 'capsules', 'injectables', 'spices'], cities: ['hyderabad'] },
   { slug: 'tripura', name: 'Tripura', kind: 'state', corp: 'TIDC', pharma: '', food: 'pineapple, tea and rubber', lines: ['juices', 'snacks'] },
   { slug: 'uttar-pradesh', name: 'Uttar Pradesh', kind: 'state', corp: 'UPSIDA', pharma: 'Lucknow and the Noida–Ghaziabad area have pharma units.', food: 'sugar, wheat, dairy, mangoes and potatoes', lines: ['tablets', 'dry-mixes', 'snacks', 'juices'] },
-  { slug: 'uttarakhand', name: 'Uttarakhand', kind: 'state', corp: 'SIIDCUL', pharma: 'Our factory is in Haridwar. SIDCUL Haridwar, Roorkee, Selaqui (Dehradun) and Pantnagar have many pharma, nutraceutical and FMCG plants.', food: 'basmati rice, fruit and herbs', lines: ['tablets', 'capsules', 'oral-liquids', 'ointments', 'juices'], cities: ['haridwar'] },
+  { slug: 'uttarakhand', name: 'Uttarakhand', seoTitle: 'Pharma & Food Machinery Manufacturer in Uttarakhand', seoDescription: 'Pharma and food machinery manufacturer in Haridwar, Uttarakhand: machines, installation, AMC and spares for SIDCUL, Roorkee, Selaqui and Pantnagar.', kind: 'state', corp: 'SIIDCUL', pharma: 'Our factory is in Haridwar. SIDCUL Haridwar, Roorkee, Selaqui (Dehradun) and Pantnagar have many pharma, nutraceutical and FMCG plants.', food: 'basmati rice, fruit and herbs', lines: ['tablets', 'capsules', 'oral-liquids', 'ointments', 'juices'], cities: ['haridwar'] },
   { slug: 'west-bengal', name: 'West Bengal', kind: 'state', corp: 'WBIDC', pharma: 'Kolkata has a long-established pharma industry.', food: 'rice, Darjeeling tea, fish and sweets', lines: ['tablets', 'snacks', 'dry-mixes'] },
   { slug: 'andaman-and-nicobar-islands', name: 'Andaman and Nicobar Islands', short: 'Andaman & Nicobar', kind: 'union territory', corp: 'ANIIDCO', pharma: '', food: 'coconut, seafood and spices', lines: ['juices', 'spices'], sea: true },
   { slug: 'chandigarh', name: 'Chandigarh', kind: 'union territory', corp: '', pharma: 'Chandigarh sits next to Mohali and Panchkula and about an hour from the Baddi pharma belt.', food: 'bakery, dairy and packaged foods', lines: ['tablets', 'snacks'] },
@@ -93,8 +93,8 @@ export const STATE_PAGES = [
   ...INDIA_STATES.map((s) => ({
     path: `/machinery-supplier/${s.slug}`,
     // within the ~60 characters Google shows: a shorter wording for the longest names
-    title: [`Pharma & Food Machinery Supplier in ${s.name}`, `Pharma & Food Machinery in ${s.short || s.name}`, `Machinery Supplier in ${s.short || s.name}`].find((t) => t.length <= 60) || `Machinery in ${s.short || s.name}`,
-    description: fitDescription(`Pharma and food processing machines for ${s.name}${s.pharma ? ' pharma plants' : ''} and ${s.food.split(',')[0]} processing: delivery from Haridwar, installation, AMC and spares.`),
+    title: s.seoTitle || [`Pharma & Food Machinery Supplier in ${s.name}`, `Pharma & Food Machinery in ${s.short || s.name}`, `Machinery Supplier in ${s.short || s.name}`].find((t) => t.length <= 60) || `Machinery in ${s.short || s.name}`,
+    description: s.seoDescription || fitDescription(`Pharma and food processing machines for ${s.name}${s.pharma ? ' pharma plants' : ''} and ${s.food.split(',')[0]} processing: delivery from Haridwar, installation, AMC and spares.`),
     indiaOnly: true,
   })),
 ];

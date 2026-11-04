@@ -8,13 +8,18 @@ export const COMPANY = {
   streetAddress: 'Q-37, Shivalik Nagar',
   addressLocality: 'Haridwar',
   addressRegion: 'Uttarakhand',
+  postalCode: '249403',
   addressCountry: 'IN',
   telephone: '+91-8700792607',
   email: 'safescan21@gmail.com',
 };
 
+// One spelling of the address everywhere (Contact, footer, map, Google data)
+export const MAP_ADDRESS = `${COMPANY.streetAddress}, ${COMPANY.addressLocality}, ${COMPANY.addressRegion} ${COMPANY.postalCode}, India`;
+export const MAP_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(MAP_ADDRESS)}`;
+
 export const organizationNode = {
-  '@type': 'Organization',
+  '@type': ['Organization', 'LocalBusiness'],
   '@id': `${SITE_URL}/#organization`,
   name: SITE_NAME,
   legalName: COMPANY.legalName,
@@ -28,8 +33,15 @@ export const organizationNode = {
     streetAddress: COMPANY.streetAddress,
     addressLocality: COMPANY.addressLocality,
     addressRegion: COMPANY.addressRegion,
+    postalCode: COMPANY.postalCode,
     addressCountry: COMPANY.addressCountry,
   },
+  hasMap: MAP_URL,
+  // as on the Contact page
+  openingHoursSpecification: [
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '08:00', closes: '18:00' },
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Saturday', opens: '09:00', closes: '13:00' },
+  ],
   areaServed: 'IN',
   contactPoint: [
     {

@@ -9,6 +9,7 @@ import { INDIA_STATES, stateLines, stateFaqs } from '../seo/indiaStates';
 import { cityHub } from '../seo/cityHubs';
 import QuickQuote from '../quote/QuickQuote';
 import AvailableMachines from './AvailableMachines';
+import LocationMap from './LocationMap';
 
 export default function StatePage({ state, installations = [], machines = [] }) {
   const lines = stateLines(state);
@@ -57,6 +58,8 @@ export default function StatePage({ state, installations = [], machines = [] }) 
           </p>
 
           <AvailableMachines place={state.name} machines={machines} />
+
+          {state.slug === 'uttarakhand' && <LocationMap />}
 
           {cities.length > 0 && (
             <>

@@ -8,6 +8,7 @@ import { CITY_HUBS } from '../seo/cityHubs';
 import { INDIA_STATES } from '../seo/indiaStates';
 import QuickQuote from '../quote/QuickQuote';
 import AvailableMachines from './AvailableMachines';
+import LocationMap from './LocationMap';
 import { useLocale } from '../../i18n/LocaleContext';
 import useFactoryReady from '../../utlis/useFactoryReady';
 
@@ -41,6 +42,8 @@ export default function CityPage({ hub, installations = [], machines = [] }) {
           </div>
 
           <AvailableMachines place={hub.city} machines={machines} />
+
+          {hub.slug === 'haridwar' && <LocationMap />}
 
           <h2 className="mt-10 text-xl font-bold text-slate-900">How we work with plants in {hub.city}</h2>
           <ol className="mt-4 space-y-3">

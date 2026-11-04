@@ -5,6 +5,8 @@ export const CITY_HUBS = [
   {
     slug: 'haridwar',
     city: 'Haridwar',
+    seoTitle: 'Pharma Machinery Manufacturer in Haridwar, Uttarakhand',
+    seoDescription: 'Pharma machinery manufacturer in Haridwar, Uttarakhand: machines, installation, AMC and spares for SIDCUL, Roorkee and Selaqui plants.',
     state: 'Uttarakhand',
     area: 'Haridwar, SIDCUL Haridwar, Roorkee and Dehradun (Selaqui)',
     intro: 'Haridwar is our home base: the factory of PureLine Machinery is in Haridwar, Uttarakhand. The SIDCUL industrial estate and the nearby Roorkee and Selaqui (Dehradun) areas have many pharma, nutraceutical and FMCG plants.',
@@ -75,5 +77,5 @@ export const cityHub = (slug) => CITY_HUBS.find((c) => c.slug === slug) || null;
 export const CITY_PAGES = CITY_HUBS.map((c) => ({
   path: `/pharma-machinery-supplier/${c.slug}`,
   title: c.seoTitle || `Pharma Machinery Supplier in ${c.city}`,
-  description: `Pharma machines for ${c.area}: tablet presses, capsule fillers, blister packing, AMC and spares.`,
+  description: c.seoDescription || `Pharma machines for ${c.area}: tablet presses, capsule fillers, blister packing, AMC and spares.`,
 }));

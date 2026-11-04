@@ -433,7 +433,7 @@ export default function PharmaMachineFooter() {
             <ContactRow icon={IconPin} label={t("Office Locations")}>
               <div className="space-y-2">
                 <div>
-                  <span className="font-semibold text-white">{t("Main Office:")}</span> Shivalik Nagar, Haridwar,
+                  <span className="font-semibold text-white">{t("Main Office:")}</span> Q-37, Shivalik Nagar, Haridwar,
                   Uttarakhand 249403, India
                 </div>
                 <div>

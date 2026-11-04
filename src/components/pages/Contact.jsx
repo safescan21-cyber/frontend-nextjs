@@ -3,6 +3,7 @@ import { formTool } from '../webmcp/webmcpTools';
 import { useState } from "react";
 import axios from "axios";
 import getBaseUrl from "../../utlis/baseURL";
+import LocationMap from "./LocationMap";
 
 // ══════════════════════════════════════════════════════════
 //  CONFIG
@@ -15,7 +16,7 @@ const PHONE_TEL = "tel:+918700792607";
 const EMAIL = "safescan21@gmail.com";
 
 const OFFICES = [
-  { name: "Main Office", address: "Shivalik Nagar, Haridwar, Uttarakhand 249403, India" },
+  { name: "Main Office", address: "Q-37, Shivalik Nagar, Haridwar, Uttarakhand 249403, India" },
   { name: "East India", address: "Lokhra, Jyotikuchhi, Guwahati, Assam, India" },
   { name: "Mumbai", address: "Thane, Mumbai, Maharashtra, India" },
 ];
@@ -313,6 +314,7 @@ export default function Contact() {
             </div>
           </section>
         </div>
+        <LocationMap dark className="mt-12" />
       </div>
     </div>
   );
