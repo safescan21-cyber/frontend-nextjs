@@ -415,6 +415,35 @@ function LiveChat() {
     if (next) playSound("message");
   };
 
+  // The greeting for this visitor: regional language on the India and Hindi sites, English for
+  // the world or an unknown state
+  const buildGreeting = useCallback(async () => {
+    const area = await fetch(`${getBaseURL()}/api/geo`).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+    const countrySite = LOCALE_CODES.some((c) => c !== "hi" && (pathname === `/${c}` || pathname.startsWith(`/${c}/`)));
+    const region = area?.country === "IN" && !countrySite ? area.region : "";
+    const language = hindiPage ? "hi" : regionLanguage(region);
+    const english = greeting(regionName(region, false), false);
+    const local = language === "hi" ? greeting(regionName(region, true), true) : REGIONAL_GREETING[language] || "";
+    const spoken = local || english;
+    return { language, english, spoken, text: hindiPage || !local ? spoken : `${local}\n\n${english}` };
+  }, [pathname, hindiPage]);
+
+  // Later pages of a visit, and pages where the chat doesn't pop up: same greeting in the chat,
+  // without the sound (it plays once per visit)
+  useEffect(() => {
+    let greeted = false;
+    try { greeted = sessionStorage.getItem("chatWelcomeShown") === "true"; } catch { /* storage blocked */ }
+    if (!greeted && !QUIET_PAGES.test(pathname)) return undefined;
+    let live = true;
+    buildGreeting().then(({ language, spoken, text }) => {
+      if (!live) return;
+      if (language === "hi") setNorthIndia(true);
+      setWelcome(spoken);
+      setMsgs((prev) => (prev.length === 1 && prev[0].role === "assistant" ? [{ ...prev[0], content: text, askLocation: true }] : prev));
+    });
+    return () => { live = false; };
+  }, [pathname, buildGreeting]);
+
   // ── Greet once per visit, as soon as the page has loaded (not while buying or logging in):
   // on a computer the chat opens with Nova "typing" the greeting; on a phone a small
   // bubble shows instead (a full chat would cover the screen). Both with a chime. ──
@@ -435,16 +464,8 @@ function LiveChat() {
     const timer = setTimeout(async () => {
       if (touched.current) return;
       try { sessionStorage.setItem("chatWelcomeShown", "true"); } catch { /* storage blocked */ }
-      const area = await fetch(`${getBaseURL()}/api/geo`).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+      const { language, english, spoken, text } = await buildGreeting();
       if (touched.current) return;
-      // Regional language on the India and Hindi sites; English for the world or an unknown state
-      const countrySite = LOCALE_CODES.some((c) => c !== "hi" && (pathname === `/${c}` || pathname.startsWith(`/${c}/`)));
-      const region = area?.country === "IN" && !countrySite ? area.region : "";
-      const language = hindiPage ? "hi" : regionLanguage(region);
-      const english = greeting(regionName(region, false), false);
-      const local = language === "hi" ? greeting(regionName(region, true), true) : REGIONAL_GREETING[language] || "";
-      const spoken = local || english;
-      const text = hindiPage || !local ? spoken : `${local}\n\n${english}`;
       if (language === "hi") setNorthIndia(true);
       setWelcome(spoken);
       if (window.matchMedia("(min-width: 1024px)").matches) {
@@ -469,7 +490,7 @@ function LiveChat() {
       }
     }, 500);
     return () => clearTimeout(timer);
-  }, [pathname, hindiPage]);
+  }, [pathname, buildGreeting]);
 
   useEffect(() => {
     return () => {

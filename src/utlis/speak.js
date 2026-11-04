@@ -3,12 +3,10 @@
 export const canSpeak = () => typeof window !== 'undefined' && 'speechSynthesis' in window;
 if (canSpeak()) window.speechSynthesis.getVoices(); // browsers load the voice list on first ask
 
-const voices = () => new Promise((resolve) => {
-  const list = window.speechSynthesis.getVoices();
-  if (list.length) return resolve(list);
+// Chrome adds its online voices (Hindi among them) after the first ones
+const moreVoices = () => new Promise((resolve) => {
   window.speechSynthesis.addEventListener('voiceschanged', () => resolve(window.speechSynthesis.getVoices()), { once: true });
-  setTimeout(() => resolve(window.speechSynthesis.getVoices()), 800); // some browsers never fire it
-  return undefined;
+  setTimeout(() => resolve(window.speechSynthesis.getVoices()), 1500); // some browsers never fire it
 });
 
 export const stopSpeaking = () => { if (canSpeak()) window.speechSynthesis.cancel(); };
@@ -30,10 +28,9 @@ export const speak = async (text, onEnd, language) => {
   if (!canSpeak()) return false;
   const lang = language || textLanguage(text);
   // no waiting when the list is there: iPhones only speak straight from the tap itself
-  const ready = window.speechSynthesis.getVoices();
-  const list = ready.length ? ready : await voices();
-  const voice = list.find((v) => v.lang.toLowerCase().startsWith(`${lang}-in`)) || list.find((v) => v.lang.toLowerCase().startsWith(lang))
+  const pick = (list) => list.find((v) => v.lang.toLowerCase().replace('_', '-').startsWith(`${lang}-in`)) || list.find((v) => v.lang.toLowerCase().startsWith(lang))
     || (lang === 'mr' && list.find((v) => v.lang.toLowerCase().startsWith('hi')));
+  const voice = pick(window.speechSynthesis.getVoices()) || pick(await moreVoices());
   if (!voice) return false;
   if (window.speechSynthesis.speaking) stopSpeaking();
   const u = new SpeechSynthesisUtterance(text.replace(/https?:\/\/\S+/g, ''));
