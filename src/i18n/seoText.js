@@ -2,6 +2,7 @@
 // Pages missing here keep their English text. US/UK only override a few lines that
 // talk about India. Used by the server (page.jsx) and the browser (components/Seo.jsx).
 import { CITY_HUBS } from '../components/seo/cityHubs';
+import { hi, hiCity } from './seoTextHi';
 
 const fr = {
   '/': ['Food Pharma Machinery | Machines pharma et agroalimentaires', 'Machines pharmaceutiques et agroalimentaires fabriquées en Inde : presses à comprimés, gélules, blisters, remplissage et mélangeurs. Export vers la France.'],
@@ -229,6 +230,7 @@ Object.assign(ur, MORE.ur);
 
 // City pages (/pharma-machinery-supplier/<city>): one pattern per language
 const CITY_TEXT = {
+  hi: hiCity,
   fr: (c) => [`Fournisseur de machines pharmaceutiques à ${c}`, `Presses à comprimés, remplisseuses de gélules, blistéreuses et autres machines pour les usines de ${c}. Devis, livraison, installation, maintenance et pièces.`],
   ja: (c) => [`${c}の製薬機械サプライヤー`, `${c}の工場向け打錠機、カプセル充填機、ブリスター包装機などの製薬機械。見積、配送、据付、保守、部品。`],
   ko: (c) => [`${c} 제약 기계 공급업체`, `${c} 공장용 타정기, 캡슐 충전기, 블리스터 포장기 등 제약 기계. 견적, 배송, 설치, 유지보수, 부품.`],
@@ -239,7 +241,7 @@ const cityName = (path) => {
   return slug ? CITY_HUBS.find((c) => c.slug === slug)?.city : null;
 };
 
-export const SEO_TEXT = { fr, ja, ko, ur, 'en-us': enUs, 'en-gb': enGb, 'en-au': enAu };
+export const SEO_TEXT = { fr, ja, ko, ur, hi, 'en-us': enUs, 'en-gb': enGb, 'en-au': enAu };
 
 // { title, description } for a page in a country version, or null to keep English
 export const seoText = (locale, path) => {

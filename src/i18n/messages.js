@@ -5,6 +5,7 @@
 import { PRODUCT_DATA } from '../components/pages/productCategoryData';
 import { SEO_TEXT } from './seoText';
 import { UR } from './messagesUr';
+import { HI } from './messagesHi';
 
 const ROWS = {
   // ── Navigation, top bar, search ──
@@ -534,4 +535,17 @@ const buildUr = () => {
   return out;
 };
 
-export const MESSAGES = { fr: build(0), ja: build(1), ko: build(2), ur: buildUr() };
+// Hindi has its own file too (messagesHi.js)
+const buildHi = () => {
+  const out = { ...HI };
+  for (const [slug, c] of Object.entries(PRODUCT_DATA)) {
+    const row = SEO_TEXT.hi?.[`/products/${slug}`];
+    if (row) {
+      out[c.title] ??= row[0];
+      out[c.description] ??= row[1];
+    }
+  }
+  return out;
+};
+
+export const MESSAGES = { fr: build(0), ja: build(1), ko: build(2), ur: buildUr(), hi: buildHi() };
