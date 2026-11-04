@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { usePathname } from "next/navigation";
-import { BotMessageSquare, Mic, Phone, Volume2 } from "lucide-react";
+import { BotMessageSquare, MapPin, Mic, Phone, Volume2 } from "lucide-react";
 import { canSpeak, speak, stopSpeaking } from "../../utlis/speak";
 import getBaseURL from "../../utlis/baseURL";
 import { getLeadOrigin } from "../../utlis/leadOrigin";
@@ -233,6 +233,33 @@ function ExpertCard({ machine, summary }) {
   );
 }
 
+// ─── EXACT LOCATION ─────────────────────────────────────────────
+// The internet address only gives a rough area. Only the visitor's own GPS is exact, and the
+// browser asks their permission first, so it starts from this button.
+function LocationButton({ hindi, onResult }) {
+  const [busy, setBusy] = useState(false);
+  const [gone, setGone] = useState(false);
+  if (gone || typeof navigator === "undefined" || !navigator.geolocation) return null;
+  const locate = () => {
+    setBusy(true);
+    navigator.geolocation.getCurrentPosition(async ({ coords }) => {
+      const data = await fetch(`${getBaseURL()}/api/geo/near`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lat: coords.latitude, lon: coords.longitude }),
+      }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+      setGone(true);
+      onResult(data?.city || "");
+    }, () => { setGone(true); onResult(null); }, { timeout: 10000, maximumAge: 600000 });
+  };
+  return (
+    <button type="button" onClick={locate} disabled={busy} className="mt-2 flex items-center gap-1 text-xs font-semibold text-amber-300 hover:text-amber-200 disabled:opacity-60">
+      <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
+      {busy ? (hindi ? "ढूँढ रहे हैं…" : "Finding you…") : (hindi ? "मेरी सही लोकेशन इस्तेमाल करें" : "Use my exact location")}
+    </button>
+  );
+}
+
 // ─── MIC ─────────────────────────────────────────────────────────
 // Browser speech recognition (Chrome, Edge and Safari; the browser's provider hears the audio)
 const Recognition = () => (typeof window === "undefined" ? null : window.SpeechRecognition || window.webkitSpeechRecognition || null);
@@ -298,7 +325,7 @@ function SpeakButton({ text }) {
 }
 
 // ─── MESSAGE BUBBLE ─────────────────────────────────────────────
-function Bubble({ msg, isNew }) {
+function Bubble({ msg, isNew, hindi, onLocated }) {
   const isUser = msg.role === "user";
   return (
     <div
@@ -317,6 +344,7 @@ function Bubble({ msg, isNew }) {
       }`}>
         {isUser ? msg.content : <MessageText text={msg.content} />}
         {!isUser && <SpeakButton text={msg.content} />}
+        {msg.askLocation && <LocationButton hindi={hindi} onResult={onLocated} />}
         {msg.showWhatsApp && (
           <div className="mt-3">
             <WhatsAppButton aiSummary={msg.waSummary} />
@@ -416,10 +444,10 @@ function LiveChat() {
         sayHello(text);
         welcomeTimeout.current = setTimeout(() => {
           setLoading(false);
-          setMsgs([{ ...INIT_MSG, content: text, isNew: true }]);
+          setMsgs([{ ...INIT_MSG, content: text, isNew: true, askLocation: true }]);
         }, 1400);
       } else {
-        setMsgs([{ ...INIT_MSG, content: text }]);
+        setMsgs([{ ...INIT_MSG, content: text, askLocation: true }]);
         setShowWelcome(true);
         playSound("chime", { wait: true });
         sayHello(text);
@@ -513,6 +541,15 @@ function LiveChat() {
       setLoading(false);
     }
   }, [input, loading, open, hindi]);
+
+  // The visitor shared their position: city, or null when they said no
+  const onLocated = (city) => {
+    const text = city
+      ? (hindi ? `धन्यवाद! आप ${city} के पास हैं। आप किस तरह की मशीन ढूँढ रहे हैं?` : `Thank you! You're near ${city}. Which type of machine are you looking for?`)
+      : (hindi ? 'कोई बात नहीं। आप किस तरह की मशीन ढूँढ रहे हैं?' : 'No problem. Which type of machine are you looking for?');
+    setMsgs((prev) => [...prev, { role: "assistant", content: text, isNew: true }]);
+    if (!soundOff()) speak(text);
+  };
 
   const handleKey = (e) => {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
@@ -651,7 +688,7 @@ function LiveChat() {
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto px-4 py-5 space-y-3 min-h-[220px]">
-            {msgs.map((m, i) => <Bubble key={i} msg={m} isNew={m.isNew} />)}
+            {msgs.map((m, i) => <Bubble key={i} msg={m} isNew={m.isNew} hindi={hindi} onLocated={onLocated} />)}
             {loading && <TypingDots />}
             <div ref={bottomRef} />
           </div>
