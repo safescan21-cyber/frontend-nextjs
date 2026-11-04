@@ -406,7 +406,7 @@ export async function seoForPath(segments = []) {
   if (category) {
     const c = Object.hasOwn(PRODUCT_DATA, category[1]) ? PRODUCT_DATA[category[1]] : null;
     if (!c) return { notFound: true };
-    const description = `${c.description} Compare models, specifications and get a quote from ${SITE_NAME}.`;
+    const description = `${c.description} Get specifications and a quote.`;
     const { data } = await getJson('/api/products/?category=&color=&minPrice=0&maxPrice=&page=1&limit=1000');
     return {
       title: fullTitle(c.seoTitle || c.title),

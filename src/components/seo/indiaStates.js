@@ -8,6 +8,7 @@
 //   corp:   the state's industrial development corporation ('' when there is none to name)
 //   lines:  machine lines that fit (keys of LINES below), cities: city pages (cityHubs.js)
 //   sea:    machines reach it partly by sea (islands); short: a shorter name for page titles
+import { fitDescription } from '../../i18n/seoText';
 import { MACHINERY_HUBS } from './machineryHubs';
 
 export const INDIA_STATES = [
@@ -86,14 +87,14 @@ export const STATE_PAGES = [
   {
     path: '/machinery-supplier',
     title: 'Pharma & Food Machinery Suppliers by State in India',
-    description: 'Pharma and food processing machinery for every Indian state and union territory: machines, delivery from our Haridwar factory, installation support, AMC and spares.',
+    description: 'Pharma and food processing machinery for every Indian state and union territory: delivery from our Haridwar factory, installation, AMC and spares.',
     indiaOnly: true,
   },
   ...INDIA_STATES.map((s) => ({
     path: `/machinery-supplier/${s.slug}`,
     // within the ~60 characters Google shows: a shorter wording for the longest names
     title: [`Pharma & Food Machinery Supplier in ${s.name}`, `Pharma & Food Machinery in ${s.short || s.name}`, `Machinery Supplier in ${s.short || s.name}`].find((t) => t.length <= 60) || `Machinery in ${s.short || s.name}`,
-    description: `Pharma and food processing machines for ${s.name}${s.pharma ? ' pharma plants' : ''} and ${s.food.split(',')[0]} processing: quotation, delivery from Haridwar, installation support, AMC and spares.`.slice(0, 160),
+    description: fitDescription(`Pharma and food processing machines for ${s.name}${s.pharma ? ' pharma plants' : ''} and ${s.food.split(',')[0]} processing: delivery from Haridwar, installation, AMC and spares.`),
     indiaOnly: true,
   })),
 ];

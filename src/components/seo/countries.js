@@ -6,6 +6,8 @@
 //   row: slug | name | region | volts | hertz | currency | flags | medicines regulator
 //   flags: L = landlocked (by sea to a neighbouring country's port, then road),
 //          R = can be reached by road from India, I = island country
+import { fitDescription } from '../../i18n/seoText';
+
 const ROWS = `
 afghanistan|Afghanistan|central-asia|220|50|AFN|L|
 albania|Albania|europe|230|50|ALL||
@@ -262,13 +264,13 @@ export const COUNTRY_PAGES = [
   {
     path: '/export',
     title: 'Pharma & Food Machinery Exporter from India – All Countries',
-    description: 'Pharma and food processing machinery exported from India to every region: machines built in Haridwar, export packing, documents, installation support and spares.',
+    description: 'Pharma and food processing machinery exported from India to every region: machines built in Haridwar, export packing, documents and spares.',
     indiaOnly: true,
   },
   ...COUNTRIES.map((c) => ({
     path: `/export/${c.slug}`,
     title: fit(`Pharma & Food Machinery Exporter to ${c.name}`, `Pharma Machinery Exporter to ${c.name}`, `Pharma Machinery for ${c.name}`),
-    description: `Pharma and food machinery from India for ${c.name}: built for ${countrySupply(c)}, ${c.landlocked ? 'shipped via a neighbouring port' : c.road ? 'delivered by road' : 'shipped by sea'}, export documents, installation support and spares.`.slice(0, 160),
+    description: fitDescription(`Pharma and food machinery from India for ${c.name}: built for ${countrySupply(c)}, ${c.landlocked ? 'shipped via a neighbouring port' : c.road ? 'delivered by road' : 'shipped by sea'}, export documents, installation help and spares.`),
     indiaOnly: true,
   })),
 ];

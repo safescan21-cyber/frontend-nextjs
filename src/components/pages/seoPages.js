@@ -72,7 +72,7 @@ export const seoPages = {
     path: '/solutions/packaging',
     title: 'Pharma Packaging Machinery Manufacturers in India',
     description:
-      'Pharma packaging machinery manufacturers in India: pharmaceutical packaging machinery and food packaging machinery for blister, strip, bottles and cartons.',
+      'Pharma packaging machinery manufacturers: pharmaceutical and food packaging equipment and machinery for blister, strip, bottles and cartons.',
   },
   sterile: {
     path: '/solutions/sterile',

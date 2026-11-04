@@ -28,7 +28,7 @@ export const PHARMA_HUB = {
     path: '/pharma-machinery',
     title: 'Pharmaceutical Machinery Manufacturer & Supplier, India',
     description:
-      'Pharma machine manufacturer in Haridwar, India: pharmaceutical manufacturing machinery such as tablet presses, capsule fillers, packaging and filling lines.',
+      'Pharma machine manufacturer in Haridwar, India: pharmaceutical manufacturing machinery for tablets, capsules, liquids and packaging.',
   },
   crumb: 'Pharma machinery',
   theme: 'blue',
@@ -90,7 +90,7 @@ export const FOOD_HUB = {
     path: '/food-machinery',
     title: 'Food Packaging Machinery & Food Filling Machines',
     description:
-      'Food packaging machinery from Haridwar, India: mixers, pulverisers, food filling machines for powders and liquids, pouch packing, sealing and labelling.',
+      'Food processing machinery and food manufacturing equipment: industrial food packaging machines, mixers, pulverisers and filling lines.',
   },
   crumb: 'Food machinery',
   theme: 'emerald',

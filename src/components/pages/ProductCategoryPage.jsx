@@ -92,7 +92,7 @@ export default function ProductCategoryPage({ products = [] }) {
     <div className="min-h-screen bg-[#0d1017] text-slate-300 font-barlow">
       <Seo
         title={t(data.seoTitle || data.title)}
-        description={`${t(data.description)} Compare models, specifications and get a quote from Food Pharma Machinery.`}
+        description={`${t(data.description)} Get specifications and a quote.`}
         path={`/products/${category}`}
         jsonLd={{
           "@context": "https://schema.org",

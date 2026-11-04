@@ -15,7 +15,9 @@ export const PRODUCT_DATA = {
   },
   "blister-packaging": {
     title: "Blister Packaging Machines",
-    description: "Thermoforming and cold‑form blister lines for tablets and capsules.",
+    // Search title (Search Console: "blister packaging suppliers")
+    seoTitle: "Blister Packaging Machine Suppliers",
+    description: "Blister packaging machine suppliers: thermoforming and cold‑form blister lines for tablets and capsules.",
   },
   "liquid-filling": {
     title: "Liquid Filling & Capping",
