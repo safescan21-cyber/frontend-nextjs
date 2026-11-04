@@ -1,6 +1,7 @@
 'use client';
 import { useLocale } from '../i18n/LocaleContext';
 import { slideSrcSet, slideThumb, orderedSlides } from './heroSlidesData';
+import { youtubeEmbed } from '../utlis/youtube';
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Play, Pause, Grid } from 'lucide-react';
 import ShopPage from '../components/pages/ShopePage';
@@ -105,6 +106,17 @@ const Home = () => {
     window.addEventListener('load', add, { once: true });
     return () => window.removeEventListener('load', add);
   }, [currentIndex, images.length]);
+  // Slide films start once the page has loaded, so they never slow the first photo. Not on phones
+  // (mobile data and speed), with Data Saver or for visitors who asked for less motion: they get the photo.
+  const [heroVideoOn, setHeroVideoOn] = useState(false);
+  useEffect(() => {
+    if (window.innerWidth < 768 || navigator.connection?.saveData || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    const on = () => setHeroVideoOn(true);
+    if (document.readyState === 'complete') { on(); return undefined; }
+    window.addEventListener('load', on, { once: true });
+    return () => window.removeEventListener('load', on);
+  }, []);
+  const holdForVideo = heroVideoOn && Boolean(images[currentIndex]?.video); // a film needs longer than a photo
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [showThumbnails, setShowThumbnails] = useState(false);
   const [slideDuration, setSlideDuration] = useState(5000);
@@ -121,10 +133,10 @@ const Home = () => {
     if (isAutoPlaying && images.length > 1) {
       autoPlayRef.current = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % images.length);
-      }, slideDuration);
+      }, holdForVideo ? 30000 : slideDuration);
     }
     return () => clearInterval(autoPlayRef.current);
-  }, [isAutoPlaying, images.length, slideDuration]);
+  }, [isAutoPlaying, images.length, slideDuration, holdForVideo]);
 
   const nextSlide = () => setCurrentIndex((prev) => (prev + 1) % images.length);
   const prevSlide = () => setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
@@ -216,6 +228,16 @@ const Home = () => {
                 onError={handleImageError}
                 fetchPriority={index === 0 ? 'high' : 'low'}
                 decoding="async"
+              />
+            )}
+            {heroVideoOn && image.video && index === currentIndex && (
+              <iframe
+                title={`${image.title} video`}
+                src={youtubeEmbed(image.video)}
+                allow="autoplay; encrypted-media"
+                tabIndex={-1}
+                className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border-0"
+                style={{ width: 'max(100%, 1245px)', aspectRatio: '16 / 9' }}
               />
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>

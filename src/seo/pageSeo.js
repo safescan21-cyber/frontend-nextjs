@@ -7,6 +7,7 @@
 import { seoPages } from '../components/pages/seoPages';
 import { SOLUTIONS, RESOURCES } from '../components/seo/solutionsData';
 import { PRODUCT_DATA, categoryMachines } from '../components/pages/productCategoryData';
+import { youtubeId, youtubeThumb } from '../utlis/youtube';
 import { SITE_URL, SITE_NAME } from '../components/seo/organization';
 import { brandTitle } from '../i18n/seoText';
 import { CITY_PAGES } from '../components/seo/cityHubs';
@@ -81,6 +82,17 @@ const productExtrasLd = (p, url, text) => {
       contentUrl: v.replace(/\.(webm|ogv|mov|mkv|avi)(\?.*)?$/i, '.mp4'),
       uploadDate: new Date(p.updatedAt || p.createdAt || Date.now()).toISOString(),
       embedUrl: url,
+    });
+  });
+  (p.videos || []).map(youtubeId).filter(Boolean).slice(0, 3).forEach((id) => {
+    out.push({
+      '@context': 'https://schema.org',
+      '@type': 'VideoObject',
+      name: `${p.name} in operation`,
+      description: clip(text || `${p.name} in operation.`, 300),
+      thumbnailUrl: [youtubeThumb(id)],
+      embedUrl: `https://www.youtube.com/embed/${id}`,
+      uploadDate: new Date(p.updatedAt || p.createdAt || Date.now()).toISOString(),
     });
   });
   return out;

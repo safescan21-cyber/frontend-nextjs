@@ -3,6 +3,7 @@ import LocalPrice from '../../../i18n/LocalPrice';
 import { useLocale } from '../../../i18n/LocaleContext';
 import { formTool } from '../../webmcp/webmcpTools';
 import React, { useState, useEffect } from 'react';
+import { youtubeEmbed, youtubeId, youtubeThumb } from '../../../utlis/youtube';
 import { useParams, useNavigate, Link } from '../../../shell/router';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -148,6 +149,18 @@ const SingleProduct = () => {
   const [filterRating, setFilterRating] = useState(0);
   const [sortBy, setSortBy] = useState('newest');
 
+  // A machine with a YouTube film: the gallery moves to it (muted) once the page has loaded
+  useEffect(() => {
+    const videos = (Array.isArray(product?.videos) ? product.videos : []).filter((v) => typeof v === 'string' && v);
+    const film = videos.findIndex((v) => youtubeId(v));
+    if (film < 0) return undefined;
+    const photos = Array.isArray(product.images) && product.images.length ? product.images.length : 1;
+    const start = () => setSelectedImage(photos + film);
+    if (document.readyState === 'complete') { start(); return undefined; }
+    window.addEventListener('load', start, { once: true });
+    return () => window.removeEventListener('load', start);
+  }, [product?._id]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Loading ──
   if (productLoading) {
     return (
@@ -206,7 +219,7 @@ const SingleProduct = () => {
   // ── Product videos (Cloudinary): play as MP4 everywhere, JPG frame as poster ──
   const videoUrls = (Array.isArray(product.videos) ? product.videos : []).filter((v) => typeof v === 'string' && v);
   const videoSrc = (url) => (url.includes('res.cloudinary.com') ? url.replace(/\.(webm|ogv|mov|mkv|avi)(\?.*)?$/i, '.mp4') : url);
-  const videoPoster = (url) => (url.includes('res.cloudinary.com') ? url.replace(/\.\w+(\?.*)?$/, '.jpg').replace('/video/upload/', '/video/upload/so_1/') : undefined);
+  const videoPoster = (url) => (youtubeId(url) ? youtubeThumb(youtubeId(url)) : url.includes('res.cloudinary.com') ? url.replace(/\.\w+(\?.*)?$/, '.jpg').replace('/video/upload/', '/video/upload/so_1/') : undefined);
 
   // ── Build image gallery ──
   let imageUrls = [];
@@ -472,7 +485,15 @@ const SingleProduct = () => {
                     ★ Best Seller
                   </div>
                 )}
-                {selectedImage >= imageUrls.length && videoUrls[selectedImage - imageUrls.length] ? (
+                {selectedImage >= imageUrls.length && youtubeId(videoUrls[selectedImage - imageUrls.length]) ? (
+                  <iframe
+                    key={videoUrls[selectedImage - imageUrls.length]}
+                    title={`${product.name} video`}
+                    src={youtubeEmbed(youtubeId(videoUrls[selectedImage - imageUrls.length]), { controls: 1 })}
+                    allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                    className="h-full w-full border-0 bg-black"
+                  />
+                ) : selectedImage >= imageUrls.length && videoUrls[selectedImage - imageUrls.length] ? (
                   <video
                     key={videoUrls[selectedImage - imageUrls.length]}
                     src={videoSrc(videoUrls[selectedImage - imageUrls.length])}

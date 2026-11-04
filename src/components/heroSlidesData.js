@@ -145,11 +145,15 @@ export const DEFAULT_SLIDES = [
   },
 ];
 
+// Slides with a film (SGWEIGH's YouTube channel), by slide title
+const SLIDE_VIDEOS = { 'SGWEIGH Checkweighers': 'LhS2Xi0mlEM', 'SGWEIGH Metal Detectors': 'MhKsy_cLYPc' };
+
 // ── Map API slide to component shape ──
 export const mapApiSlide = (slide) => ({
   id: slide._id || slide.id,
   url: slide.imageUrl || slide.image || slide.url || slide.mediaUrl || '',
   title: slide.title || '',
+  video: SLIDE_VIDEOS[slide.title] || null,
   subtitle: slide.subtitle || slide.description || '',
   cta: slide.ctaText || slide.cta || 'Shop Now',
   ctaLink: slide.ctaLink || slide.link || '#',

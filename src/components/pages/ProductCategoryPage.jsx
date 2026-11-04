@@ -1,6 +1,7 @@
 'use client';
 // /products (all categories) and /products/:category. The machines shown are the real ones in
 // the shop (the page's server part passes them: app/[locale]/products/…), never sample models.
+import { useEffect, useState } from 'react';
 import { useLocale } from '../../i18n/LocaleContext';
 import { useParams, Link } from '../../shell/router';
 import Seo from "../Seo";
@@ -9,6 +10,7 @@ import NotFound from "../seo/NotFound";
 import { PRODUCT_DATA, categoryMachines } from "./productCategoryData";
 import MachineCards from "./MachineCards";
 import QuickQuote from "../quote/QuickQuote";
+import { youtubeEmbed } from "../../utlis/youtube";
 
 const SITE = "https://www.foodpharmamachinery.com";
 
@@ -19,6 +21,12 @@ const getWhatsAppLink = (productName) => {
   return `https://wa.me/${phone}?text=${message}`;
 };
 
+// Films on /products (SGWEIGH's YouTube channel)
+const FILMS = [
+  { id: "LhS2Xi0mlEM", title: "Inline multi-lane checkweigher" },
+  { id: "MhKsy_cLYPc", title: "Food metal detector" },
+];
+
 const machinesText = (n) => `${n} ${n === 1 ? "machine" : "machines"}`;
 
 /* ─── Page Component ─── */
@@ -26,6 +34,14 @@ export default function ProductCategoryPage({ products = [] }) {
   const { t } = useLocale();
   const { category } = useParams();
   const data = PRODUCT_DATA[category];
+  // Films wait until the page has loaded, so they never slow it down
+  const [filmsOn, setFilmsOn] = useState(false);
+  useEffect(() => {
+    const on = () => setFilmsOn(true);
+    if (document.readyState === "complete") { on(); return undefined; }
+    window.addEventListener("load", on, { once: true });
+    return () => window.removeEventListener("load", on);
+  }, []);
 
   // /products — the machines in the shop, then every category
   if (!category) {
@@ -48,6 +64,17 @@ export default function ProductCategoryPage({ products = [] }) {
           <div className="max-w-6xl mx-auto">
             <h1 className="font-barlowC font-bold text-4xl sm:text-5xl tracking-tight text-white">{t("Pharma & food machinery products")}</h1>
             <p className="mt-3 text-lg text-white/80 max-w-2xl">{seoPages.products.description}</p>
+          </div>
+        </section>
+
+        <section className="max-w-6xl mx-auto px-5 sm:px-8 pt-12" aria-labelledby="films">
+          <h2 id="films" className="font-barlowC font-bold text-3xl text-white">{t("See the machines running")}</h2>
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            {FILMS.map((f) => (
+              <div key={f.id} className="aspect-video overflow-hidden rounded-xl bg-slate-900">
+                {filmsOn && <iframe title={f.title} src={youtubeEmbed(f.id, { controls: 1 })} loading="lazy" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" className="h-full w-full border-0" />}
+              </div>
+            ))}
           </div>
         </section>
 
