@@ -19,6 +19,8 @@ export const CITY_HUBS = [
   {
     slug: 'ahmedabad',
     city: 'Ahmedabad',
+    // Search Console: "pharma machinery manufacturers in ahmedabad" (we make them in Haridwar)
+    seoTitle: 'Pharma Machinery Manufacturers Supplying Ahmedabad',
     state: 'Gujarat',
     area: 'Ahmedabad, Changodar, Sanand, Bavla and Moraiya',
     intro: 'Ahmedabad and its industrial belt (Changodar, Sanand, Bavla, Moraiya) are among the main pharma manufacturing areas of Gujarat, from formulations to APIs.',
@@ -72,6 +74,6 @@ export const cityHub = (slug) => CITY_HUBS.find((c) => c.slug === slug) || null;
 // For the sitemap / page SEO (seo/pageSeo.js)
 export const CITY_PAGES = CITY_HUBS.map((c) => ({
   path: `/pharma-machinery-supplier/${c.slug}`,
-  title: `Pharma Machinery Supplier in ${c.city}`,
+  title: c.seoTitle || `Pharma Machinery Supplier in ${c.city}`,
   description: `Tablet presses, capsule fillers, blister packing, liquid filling and other pharma machines for plants in ${c.area}. Quotation, delivery, installation support, AMC and spares.`.slice(0, 160),
 }));

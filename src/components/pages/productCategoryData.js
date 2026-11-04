@@ -33,7 +33,9 @@ export const PRODUCT_DATA = {
   },
   "labeling": {
     title: "Labeling Machines",
-    description: "Wrap‑around, top‑label, and print‑and‑apply labeling systems.",
+    // Search title (Search Console: "food/pharma labeling")
+    seoTitle: "Food & Pharma Labeling Machines",
+    description: "Food and pharma labeling machines: wrap‑around, top‑label, and print‑and‑apply labeling systems.",
   },
   "coating": {
     title: "Coating Systems",

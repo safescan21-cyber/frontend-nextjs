@@ -148,9 +148,9 @@ export const seoPages = {
   },
   spares: {
     path: '/spares',
-    title: 'Spare Parts by Machine Model',
+    title: 'Pharma & Food Machine Parts – Spares by Model',
     description:
-      'Spare parts for tablet presses, capsule fillers, blister and liquid filling machines: punches, dies, seals and change parts. Pick your machine model or ask for any part.',
+      'Pharma and food machine parts: punches, dies, seals and change parts for tablet presses, capsule fillers, blister and filling machines. Ask for any part.',
   },
   amc: {
     path: '/amc',
@@ -174,7 +174,7 @@ export const seoPages = {
     path: '/pharma-machinery-supplier',
     title: 'Pharma Machinery Suppliers for India’s Pharma Hubs',
     description:
-      'Pharma machinery, installation support, AMC and spares for plants in Haridwar, Baddi, Ahmedabad, Hyderabad, Vapi, Mumbai, Pune, Indore and Sikkim.',
+      'Premium pharma machinery supplier for plants in Haridwar, Baddi, Ahmedabad, Hyderabad, Vapi, Mumbai, Pune, Indore and Sikkim: installation, AMC and spares.',
   },
   plantChecklist: {
     path: '/pharma-plant-checklist',
