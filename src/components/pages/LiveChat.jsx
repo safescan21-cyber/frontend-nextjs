@@ -6,7 +6,7 @@ import getBaseURL from "../../utlis/baseURL";
 import { getLeadOrigin } from "../../utlis/leadOrigin";
 import { gaEvent } from "../../utlis/analytics";
 import { LOCALE_CODES } from "../../i18n/locales";
-import { regionName } from "../../utlis/regionNames";
+import { regionLanguage, regionName, SOUTH_GREETING } from "../../utlis/regionNames";
 
 // ─── CONFIG ──────────────────────────────────────────────────────
 const WHATSAPP_NUMBER = "918700792607"; // +91 87007 92607
@@ -399,7 +399,9 @@ function LiveChat() {
   const welcomeTimeout = useRef(null);
 
   const pathname = usePathname() || "/";
-  const hindi = /^\/hi(\/|$)/.test(pathname);
+  const hindiPage = /^\/hi(\/|$)/.test(pathname);
+  const [northIndia, setNorthIndia] = useState(false); // Hindi-speaking visitor on the English site
+  const hindi = hindiPage || northIndia; // Nova listens and speaks in Hindi (chat answers stay as they are)
   const [welcome, setWelcome] = useState(null); // the greeting, once the state is known
   const [soundOn, setSoundOn] = useState(true);
   const autoOpened = useRef(false);
@@ -422,26 +424,36 @@ function LiveChat() {
     try { shown = sessionStorage.getItem("chatWelcomeShown") === "true"; } catch { /* storage blocked */ }
     if (shown) return undefined;
     // Sound can only start after a click or tap: until then the greeting waits with the chime
-    const sayHello = (text) => {
+    // (in English when this device has no voice for the regional language)
+    const sayHello = (text, english) => {
       if (soundOff()) return;
-      if (hasUserGesture()) { speak(text); return; }
+      const say = () => speak(text).then((ok) => { if (!ok && english) speak(english); });
+      if (hasUserGesture()) { say(); return; }
       const chime = pendingSound;
-      pendingSound = () => { chime?.(); speak(text); };
+      pendingSound = () => { chime?.(); say(); };
     };
     const timer = setTimeout(async () => {
       if (touched.current) return;
       try { sessionStorage.setItem("chatWelcomeShown", "true"); } catch { /* storage blocked */ }
       const area = await fetch(`${getBaseURL()}/api/geo`).then((r) => (r.ok ? r.json() : null)).catch(() => null);
       if (touched.current) return;
-      const text = greeting(area?.country === "IN" ? regionName(area.region, hindi) : "", hindi);
-      setWelcome(text);
+      // Regional language on the India and Hindi sites; English for the world or an unknown state
+      const countrySite = LOCALE_CODES.some((c) => c !== "hi" && (pathname === `/${c}` || pathname.startsWith(`/${c}/`)));
+      const region = area?.country === "IN" && !countrySite ? area.region : "";
+      const language = hindiPage ? "hi" : regionLanguage(region);
+      const english = greeting(regionName(region, false), false);
+      const local = language === "hi" ? greeting(regionName(region, true), true) : SOUTH_GREETING[language] || "";
+      const spoken = local || english;
+      const text = hindiPage || !local ? spoken : `${local}\n\n${english}`;
+      if (language === "hi") setNorthIndia(true);
+      setWelcome(spoken);
       if (window.matchMedia("(min-width: 1024px)").matches) {
         autoOpened.current = true;
         setMsgs([]);
         setLoading(true);
         setOpen(true);
         playSound("chime", { wait: true });
-        sayHello(text);
+        sayHello(spoken, english);
         welcomeTimeout.current = setTimeout(() => {
           setLoading(false);
           setMsgs([{ ...INIT_MSG, content: text, isNew: true, askLocation: true }]);
@@ -450,14 +462,14 @@ function LiveChat() {
         setMsgs([{ ...INIT_MSG, content: text, askLocation: true }]);
         setShowWelcome(true);
         playSound("chime", { wait: true });
-        sayHello(text);
+        sayHello(spoken, english);
         welcomeTimeout.current = setTimeout(() => {
           setShowWelcome(false); // the voice still waits for their first tap
         }, 12000);
       }
     }, 500);
     return () => clearTimeout(timer);
-  }, [pathname, hindi]);
+  }, [pathname, hindiPage]);
 
   useEffect(() => {
     return () => {
