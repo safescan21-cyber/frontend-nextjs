@@ -105,7 +105,8 @@ if (typeof window !== "undefined") {
     pendingSound = null;
     p();
   };
-  ["pointerdown", "keydown", "touchstart"].forEach((ev) => document.addEventListener(ev, unlock, { capture: true, passive: true }));
+  // (on a touch screen sound is only allowed when the finger lifts, not when it lands)
+  ["pointerup", "click", "keydown", "touchend"].forEach((ev) => document.addEventListener(ev, unlock, { capture: true, passive: true }));
 }
 
 // Pages where the chat must not pop up by itself (buying, logging in, admin)
@@ -422,8 +423,7 @@ function LiveChat() {
         playSound("chime", { wait: true });
         sayHello(text);
         welcomeTimeout.current = setTimeout(() => {
-          setShowWelcome(false);
-          cancelPendingSound();
+          setShowWelcome(false); // the voice still waits for their first tap
         }, 12000);
       }
     }, 500);

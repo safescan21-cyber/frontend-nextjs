@@ -1,6 +1,7 @@
 // Reads text aloud with the voices on the visitor's own device (the browser's speech feature).
 // Browsers only allow sound after a click, so it always starts from a button.
 export const canSpeak = () => typeof window !== 'undefined' && 'speechSynthesis' in window;
+if (canSpeak()) window.speechSynthesis.getVoices(); // browsers load the voice list on first ask
 
 const voices = () => new Promise((resolve) => {
   const list = window.speechSynthesis.getVoices();
@@ -16,10 +17,12 @@ export const stopSpeaking = () => { if (canSpeak()) window.speechSynthesis.cance
 export const speak = async (text, onEnd) => {
   if (!canSpeak()) return false;
   const lang = /[ऀ-ॿ]/.test(text) ? 'hi' : 'en';
-  const list = await voices();
+  // no waiting when the list is there: iPhones only speak straight from the tap itself
+  const ready = window.speechSynthesis.getVoices();
+  const list = ready.length ? ready : await voices();
   const voice = list.find((v) => v.lang.toLowerCase().startsWith(`${lang}-in`)) || list.find((v) => v.lang.toLowerCase().startsWith(lang));
   if (!voice) return false;
-  stopSpeaking();
+  if (window.speechSynthesis.speaking) stopSpeaking();
   const u = new SpeechSynthesisUtterance(text.replace(/https?:\/\/\S+/g, ''));
   u.voice = voice;
   u.lang = voice.lang;
