@@ -13,8 +13,8 @@ const voices = () => new Promise((resolve) => {
 
 export const stopSpeaking = () => { if (canSpeak()) window.speechSynthesis.cancel(); };
 
-// By the text's script: Hindi, Tamil, Telugu, Kannada, Malayalam, else English
-const SCRIPTS = [['hi', 0x900, 0x97f], ['ta', 0xb80, 0xbff], ['te', 0xc00, 0xc7f], ['kn', 0xc80, 0xcff], ['ml', 0xd00, 0xd7f]];
+// By the text's script: Hindi, Bengali, Gujarati, Tamil, Telugu, Kannada, Malayalam, else English
+const SCRIPTS = [['hi', 0x900, 0x97f], ['bn', 0x980, 0x9ff], ['gu', 0xa80, 0xaff], ['ta', 0xb80, 0xbff], ['te', 0xc00, 0xc7f], ['kn', 0xc80, 0xcff], ['ml', 0xd00, 0xd7f]];
 const textLanguage = (text) => {
   for (const ch of text) {
     const code = ch.codePointAt(0);
@@ -25,13 +25,15 @@ const textLanguage = (text) => {
 };
 
 // Resolves false when the device has no voice for the language (an English voice would garble Hindi)
-export const speak = async (text, onEnd) => {
+// (language: for Marathi, which shares the Hindi script; a Hindi voice reads it if there is no Marathi one)
+export const speak = async (text, onEnd, language) => {
   if (!canSpeak()) return false;
-  const lang = textLanguage(text);
+  const lang = language || textLanguage(text);
   // no waiting when the list is there: iPhones only speak straight from the tap itself
   const ready = window.speechSynthesis.getVoices();
   const list = ready.length ? ready : await voices();
-  const voice = list.find((v) => v.lang.toLowerCase().startsWith(`${lang}-in`)) || list.find((v) => v.lang.toLowerCase().startsWith(lang));
+  const voice = list.find((v) => v.lang.toLowerCase().startsWith(`${lang}-in`)) || list.find((v) => v.lang.toLowerCase().startsWith(lang))
+    || (lang === 'mr' && list.find((v) => v.lang.toLowerCase().startsWith('hi')));
   if (!voice) return false;
   if (window.speechSynthesis.speaking) stopSpeaking();
   const u = new SpeechSynthesisUtterance(text.replace(/https?:\/\/\S+/g, ''));

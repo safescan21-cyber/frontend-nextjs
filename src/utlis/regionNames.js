@@ -14,19 +14,25 @@ const NAMES = {
 export const regionName = (code, hindi) => NAMES[code]?.[hindi ? 1 : 0] || '';
 
 // The language Nova greets in, by region code: Hindi in the north, the state's language in the
-// south, and nothing (English) anywhere else or when the state isn't known
+// south, west and east, and nothing (English) anywhere else or when the state isn't known
 const LANGUAGES = {
   hi: ['HR', 'UP', 'UT', 'UK', 'HP', 'DL', 'RJ', 'MP', 'BR', 'JH', 'CT', 'CG', 'PB', 'CH', 'JK', 'LA'],
   ta: ['TN', 'PY'],
   te: ['AP', 'TG', 'TS'],
   kn: ['KA'],
   ml: ['KL', 'LD'],
+  gu: ['GJ'],
+  mr: ['MH'],
+  bn: ['WB', 'TR'],
 };
 export const regionLanguage = (code) => Object.keys(LANGUAGES).find((l) => LANGUAGES[l].includes(code)) || '';
 
-export const SOUTH_GREETING = {
+export const REGIONAL_GREETING = {
   ta: 'ஃபுட் ஃபார்மா மெஷினரிக்கு வரவேற்கிறோம்! நான் நோவா. உங்களுக்கு எந்த வகை இயந்திரம் வேண்டும்?',
   te: 'ఫుడ్ ఫార్మా మెషినరీకి స్వాగతం! నేను నోవా. మీకు ఏ రకమైన యంత్రం కావాలి?',
   kn: 'ಫುಡ್ ಫಾರ್ಮಾ ಮೆಷಿನರಿಗೆ ಸ್ವಾಗತ! ನಾನು ನೋವಾ. ನಿಮಗೆ ಯಾವ ರೀತಿಯ ಯಂತ್ರ ಬೇಕು?',
   ml: 'ഫുഡ് ഫാർമ മെഷിനറിയിലേക്ക് സ്വാഗതം! ഞാൻ നോവ. നിങ്ങൾക്ക് ഏത് തരം യന്ത്രമാണ് വേണ്ടത്?',
+  gu: 'ફૂડ ફાર્મા મશીનરીમાં આપનું સ્વાગત છે! હું નોવા છું. તમે કયા પ્રકારનું મશીન શોધી રહ્યા છો?',
+  mr: 'फूड फार्मा मशिनरीमध्ये आपले स्वागत आहे! मी नोवा. तुम्ही कोणत्या प्रकारचे मशीन शोधत आहात?',
+  bn: 'ফুড ফার্মা মেশিনারিতে আপনাকে স্বাগতম! আমি নোভা। আপনি কোন ধরনের মেশিন খুঁজছেন?',
 };

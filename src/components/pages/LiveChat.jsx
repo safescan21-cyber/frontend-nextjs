@@ -6,7 +6,7 @@ import getBaseURL from "../../utlis/baseURL";
 import { getLeadOrigin } from "../../utlis/leadOrigin";
 import { gaEvent } from "../../utlis/analytics";
 import { LOCALE_CODES } from "../../i18n/locales";
-import { regionLanguage, regionName, SOUTH_GREETING } from "../../utlis/regionNames";
+import { regionLanguage, regionName, REGIONAL_GREETING } from "../../utlis/regionNames";
 
 // ─── CONFIG ──────────────────────────────────────────────────────
 const WHATSAPP_NUMBER = "918700792607"; // +91 87007 92607
@@ -425,9 +425,9 @@ function LiveChat() {
     if (shown) return undefined;
     // Sound can only start after a click or tap: until then the greeting waits with the chime
     // (in English when this device has no voice for the regional language)
-    const sayHello = (text, english) => {
+    const sayHello = (text, english, language) => {
       if (soundOff()) return;
-      const say = () => speak(text).then((ok) => { if (!ok && english) speak(english); });
+      const say = () => speak(text, undefined, language === "mr" ? "mr" : undefined).then((ok) => { if (!ok && english) speak(english); });
       if (hasUserGesture()) { say(); return; }
       const chime = pendingSound;
       pendingSound = () => { chime?.(); say(); };
@@ -442,7 +442,7 @@ function LiveChat() {
       const region = area?.country === "IN" && !countrySite ? area.region : "";
       const language = hindiPage ? "hi" : regionLanguage(region);
       const english = greeting(regionName(region, false), false);
-      const local = language === "hi" ? greeting(regionName(region, true), true) : SOUTH_GREETING[language] || "";
+      const local = language === "hi" ? greeting(regionName(region, true), true) : REGIONAL_GREETING[language] || "";
       const spoken = local || english;
       const text = hindiPage || !local ? spoken : `${local}\n\n${english}`;
       if (language === "hi") setNorthIndia(true);
@@ -453,7 +453,7 @@ function LiveChat() {
         setLoading(true);
         setOpen(true);
         playSound("chime", { wait: true });
-        sayHello(spoken, english);
+        sayHello(spoken, english, language);
         welcomeTimeout.current = setTimeout(() => {
           setLoading(false);
           setMsgs([{ ...INIT_MSG, content: text, isNew: true, askLocation: true }]);
@@ -462,7 +462,7 @@ function LiveChat() {
         setMsgs([{ ...INIT_MSG, content: text, askLocation: true }]);
         setShowWelcome(true);
         playSound("chime", { wait: true });
-        sayHello(spoken, english);
+        sayHello(spoken, english, language);
         welcomeTimeout.current = setTimeout(() => {
           setShowWelcome(false); // the voice still waits for their first tap
         }, 12000);
