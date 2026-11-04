@@ -4,6 +4,7 @@ import { useState } from "react";
 import axios from "axios";
 import getBaseUrl from "../../utlis/baseURL";
 import LocationMap from "./LocationMap";
+import { useLocale } from "../../i18n/LocaleContext";
 
 // ══════════════════════════════════════════════════════════
 //  CONFIG
@@ -91,6 +92,7 @@ const Field = ({ label, name, value, onChange, placeholder, error, type = "text"
 //  CONTACT PAGE
 // ══════════════════════════════════════════════════════════
 export default function Contact() {
+  const { t, info } = useLocale();
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState("idle"); // idle | sending | sent
@@ -98,11 +100,11 @@ export default function Contact() {
 
   const validate = () => {
     const e = {};
-    if (!form.name.trim()) e.name = "Name is required";
-    if (!form.email.trim()) e.email = "Email is required";
-    else if (!EMAIL_RE.test(form.email.trim())) e.email = "Enter a valid email address";
-    if (!form.message.trim()) e.message = "Message cannot be empty";
-    else if (form.message.length > 5000) e.message = "Message is too long (max 5000 characters)";
+    if (!form.name.trim()) e.name = t("Name is required");
+    if (!form.email.trim()) e.email = t("Email is required");
+    else if (!EMAIL_RE.test(form.email.trim())) e.email = t("Enter a valid email address");
+    if (!form.message.trim()) e.message = t("Message cannot be empty");
+    else if (form.message.length > 5000) e.message = t("Message is too long (max 5000 characters)");
     return e;
   };
 
@@ -144,10 +146,10 @@ export default function Contact() {
       setStatus("sent");
     } catch (error) {
       console.error("Contact submission error:", error);
-      let msg = "Something went wrong. Please try again, or message us on WhatsApp.";
+      let msg = t("Something went wrong. Please try again, or message us on WhatsApp.");
       if (error.response?.data?.message) msg = error.response.data.message;
-      else if (error.code === "ECONNABORTED") msg = "The request timed out. Please try again.";
-      else if (!error.response) msg = "Could not reach the server. Check your connection or use WhatsApp.";
+      else if (error.code === "ECONNABORTED") msg = t("The request timed out. Please try again.");
+      else if (!error.response) msg = t("Could not reach the server. Check your connection or use WhatsApp.");
       setServerError(msg);
       setStatus("idle");
     }
@@ -169,13 +171,13 @@ export default function Contact() {
         <header className="mb-14 sm:mb-20">
           <div className="inline-flex items-center gap-2 border border-amber-500/30 bg-amber-500/10 rounded-full px-4 py-1.5 mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-            <p className="text-xs tracking-[0.3em] uppercase text-amber-400 font-semibold">Get in touch</p>
+            <p className="text-xs tracking-[0.3em] uppercase text-amber-400 font-semibold">{t("Get in touch")}</p>
           </div>
           <h1 className="text-5xl sm:text-7xl font-black leading-none text-white" style={{ fontFamily: "Georgia,serif", letterSpacing: "-0.03em" }}>
-            Let&apos;s <span className="text-transparent" style={{ WebkitTextStroke: "2px #f59e0b" }}>Talk.</span>
+            {info.language === "hi" ? t("Let's Talk.") : <>Let&apos;s <span className="text-transparent" style={{ WebkitTextStroke: "2px #f59e0b" }}>Talk.</span></>}
           </h1>
           <p className="mt-6 text-stone-400 text-base sm:text-lg max-w-xl leading-relaxed">
-            Tell us about your plant and the machine you need. Our engineers reply within 24 hours, or message us on WhatsApp for a faster answer.
+            {t("Tell us about your plant and the machine you need. Our engineers reply within 24 hours, or message us on WhatsApp for a faster answer.")}
           </p>
           <div className="mt-8 flex items-center gap-4 flex-wrap">
             <a
@@ -185,7 +187,7 @@ export default function Contact() {
               className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white text-sm font-bold px-5 py-3 rounded-xl transition-all duration-200 hover:shadow-[0_4px_20px_rgba(37,211,102,0.35)] hover:-translate-y-0.5"
             >
               <WhatsAppIcon className="w-4 h-4" />
-              WhatsApp Us
+              {t("WhatsApp Us")}
             </a>
             <a href={PHONE_TEL} className="inline-flex items-center gap-2 border border-white/15 hover:border-amber-500/50 text-stone-200 text-sm font-semibold px-5 py-3 rounded-xl transition-colors">
               <Icon d={ICON_PHONE} />
@@ -197,27 +199,27 @@ export default function Contact() {
         <div className="grid md:grid-cols-5 gap-12 lg:gap-20 items-start">
           {/* Left: details */}
           <aside className="md:col-span-2 space-y-8">
-            <InfoRow icon={ICON_MAIL} label="Email">
+            <InfoRow icon={ICON_MAIL} label={t("Email")}>
               <a href={`mailto:${EMAIL}`} className="hover:text-amber-400 transition-colors break-all">{EMAIL}</a>
             </InfoRow>
-            <InfoRow icon={ICON_PHONE} label="Phone / WhatsApp">
+            <InfoRow icon={ICON_PHONE} label={t("Phone / WhatsApp")}>
               <a href={PHONE_TEL} className="hover:text-amber-400 transition-colors">{PHONE_DISPLAY}</a>
             </InfoRow>
-            <InfoRow icon={ICON_PIN} label="Offices">
+            <InfoRow icon={ICON_PIN} label={t("Offices")}>
               <ul className="space-y-2">
                 {OFFICES.map((o) => (
                   <li key={o.name}>
-                    <span className="font-semibold text-white">{o.name}:</span> {o.address}
+                    <span className="font-semibold text-white">{t(o.name)}:</span> {o.address}
                   </li>
                 ))}
               </ul>
             </InfoRow>
-            <InfoRow icon={ICON_CLOCK} label="Business Hours">
+            <InfoRow icon={ICON_CLOCK} label={t("Business Hours")}>
               <ul className="space-y-1">
                 {HOURS.map((h) => (
                   <li key={h.day} className="flex justify-between gap-6 max-w-[260px]">
-                    <span className="text-stone-500">{h.day}</span>
-                    <span>{h.time}</span>
+                    <span className="text-stone-500">{t(h.day)}</span>
+                    <span>{t(h.time)}</span>
                   </li>
                 ))}
               </ul>
@@ -234,9 +236,9 @@ export default function Contact() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <h2 className="text-2xl font-bold text-white" style={{ fontFamily: "Georgia,serif" }}>Message Sent!</h2>
+                  <h2 className="text-2xl font-bold text-white" style={{ fontFamily: "Georgia,serif" }}>{t("Message Sent!")}</h2>
                   <p className="text-stone-400 text-sm max-w-xs">
-                    Thank you. We&apos;ll get back to you within 24 hours. For an instant reply, message us on WhatsApp.
+                    {t("Thank you. We'll get back to you within 24 hours. For an instant reply, message us on WhatsApp.")}
                   </p>
                   <a
                     href={WHATSAPP_URL}
@@ -245,28 +247,28 @@ export default function Contact() {
                     className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white text-sm font-bold px-5 py-3 rounded-xl transition-colors"
                   >
                     <WhatsAppIcon className="w-4 h-4" />
-                    Chat on WhatsApp
+                    {t("Chat on WhatsApp")}
                   </a>
                   <button
                     type="button"
                     onClick={() => setStatus("idle")}
                     className="text-xs tracking-widest uppercase text-stone-500 hover:text-amber-400 transition-colors"
                   >
-                    Send another message →
+                    {t("Send another message →")}
                   </button>
                 </div>
               ) : (
                 <form {...formTool('contact')} onSubmit={handleSubmit} className="space-y-7" noValidate>
-                  <p className="text-[10px] tracking-[0.3em] uppercase text-stone-500">Send a message</p>
+                  <p className="text-[10px] tracking-[0.3em] uppercase text-stone-500">{t("Send a message")}</p>
 
                   <div className="grid sm:grid-cols-2 gap-6">
-                    <Field label="Full Name" name="name" value={form.name} onChange={handleChange} placeholder="Your name" error={errors.name} required />
-                    <Field label="Email Address" name="email" type="email" value={form.email} onChange={handleChange} placeholder="you@company.com" error={errors.email} required />
+                    <Field label={t("Full Name")} name="name" value={form.name} onChange={handleChange} placeholder={t("Your name")} error={errors.name} required />
+                    <Field label={t("Email Address")} name="email" type="email" value={form.email} onChange={handleChange} placeholder="you@company.com" error={errors.email} required />
                   </div>
 
-                  <Field label="Subject" name="subject" value={form.subject} onChange={handleChange} placeholder="e.g. Tablet press quotation" />
+                  <Field label={t("Subject")} name="subject" value={form.subject} onChange={handleChange} placeholder={t("e.g. Tablet press quotation")} />
 
-                  <Field label="Message" name="message" error={errors.message} required>
+                  <Field label={t("Message")} name="message" error={errors.message} required>
                     <textarea
                       id="c-message"
                       name="message"
@@ -274,7 +276,7 @@ export default function Contact() {
                       onChange={handleChange}
                       rows={5}
                       maxLength={5000}
-                      placeholder="Tell us which machine you need, capacity, and your location…"
+                      placeholder={t("Tell us which machine you need, capacity, and your location…")}
                       aria-invalid={!!errors.message}
                       className={`w-full bg-transparent border-b-2 ${
                         errors.message ? "border-rose-500" : "border-stone-700 hover:border-amber-500/60"
@@ -300,14 +302,14 @@ export default function Contact() {
                       disabled={status === "sending"}
                       className="group inline-flex items-center gap-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 disabled:from-stone-700 disabled:to-stone-700 text-white disabled:text-stone-400 px-7 py-3.5 rounded-xl text-sm font-bold transition-all duration-300 hover:shadow-[0_4px_20px_rgba(245,158,11,0.35)] disabled:cursor-not-allowed"
                     >
-                      <span>{status === "sending" ? "Sending…" : "Send Message"}</span>
+                      <span>{status === "sending" ? t("Sending…") : t("Send Message")}</span>
                       {status !== "sending" && (
                         <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
                       )}
                     </button>
-                    <span className="text-xs text-stone-500">or use WhatsApp for instant replies</span>
+                    <span className="text-xs text-stone-500">{t("or use WhatsApp for instant replies")}</span>
                   </div>
                 </form>
               )}

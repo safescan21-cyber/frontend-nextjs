@@ -5,6 +5,7 @@ import { formTool } from '../../webmcp/webmcpTools';
 import React, { useState, useEffect } from 'react';
 import { youtubeEmbed, youtubeId, youtubeThumb } from '../../../utlis/youtube';
 import { VIDEO_HINDI } from '../../../utlis/videoHindi';
+import { productHindi } from '../../../utlis/productHindi';
 import HindiVoice from './HindiVoice';
 import { useParams, useNavigate, Link } from '../../../shell/router';
 import { useDispatch, useSelector } from 'react-redux';
@@ -220,6 +221,7 @@ const SingleProduct = () => {
 
   // ── Product videos (Cloudinary): play as MP4 everywhere, JPG frame as poster ──
   const videoUrls = (Array.isArray(product.videos) ? product.videos : []).filter((v) => typeof v === 'string' && v);
+  const description = (i18n.info.language === 'hi' && productHindi(product._id)) || product.description;
   const hindiVideo = videoUrls.map((v) => VIDEO_HINDI[youtubeId(v)]).find(Boolean);
   const videoSrc = (url) => (url.includes('res.cloudinary.com') ? url.replace(/\.(webm|ogv|mov|mkv|avi)(\?.*)?$/i, '.mp4') : url);
   const videoPoster = (url) => (youtubeId(url) ? youtubeThumb(youtubeId(url)) : url.includes('res.cloudinary.com') ? url.replace(/\.\w+(\?.*)?$/, '.jpg').replace('/video/upload/', '/video/upload/so_1/') : undefined);
@@ -636,9 +638,9 @@ const SingleProduct = () => {
               <ProductCoupon product={product} />
               </>)}
 
-              {product.description && (
+              {description && (
                 <p className="whitespace-pre-line text-gray-600 text-sm md:text-base leading-relaxed border-l-4 border-blue-200 pl-4 bg-blue-50/40 py-2 rounded-r-lg">
-                  {product.description}
+                  {description}
                 </p>
               )}
 
@@ -840,7 +842,7 @@ const SingleProduct = () => {
               <div className="prose prose-sm max-w-none text-gray-700 space-y-4">
                 <h3 className="text-lg font-bold text-gray-900">{t("Product Overview")}</h3>
                 <p className="leading-relaxed whitespace-pre-line">
-                  {product.description ||
+                  {description ||
                     `${product.name} for pharma and food manufacturing. Contact us for full specifications and a quote.`}
                 </p>
                 {/* Only facts from the product's own data (no template claims) */}

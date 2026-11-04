@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { Link } from '../../shell/router';
+import { useLocale } from '../../i18n/LocaleContext';
 import {
   Shield, Users, Clock, Zap, CheckCircle, TrendingUp, Eye,
   Settings, HeartHandshake, Package, Wrench, FileText,
@@ -39,7 +40,10 @@ const REASONS = [
   { icon: Zap, title: 'After-Sales Support', desc: 'Technical help after delivery, from installation to troubleshooting.' },
 ];
 
-const About = () => (
+const About = () => {
+  const { t, info } = useLocale();
+  const hi = info.language === 'hi'; // headings with coloured words are written whole in Hindi
+  return (
   <>
     <Seo {...seoPages.about} jsonLd={aboutJsonLd} />
 
@@ -48,24 +52,23 @@ const About = () => (
       <header className="relative bg-gradient-to-br from-slate-800 to-slate-900 py-20 px-4 md:py-28 overflow-hidden">
         <div className="max-w-6xl mx-auto text-center relative z-10">
           <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight">
-            About <span className="text-orange-500">Food Pharma Machinery</span>
+            {hi ? <span className="text-orange-500">{t('About Food Pharma Machinery')}</span> : <>About <span className="text-orange-500">Food Pharma Machinery</span></>}
           </h1>
           <p className="mt-6 text-lg md:text-xl text-slate-400 max-w-3xl mx-auto">
-            We supply tablet presses, capsule fillers, packaging machines and weighing equipment to
-            pharma and food manufacturers, built to cGMP standards.
+            {t('We supply tablet presses, capsule fillers, packaging machines and weighing equipment to pharma and food manufacturers, built to cGMP standards.')}
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
               to="/bulk-quote"
               className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-8 rounded-full transition shadow-lg"
             >
-              Get a Quote
+              {t('Get a Quote')}
             </Link>
             <Link
               to="/products"
               className="bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-8 rounded-full transition"
             >
-              Explore Products
+              {t('Explore Products')}
             </Link>
           </div>
         </div>
@@ -75,25 +78,25 @@ const About = () => (
       <section className="py-16 px-4 max-w-6xl mx-auto" aria-labelledby="who-we-are">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <article>
-            <h2 id="who-we-are" className="text-3xl md:text-4xl font-bold text-white">Who We Are</h2>
+            <h2 id="who-we-are" className="text-3xl md:text-4xl font-bold text-white">{t('Who We Are')}</h2>
             <div className="w-16 h-1 bg-orange-500 mt-2 mb-6" aria-hidden="true"></div>
             <p className="text-slate-400 text-lg leading-relaxed">
-              Food Pharma Machinery is a <strong>B2B supplier of pharmaceutical and food processing
+              {hi ? t('Food Pharma Machinery is a B2B supplier of pharmaceutical and food processing machinery. We help manufacturers find the right equipment for their plant, from a single machine to a complete production line.') : <>Food Pharma Machinery is a <strong>B2B supplier of pharmaceutical and food processing
               machinery</strong>. We help manufacturers find the right equipment for their plant, from a
-              single machine to a complete production line.
+              single machine to a complete production line.</>}
             </p>
             <p className="text-slate-400 text-lg leading-relaxed mt-4">
-              Our focus is on precision, reliability and compliance with{' '}
+              {hi ? t('Our focus is on precision, reliability and compliance with cGMP expectations. We work with you from the first enquiry through delivery and support.') : <>Our focus is on precision, reliability and compliance with{' '}
               <abbr title="Current Good Manufacturing Practice">cGMP</abbr> expectations. We work with you
-              from the first enquiry through delivery and support.
+              from the first enquiry through delivery and support.</>}
             </p>
           </article>
           <div className="grid grid-cols-2 gap-4" role="list">
             {HIGHLIGHTS.map((h) => (
               <div key={h.title} className="bg-slate-800 p-6 rounded-2xl border border-slate-700" role="listitem">
                 <h.icon className="text-orange-500 w-10 h-10 mb-3" aria-hidden="true" />
-                <h3 className="text-white font-bold text-lg">{h.title}</h3>
-                <p className="text-slate-500 text-sm">{h.text}</p>
+                <h3 className="text-white font-bold text-lg">{t(h.title)}</h3>
+                <p className="text-slate-500 text-sm">{t(h.text)}</p>
               </div>
             ))}
           </div>
@@ -104,7 +107,7 @@ const About = () => (
       <section className="bg-slate-800/50 py-16 px-4" aria-labelledby="core-principles">
         <div className="max-w-6xl mx-auto">
           <h2 id="core-principles" className="text-3xl md:text-4xl font-bold text-white text-center">
-            Our <span className="text-orange-500">Core</span> Principles
+            {hi ? t('Our Core Principles') : <>Our <span className="text-orange-500">Core</span> Principles</>}
           </h2>
           <div className="w-16 h-1 bg-orange-500 mx-auto mt-2 mb-10" aria-hidden="true"></div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -112,32 +115,30 @@ const About = () => (
               <div className="bg-orange-600/20 w-14 h-14 rounded-full flex items-center justify-center mb-4">
                 <TrendingUp className="text-orange-500 w-7 h-7" aria-hidden="true" />
               </div>
-              <h3 className="text-white text-xl font-bold mb-2">Mission</h3>
+              <h3 className="text-white text-xl font-bold mb-2">{t('Mission')}</h3>
               <p className="text-slate-400 leading-relaxed">
-                To help pharma and food manufacturers get dependable machinery that improves
-                productivity and protects product quality.
+                {t('To help pharma and food manufacturers get dependable machinery that improves productivity and protects product quality.')}
               </p>
             </article>
             <article className="bg-slate-900 p-8 rounded-2xl border border-slate-700 hover:border-orange-500 transition">
               <div className="bg-orange-600/20 w-14 h-14 rounded-full flex items-center justify-center mb-4">
                 <Eye className="text-orange-500 w-7 h-7" aria-hidden="true" />
               </div>
-              <h3 className="text-white text-xl font-bold mb-2">Vision</h3>
+              <h3 className="text-white text-xl font-bold mb-2">{t('Vision')}</h3>
               <p className="text-slate-400 leading-relaxed">
-                To be a trusted source for industrial pharma and food machinery, known for honest
-                advice and reliable support.
+                {t('To be a trusted source for industrial pharma and food machinery, known for honest advice and reliable support.')}
               </p>
             </article>
             <article className="bg-slate-900 p-8 rounded-2xl border border-slate-700 hover:border-orange-500 transition">
               <div className="bg-orange-600/20 w-14 h-14 rounded-full flex items-center justify-center mb-4">
                 <HeartHandshake className="text-orange-500 w-7 h-7" aria-hidden="true" />
               </div>
-              <h3 className="text-white text-xl font-bold mb-2">Values</h3>
+              <h3 className="text-white text-xl font-bold mb-2">{t('Values')}</h3>
               <ul className="text-slate-400 space-y-2">
                 {['Integrity & transparency', 'Customer-focused service', 'Uncompromising quality', 'Safety & compliance'].map((v) => (
                   <li key={v} className="flex items-start gap-2">
                     <CheckCircle className="text-orange-500 w-4 h-4 mt-1 shrink-0" aria-hidden="true" />
-                    {v}
+                    {t(v)}
                   </li>
                 ))}
               </ul>
@@ -149,7 +150,7 @@ const About = () => (
       {/* ─── WHY CHOOSE US ─── */}
       <section className="py-16 px-4 max-w-6xl mx-auto" aria-labelledby="why-choose">
         <h2 id="why-choose" className="text-3xl md:text-4xl font-bold text-white text-center">
-          Why <span className="text-orange-500">Choose Us</span>
+          {hi ? t('Why Choose Us') : <>Why <span className="text-orange-500">Choose Us</span></>}
         </h2>
         <div className="w-16 h-1 bg-orange-500 mx-auto mt-2 mb-10" aria-hidden="true"></div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -158,8 +159,8 @@ const About = () => (
               <div className="bg-orange-600/20 w-12 h-12 rounded-full flex items-center justify-center mb-3 group-hover:bg-orange-600/40 transition">
                 <item.icon className="text-orange-500 w-6 h-6" aria-hidden="true" />
               </div>
-              <h3 className="text-white font-bold text-lg">{item.title}</h3>
-              <p className="text-slate-400 text-sm mt-1">{item.desc}</p>
+              <h3 className="text-white font-bold text-lg">{t(item.title)}</h3>
+              <p className="text-slate-400 text-sm mt-1">{t(item.desc)}</p>
             </article>
           ))}
         </div>
@@ -172,35 +173,36 @@ const About = () => (
       <section className="py-16 px-4" aria-labelledby="cta">
         <div className="max-w-4xl mx-auto bg-gradient-to-r from-slate-800 to-slate-900 rounded-3xl p-10 text-center border border-slate-700">
           <h2 id="cta" className="text-3xl font-bold text-white">
-            Ready to <span className="text-orange-500">Partner</span> With Us?
+            {hi ? t('Ready to Partner With Us?') : <>Ready to <span className="text-orange-500">Partner</span> With Us?</>}
           </h2>
           <p className="text-slate-400 text-lg mt-2 max-w-2xl mx-auto">
-            Tell us about your project, whether it is a single machine or a full plant.
+            {t('Tell us about your project, whether it is a single machine or a full plant.')}
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-4">
             <Link
               to="/bulk-quote"
               className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-8 rounded-full transition shadow-lg"
             >
-              Get a Quote
+              {t('Get a Quote')}
             </Link>
             <Link
               to="/contact"
               className="bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-8 rounded-full transition"
             >
-              Contact Us
+              {t('Contact Us')}
             </Link>
             <Link
               to="/shop"
               className="bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-8 rounded-full transition"
             >
-              View Our Products
+              {t('View Our Products')}
             </Link>
           </div>
         </div>
       </section>
     </div>
   </>
-);
+  );
+};
 
 export default About;
