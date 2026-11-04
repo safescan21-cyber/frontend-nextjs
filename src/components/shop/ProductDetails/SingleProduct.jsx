@@ -4,6 +4,8 @@ import { useLocale } from '../../../i18n/LocaleContext';
 import { formTool } from '../../webmcp/webmcpTools';
 import React, { useState, useEffect } from 'react';
 import { youtubeEmbed, youtubeId, youtubeThumb } from '../../../utlis/youtube';
+import { VIDEO_HINDI } from '../../../utlis/videoHindi';
+import HindiVoice from './HindiVoice';
 import { useParams, useNavigate, Link } from '../../../shell/router';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -218,6 +220,7 @@ const SingleProduct = () => {
 
   // ── Product videos (Cloudinary): play as MP4 everywhere, JPG frame as poster ──
   const videoUrls = (Array.isArray(product.videos) ? product.videos : []).filter((v) => typeof v === 'string' && v);
+  const hindiVideo = videoUrls.map((v) => VIDEO_HINDI[youtubeId(v)]).find(Boolean);
   const videoSrc = (url) => (url.includes('res.cloudinary.com') ? url.replace(/\.(webm|ogv|mov|mkv|avi)(\?.*)?$/i, '.mp4') : url);
   const videoPoster = (url) => (youtubeId(url) ? youtubeThumb(youtubeId(url)) : url.includes('res.cloudinary.com') ? url.replace(/\.\w+(\?.*)?$/, '.jpg').replace('/video/upload/', '/video/upload/so_1/') : undefined);
 
@@ -575,6 +578,7 @@ const SingleProduct = () => {
                   );
                 })}
               </div>
+              {hindiVideo && <HindiVoice text={hindiVideo.text} />}
               {videoUrls.length > 0 && selectedImage < imageUrls.length && (
                 <button
                   onClick={() => setSelectedImage(imageUrls.length)}

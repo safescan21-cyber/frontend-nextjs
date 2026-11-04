@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { usePathname } from "next/navigation";
-import { BotMessageSquare } from "lucide-react";
+import { BotMessageSquare, Volume2 } from "lucide-react";
+import { canSpeak, speak, stopSpeaking } from "../../utlis/speak";
 import getBaseURL from "../../utlis/baseURL";
 import { getLeadOrigin } from "../../utlis/leadOrigin";
 import { gaEvent } from "../../utlis/analytics";
@@ -217,6 +218,24 @@ function MessageText({ text }) {
   });
 }
 
+// Reads one of Nova's answers aloud (Hindi or English, by the answer's script)
+function SpeakButton({ text }) {
+  const [state, setState] = useState("idle"); // idle | playing | none (no voice on this device)
+  if (!canSpeak()) return null;
+  const toggle = async () => {
+    if (state === "playing") { stopSpeaking(); setState("idle"); return; }
+    setState("playing");
+    const ok = await speak(text, () => setState("idle"));
+    if (!ok) setState("none");
+  };
+  return (
+    <button type="button" onClick={toggle} aria-label="Read this answer aloud" className="mt-2 flex items-center gap-1 text-xs text-amber-300 hover:text-amber-200">
+      <Volume2 className="h-3.5 w-3.5" aria-hidden="true" />
+      {state === "playing" ? "रोकें / Stop" : state === "none" ? "No voice on this device" : "सुनिए / Listen"}
+    </button>
+  );
+}
+
 // ─── MESSAGE BUBBLE ─────────────────────────────────────────────
 function Bubble({ msg, isNew }) {
   const isUser = msg.role === "user";
@@ -236,6 +255,7 @@ function Bubble({ msg, isNew }) {
           : "bg-stone-800/90 text-stone-200 rounded-2xl rounded-bl-sm border border-white/8 backdrop-blur-sm"
       }`}>
         {isUser ? msg.content : <MessageText text={msg.content} />}
+        {!isUser && <SpeakButton text={msg.content} />}
         {msg.showWhatsApp && (
           <div className="mt-3">
             <WhatsAppButton aiSummary={msg.waSummary} />

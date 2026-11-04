@@ -6,6 +6,7 @@
 //   asks: ways customers ask it (searched too, and used as training questions)
 // (with ".js": llm-training/export_dataset.mjs imports this file with plain Node)
 import { PRODUCT_DATA } from '../../../components/pages/productCategoryData.js';
+import { VIDEO_HINDI } from '../../../utlis/videoHindi.js';
 
 const SITE = 'https://www.foodpharmamachinery.com';
 export const PHONE = '+91 87007 92607';
@@ -122,4 +123,18 @@ export const COMPANY_FACTS = [
     url: `${SITE}/track-order`,
     asks: ['Track my order', 'Where is my order?', 'What is my order status?'],
   },
+  {
+    title: 'Machine videos',
+    text: `हमारी मशीनों के वीडियो यहाँ देखिए:\n${Object.entries(VIDEO_HINDI).map(([id, v]) => `${v.machine}: https://www.youtube.com/watch?v=${id}`).join('\n')}`,
+    url: `${SITE}/products`,
+    asks: ['video dikhao', 'machine ka video dikhao', 'machine video', 'hindi mein video', 'show me machine videos', 'do you have videos?'],
+  },
+  // Each film in Hindi (utlis/videoHindi.js)
+  ...Object.entries(VIDEO_HINDI).map(([id, v]) => ({
+    film: true, // only for questions about a video (knowledge.js)
+    title: `Video: ${v.machine}`,
+    text: `${v.text}\nवीडियो: https://www.youtube.com/watch?v=${id}`,
+    url: `${SITE}/shop/${v.shopId}`,
+    asks: v.words.flatMap((w) => [`${w} video`, `${w} video dikhao`, `${w} ka video`, `${w} hindi mein samjhao`]),
+  })),
 ];

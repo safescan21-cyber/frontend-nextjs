@@ -147,7 +147,12 @@ export const findFacts = async (question, limit = 6) => {
   if (!q.length) return [];
   const k1 = 1.2;
   const b = 0.75;
+  // A film's Hindi answer only when a video or Hindi is asked for and a machine is named
+  // ("Do you have a checkweigher?" gets the English machine answer, "video dikhao" the film list)
+  const filmWords = new Set(['video', 'videos', 'hindi', 'dikhao', 'samjhao', 'show', 'machine']);
+  const wantsFilm = q.some((w) => ['video', 'videos', 'hindi'].includes(w)) && q.some((w) => !filmWords.has(w));
   return idx.facts
+    .filter((f) => !f.film || wantsFilm)
     .map((f) => {
       let score = 0;
       let hits = 0; // how many of the question's words this fact contains
