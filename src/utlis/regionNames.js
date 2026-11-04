@@ -8,7 +8,7 @@ const NAMES = {
   RJ: ['Rajasthan', 'राजस्थान'], SK: ['Sikkim', 'सिक्किम'], TN: ['Tamil Nadu', 'तमिलनाडु'], TG: ['Telangana', 'तेलंगाना'], TS: ['Telangana', 'तेलंगाना'],
   TR: ['Tripura', 'त्रिपुरा'], UP: ['Uttar Pradesh', 'उत्तर प्रदेश'], UT: ['Uttarakhand', 'उत्तराखंड'], UK: ['Uttarakhand', 'उत्तराखंड'], WB: ['West Bengal', 'पश्चिम बंगाल'],
   AN: ['Andaman and Nicobar Islands', 'अंडमान और निकोबार'], CH: ['Chandigarh', 'चंडीगढ़'], DL: ['Delhi', 'दिल्ली'], JK: ['Jammu and Kashmir', 'जम्मू और कश्मीर'],
-  LA: ['Ladakh', 'लद्दाख'], LD: ['Lakshadweep', 'लक्षद्वीप'], PY: ['Puducherry', 'पुडुचेरी'],
+  DN: ['Dadra and Nagar Haveli and Daman and Diu', 'दादरा और नगर हवेली और दमन और दीव'], LA: ['Ladakh', 'लद्दाख'], LD: ['Lakshadweep', 'लक्षद्वीप'], PY: ['Puducherry', 'पुडुचेरी'],
 };
 
 export const regionName = (code, hindi) => NAMES[code]?.[hindi ? 1 : 0] || '';

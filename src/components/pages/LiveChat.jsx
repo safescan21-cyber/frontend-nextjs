@@ -33,6 +33,11 @@ const greeting = (place, hindi) => (hindi
   ? `फूड फार्मा मशीनरी में आपका स्वागत है${place ? `, लगता है आप ${place} से हैं` : ''}! मैं नोवा हूँ। आप किस तरह की मशीन ढूँढ रहे हैं? लिखिए, या माइक दबाकर बोलिए।`
   : `Welcome to Food Pharma Machinery${place ? `! Looks like you're visiting from ${place}` : ''}. I'm Nova. Which type of machine are you looking for? Type it, or tap the mic and say it.`);
 
+// The city a visitor found with "Use my exact location", kept in their own browser so the
+// rough guess doesn't come back on the next page or visit
+const PLACE_KEY = "novaPlace";
+const savedPlace = () => { try { return JSON.parse(localStorage.getItem(PLACE_KEY) || "null"); } catch { return null; } };
+
 // What Nova says aloud after a spoken question: short, without the whole machine card
 const spokenReply = (answer, hindi) => {
   if (answer.machine) {
@@ -249,13 +254,13 @@ function LocationButton({ hindi, onResult }) {
         body: JSON.stringify({ lat: coords.latitude, lon: coords.longitude }),
       }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
       setGone(true);
-      onResult(data?.city || "");
-    }, () => { setGone(true); onResult(null); }, { timeout: 10000, maximumAge: 600000 });
+      onResult({ city: data?.city || "", region: data?.region || "" });
+    }, (err) => { setGone(true); onResult({ blocked: err.code === 1 }); }, { timeout: 10000, maximumAge: 0 });
   };
   return (
     <button type="button" onClick={locate} disabled={busy} className="mt-2 flex items-center gap-1 text-xs font-semibold text-amber-300 hover:text-amber-200 disabled:opacity-60">
       <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
-      {busy ? (hindi ? "ढूँढ रहे हैं…" : "Finding you…") : (hindi ? "मेरी सही लोकेशन इस्तेमाल करें" : "Use my exact location")}
+      {busy ? (hindi ? "ढूँढ रहे हैं…" : "Finding you…") : (hindi ? "जगह ग़लत है? मेरी सही लोकेशन इस्तेमाल करें" : "Wrong place? Use my exact location")}
     </button>
   );
 }
@@ -418,14 +423,15 @@ function LiveChat() {
   // The greeting for this visitor: regional language on the India and Hindi sites, English for
   // the world or an unknown state
   const buildGreeting = useCallback(async () => {
-    const area = await fetch(`${getBaseURL()}/api/geo`).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+    const saved = savedPlace();
+    const area = saved ? null : await fetch(`${getBaseURL()}/api/geo`).then((r) => (r.ok ? r.json() : null)).catch(() => null);
     const countrySite = LOCALE_CODES.some((c) => c !== "hi" && (pathname === `/${c}` || pathname.startsWith(`/${c}/`)));
-    const region = area?.country === "IN" && !countrySite ? area.region : "";
+    const region = countrySite ? "" : saved?.region || (area?.country === "IN" ? area.region : "");
     const language = hindiPage ? "hi" : regionLanguage(region);
-    const english = greeting(regionName(region, false), false);
-    const local = language === "hi" ? greeting(regionName(region, true), true) : REGIONAL_GREETING[language] || "";
+    const english = greeting(saved?.city || regionName(region, false), false);
+    const local = language === "hi" ? greeting(saved?.city || regionName(region, true), true) : REGIONAL_GREETING[language] || "";
     const spoken = local || english;
-    return { language, english, spoken, text: hindiPage || !local ? spoken : `${local}\n\n${english}` };
+    return { language, english, spoken, exact: Boolean(saved), text: hindiPage || !local ? spoken : `${local}\n\n${english}` };
   }, [pathname, hindiPage]);
 
   // Later pages of a visit, and pages where the chat doesn't pop up: same greeting in the chat,
@@ -435,11 +441,11 @@ function LiveChat() {
     try { greeted = sessionStorage.getItem("chatWelcomeShown") === "true"; } catch { /* storage blocked */ }
     if (!greeted && !QUIET_PAGES.test(pathname)) return undefined;
     let live = true;
-    buildGreeting().then(({ language, spoken, text }) => {
+    buildGreeting().then(({ language, spoken, text, exact }) => {
       if (!live) return;
       if (language === "hi") setNorthIndia(true);
       setWelcome(spoken);
-      setMsgs((prev) => (prev.length === 1 && prev[0].role === "assistant" ? [{ ...prev[0], content: text, askLocation: true }] : prev));
+      setMsgs((prev) => (prev.length === 1 && prev[0].role === "assistant" ? [{ ...prev[0], content: text, askLocation: !exact }] : prev));
     });
     return () => { live = false; };
   }, [pathname, buildGreeting]);
@@ -464,7 +470,7 @@ function LiveChat() {
     const timer = setTimeout(async () => {
       if (touched.current) return;
       try { sessionStorage.setItem("chatWelcomeShown", "true"); } catch { /* storage blocked */ }
-      const { language, english, spoken, text } = await buildGreeting();
+      const { language, english, spoken, text, exact } = await buildGreeting();
       if (touched.current) return;
       if (language === "hi") setNorthIndia(true);
       setWelcome(spoken);
@@ -477,10 +483,10 @@ function LiveChat() {
         sayHello(spoken, english, language);
         welcomeTimeout.current = setTimeout(() => {
           setLoading(false);
-          setMsgs([{ ...INIT_MSG, content: text, isNew: true, askLocation: true }]);
+          setMsgs([{ ...INIT_MSG, content: text, isNew: true, askLocation: !exact }]);
         }, 1400);
       } else {
-        setMsgs([{ ...INIT_MSG, content: text, askLocation: true }]);
+        setMsgs([{ ...INIT_MSG, content: text, askLocation: !exact }]);
         setShowWelcome(true);
         playSound("chime", { wait: true });
         sayHello(spoken, english, language);
@@ -575,11 +581,17 @@ function LiveChat() {
     }
   }, [input, loading, open, hindi]);
 
-  // The visitor shared their position: city, or null when they said no
-  const onLocated = (city) => {
+  // The visitor shared their position (or the browser refused it)
+  const onLocated = ({ city, region, blocked }) => {
+    if (city) {
+      try { localStorage.setItem(PLACE_KEY, JSON.stringify({ city, region })); } catch { /* storage blocked */ }
+      if (regionLanguage(region) === "hi") setNorthIndia(true);
+    }
     const text = city
       ? (hindi ? `धन्यवाद! आप ${city} के पास हैं। आप किस तरह की मशीन ढूँढ रहे हैं?` : `Thank you! You're near ${city}. Which type of machine are you looking for?`)
-      : (hindi ? 'कोई बात नहीं। आप किस तरह की मशीन ढूँढ रहे हैं?' : 'No problem. Which type of machine are you looking for?');
+      : blocked
+        ? (hindi ? 'आपके ब्राउज़र ने लोकेशन बंद की हुई है। वेब पते के बाईं ओर के आइकन पर क्लिक करके Location को Allow करें और पेज रीलोड करें।' : 'Your browser has blocked location. Click the icon left of the web address, set Location to Allow, and reload the page.')
+        : (hindi ? 'मैं आपकी जगह नहीं ढूँढ पाई। आप किस तरह की मशीन ढूँढ रहे हैं?' : "I couldn't find your location. Which type of machine are you looking for?");
     setMsgs((prev) => [...prev, { role: "assistant", content: text, isNew: true }]);
     if (!soundOff()) speak(text);
   };
