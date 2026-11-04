@@ -202,7 +202,7 @@ const HoverDropdown = ({ label, open, setOpen, timeoutRef, children, wide, id })
         type="button"
         aria-expanded={open}
         aria-controls={contentId}
-        className="flex items-center space-x-1 whitespace-nowrap px-2 2xl:px-4 py-2 text-xs 2xl:text-sm font-medium text-slate-200 hover:text-amber-400 hover:bg-slate-700/50 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
+        className="flex items-center space-x-1 whitespace-nowrap px-2 2xl:px-2.5 py-2 text-xs 2xl:text-sm font-medium text-slate-200 hover:text-amber-400 hover:bg-slate-700/50 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
       >
         <span>{label}</span>
         <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} aria-hidden="true" />
@@ -524,7 +524,7 @@ const Navbar = () => {
               </div>
 
               {/* Desktop Navigation */}
-              <nav aria-label={t("Main navigation")} className="hidden xl:flex flex-1 min-w-0 justify-start px-2 2xl:px-4 overflow-visible">
+              <nav aria-label={t("Main navigation")} className="hidden xl:flex flex-1 min-w-0 justify-start px-1 2xl:px-2 overflow-visible">
                 <ul className="flex items-center space-x-0.5 xl:space-x-1">
                   <li>
                     <Link
