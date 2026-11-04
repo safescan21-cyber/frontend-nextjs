@@ -49,13 +49,13 @@ const cleanMessages = (list) => {
   return out.length && out[out.length - 1].role === 'user' ? out : null;
 };
 
-// Our model runs on the server's processor: short answers, and a generous time limit
+// Our model runs on the server's processor: short answers, and a time limit a visitor will wait for
 const ask = async (url, key, model, messages) => {
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...(key && { Authorization: `Bearer ${key}` }) },
     body: JSON.stringify({ model, messages, max_tokens: 200, temperature: 0.3 }),
-    signal: AbortSignal.timeout(45000),
+    signal: AbortSignal.timeout(15000), // slower than this: the facts answer below
   });
   const data = await res.json().catch(() => null);
   return data?.choices?.[0]?.message?.content || null;
@@ -115,7 +115,10 @@ export async function POST(request) {
 
   try {
     // Only when the facts really cover the question: a small model invents when it has none
-    if (process.env.LLM_BASE_URL && factsCoverQuestion(facts)) {
+    // (a machine asked for by name: its card is the full answer, at once, instead of ~30 s of the
+    // model retelling it on the server's 2 CPU cores)
+    const namedMachine = facts[0]?.product && facts[0].named >= 0.6;
+    if (process.env.LLM_BASE_URL && factsCoverQuestion(facts) && !namedMachine) {
       const base = process.env.LLM_BASE_URL.replace(/\/$/, '');
       const reply = await ask(`${base}/chat/completions`, process.env.LLM_API_KEY, process.env.LLM_MODEL || 'foodpharma', prompt).catch(() => null);
       if (reply) return Response.json({ reply: withQuote(checked(reply)), source: 'own', quote });
