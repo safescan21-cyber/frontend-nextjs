@@ -54,7 +54,7 @@ const PrivacyPolicy = () => (
         <Section title="Cookies and similar storage">
           <p>
             We use necessary cookies and browser storage to keep you signed in, remember your cart and your cookie choices.
-            Our chat assistant may use your internet address to greet you with your rough city; this is looked up on our own server and not stored. If you use the microphone in the chat, your browser’s speech service (for example Google or Apple) converts your voice to text. Machine videos play through YouTube’s privacy-enhanced player. Analytics tracking runs only if you accept analytics cookies. You can change your choice at any time
+            Our chat assistant may use your internet address to greet you with your rough location (state); this is looked up on our own server and not stored. If you use the microphone in the chat, your browser’s speech service (for example Google or Apple) converts your voice to text. Machine videos play through YouTube’s privacy-enhanced player. Analytics tracking runs only if you accept analytics cookies. You can change your choice at any time
             using “Cookie Settings” at the bottom of every page.
           </p>
         </Section>

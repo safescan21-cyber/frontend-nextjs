@@ -6,6 +6,7 @@ import getBaseURL from "../../utlis/baseURL";
 import { getLeadOrigin } from "../../utlis/leadOrigin";
 import { gaEvent } from "../../utlis/analytics";
 import { LOCALE_CODES } from "../../i18n/locales";
+import { regionName } from "../../utlis/regionNames";
 
 // ─── CONFIG ──────────────────────────────────────────────────────
 const WHATSAPP_NUMBER = "918700792607"; // +91 87007 92607
@@ -26,11 +27,11 @@ const INIT_MSG = {
   isNew: false,
 };
 
-// Nova's greeting, with the visitor's rough city when we can tell it (the words "looks like":
-// it comes from the internet address and is sometimes only the nearest big city)
-const greeting = (city, hindi) => (hindi
-  ? `फूड फार्मा मशीनरी में आपका स्वागत है${city ? `, लगता है आप ${city} से हैं` : ''}! मैं नोवा हूँ। आप किस तरह की मशीन ढूँढ रहे हैं? लिखिए, या माइक दबाकर बोलिए।`
-  : `Welcome to Food Pharma Machinery${city ? `! Looks like you're visiting from ${city}` : ''}. I'm Nova. Which type of machine are you looking for? Type it, or tap the mic and say it.`);
+// Nova's greeting, with the visitor's state when we can tell it (the words "looks like": it comes
+// from the internet address, which is too rough for a city, above all on mobile data)
+const greeting = (place, hindi) => (hindi
+  ? `फूड फार्मा मशीनरी में आपका स्वागत है${place ? `, लगता है आप ${place} से हैं` : ''}! मैं नोवा हूँ। आप किस तरह की मशीन ढूँढ रहे हैं? लिखिए, या माइक दबाकर बोलिए।`
+  : `Welcome to Food Pharma Machinery${place ? `! Looks like you're visiting from ${place}` : ''}. I'm Nova. Which type of machine are you looking for? Type it, or tap the mic and say it.`);
 
 // What Nova says aloud after a spoken question: short, without the whole machine card
 const spokenReply = (answer, hindi) => {
@@ -371,7 +372,7 @@ function LiveChat() {
 
   const pathname = usePathname() || "/";
   const hindi = /^\/hi(\/|$)/.test(pathname);
-  const [welcome, setWelcome] = useState(null); // the greeting, once the city is known
+  const [welcome, setWelcome] = useState(null); // the greeting, once the state is known
   const [soundOn, setSoundOn] = useState(true);
   const autoOpened = useRef(false);
   const touched = useRef(false); // the visitor already used the chat
@@ -404,7 +405,7 @@ function LiveChat() {
       try { sessionStorage.setItem("chatWelcomeShown", "true"); } catch { /* storage blocked */ }
       const area = await fetch(`${getBaseURL()}/api/geo`).then((r) => (r.ok ? r.json() : null)).catch(() => null);
       if (touched.current) return;
-      const text = greeting(area?.country === "IN" ? area.city : "", hindi);
+      const text = greeting(area?.country === "IN" ? regionName(area.region, hindi) : "", hindi);
       setWelcome(text);
       if (window.matchMedia("(min-width: 1024px)").matches) {
         autoOpened.current = true;
