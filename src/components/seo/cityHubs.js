@@ -75,5 +75,5 @@ export const cityHub = (slug) => CITY_HUBS.find((c) => c.slug === slug) || null;
 export const CITY_PAGES = CITY_HUBS.map((c) => ({
   path: `/pharma-machinery-supplier/${c.slug}`,
   title: c.seoTitle || `Pharma Machinery Supplier in ${c.city}`,
-  description: `Pharma machines for ${c.area}: tablet presses, capsule fillers, blister and liquid filling, with installation, AMC and spares.`,
+  description: `Pharma machines for ${c.area}: tablet presses, capsule fillers, blister packing, AMC and spares.`,
 }));
