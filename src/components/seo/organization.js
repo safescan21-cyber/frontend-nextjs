@@ -14,9 +14,8 @@ export const COMPANY = {
   email: 'safescan21@gmail.com',
 };
 
-// One spelling of the address everywhere (Contact, footer, map, Google data)
+// One spelling of the address everywhere (Contact, footer, Google data)
 export const MAP_ADDRESS = `${COMPANY.streetAddress}, ${COMPANY.addressLocality}, ${COMPANY.addressRegion} ${COMPANY.postalCode}, India`;
-export const MAP_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(MAP_ADDRESS)}`;
 
 export const organizationNode = {
   '@type': ['Organization', 'LocalBusiness'],
@@ -36,7 +35,6 @@ export const organizationNode = {
     postalCode: COMPANY.postalCode,
     addressCountry: COMPANY.addressCountry,
   },
-  hasMap: MAP_URL,
   // as on the Contact page
   openingHoursSpecification: [
     { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '08:00', closes: '18:00' },
