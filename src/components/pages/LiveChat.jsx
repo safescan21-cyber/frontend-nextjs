@@ -278,7 +278,7 @@ function MicButton({ hindi, disabled, onText, onError }) {
     r.lang = hindi ? "hi-IN" : "en-IN";
     r.interimResults = false;
     r.onresult = (e) => { const said = e.results[0]?.[0]?.transcript?.trim(); if (said) onText(said); };
-    r.onerror = (e) => onError(e.error === "not-allowed" || e.error === "service-not-allowed" ? "Please allow the microphone for this site, or type your question." : e.error === "no-speech" ? "I didn't hear anything. Please try again." : "Voice isn't working right now. Please type your question.");
+    r.onerror = (e) => onError(e.error === "not-allowed" || e.error === "service-not-allowed" ? "Your browser has blocked the microphone. Click the icon left of the web address, set Microphone to Allow, and reload the page. You can also type your question." : e.error === "audio-capture" ? "I can't find a microphone on this device. Please check it is connected, or type your question." : e.error === "no-speech" ? "I didn't hear anything. Please try again." : "Voice isn't working right now. Please type your question.");
     r.onend = () => setListening(false);
     rec.current = r;
     setListening(true);

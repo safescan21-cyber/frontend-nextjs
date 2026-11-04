@@ -194,6 +194,13 @@ const AddProduct = () => {
     couponCode: '',
     fitsModels: '', // spare parts: machine models, comma separated
   });
+  // A spare part is a product in the "spares" category: it shows under its company in the
+  // Spare Parts menu and on /spares, and sells like any product
+  const isSparePart = product.category === 'spares';
+  const chooseKind = (spare) => {
+    setShowCustomCategory(false);
+    setProduct((p) => ({ ...p, category: spare ? 'spares' : '', color: spare ? p.color || 'custom' : p.color }));
+  };
   const [images, setImages] = useState([]);
   const [faqs, setFaqs] = useState([]);
   const [specifications, setSpecifications] = useState([]);
@@ -375,6 +382,10 @@ const AddProduct = () => {
       showError('Please fill in all required fields.');
       return;
     }
+    if (isSparePart && !product.manufacturer.trim()) {
+      showError('Please enter the company name: spare parts are listed under it in the menu.');
+      return;
+    }
     if (images.length === 0) {
       showError('Please upload at least one product image.');
       return;
@@ -488,18 +499,33 @@ const AddProduct = () => {
         </div>
       )}
 
-      <h2 className="text-2xl font-bold mb-6">Add New Product</h2>
+      <h2 className="text-2xl font-bold mb-6">{isSparePart ? 'Add New Spare Part' : 'Add New Product'}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="flex gap-2" role="group" aria-label="What are you adding?">
+          {[['Machine', false], ['Spare Part', true]].map(([label, spare]) => (
+            <button
+              key={label}
+              type="button"
+              onClick={() => chooseKind(spare)}
+              aria-pressed={isSparePart === spare}
+              className={`flex-1 rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors ${isSparePart === spare ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-300 bg-white text-gray-700 hover:border-blue-400'}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        {isSparePart && <p className="rounded-lg bg-blue-50 p-3 text-sm text-blue-800">This part will show under its company in the Spare Parts menu and on the spares page. With a price and “Sell online” on, customers can buy it.</p>}
+
         {/* ── Basic fields ── */}
         <TextInput
-          label="Product Name"
+          label={isSparePart ? 'Part Name' : 'Product Name'}
           name="name"
-          placeholder="Ex: High-Speed Tablet Press"
+          placeholder={isSparePart ? 'Ex: Punch and die set' : 'Ex: High-Speed Tablet Press'}
           value={product.name}
           onChange={handleChange}
         />
 
-        <div>
+        {!isSparePart && <div>
           <SelectInput
             label="Category"
             name="category"
@@ -526,15 +552,15 @@ const AddProduct = () => {
               {categoryError && <p className="text-red-500 text-xs w-full mt-1">{categoryError}</p>}
             </div>
           )}
-        </div>
+        </div>}
 
-        <SelectInput
+        {!isSparePart && <SelectInput
           label="Color"
           name="color"
           value={product.color}
           onChange={handleChange}
           options={colors}
-        />
+        />}
 
         <SelectWithAdd
           label="Origin (made in)"
@@ -547,7 +573,7 @@ const AddProduct = () => {
           placeholder="Enter country / origin name"
         />
 
-        <SelectWithAdd
+        {!isSparePart && <SelectWithAdd
           label="Product Type"
           name="productType"
           value={product.productType}
@@ -556,7 +582,7 @@ const AddProduct = () => {
           onAdd={addProductType}
           newLabel="➕ Add new product type..."
           placeholder="Enter product type name"
-        />
+        />}
 
         <TextInput
           label="Price (₹) – leave empty to show “Contact for price” with WhatsApp (can be added later)"
@@ -567,9 +593,9 @@ const AddProduct = () => {
           onChange={handleChange}
         />
         <TextInput
-          label="Manufacturer (who makes the machine)"
+          label={isSparePart ? 'Company name (parts are grouped under this in the menu)' : 'Manufacturer (who makes the machine)'}
           name="manufacturer"
-          placeholder="PureLine Machinery Pvt. Ltd."
+          placeholder={isSparePart ? 'SGWEIGH' : 'PureLine Machinery Pvt. Ltd.'}
           value={product.manufacturer}
           onChange={handleChange}
         />
@@ -584,14 +610,14 @@ const AddProduct = () => {
         />
 
         <TextInput
-          label="Model number (used in the serial numbers when sold)"
+          label={isSparePart ? 'Part number (optional)' : 'Model number (used in the serial numbers when sold)'}
           name="modelNumber"
           placeholder="ZP-35D"
           value={product.modelNumber}
           onChange={handleChange}
         />
         <TextInput
-          label="Fits machine models (spare parts, comma separated)"
+          label={isSparePart ? 'Fits machine models (comma separated, so customers can find it by their machine)' : 'Fits machine models (spare parts, comma separated)'}
           name="fitsModels"
           placeholder="ZP-35D, NJP-1200"
           value={product.fitsModels}
