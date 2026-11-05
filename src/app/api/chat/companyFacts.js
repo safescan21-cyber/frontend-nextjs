@@ -125,6 +125,7 @@ export const COMPANY_FACTS = [
   },
   {
     title: 'Machine videos',
+    videoList: true, // only for questions about videos (knowledge.js)
     text: `हमारी मशीनों के वीडियो यहाँ देखिए:\n${Object.entries(VIDEO_HINDI).map(([id, v]) => `${v.machine}: https://www.youtube.com/watch?v=${id}`).join('\n')}`,
     url: `${SITE}/products`,
     asks: ['video dikhao', 'machine ka video dikhao', 'machine video', 'hindi mein video', 'show me machine videos', 'do you have videos?'],

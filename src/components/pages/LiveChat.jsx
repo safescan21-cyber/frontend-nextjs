@@ -269,25 +269,31 @@ function LocationButton({ hindi, onResult }) {
 // Browser speech recognition (Chrome, Edge and Safari; the browser's provider hears the audio)
 const Recognition = () => (typeof window === "undefined" ? null : window.SpeechRecognition || window.webkitSpeechRecognition || null);
 
-function MicButton({ hindi, disabled, onText, onError }) {
+function MicButton({ hindi, disabled, control, onText, onError, onTap }) {
   const [listening, setListening] = useState(false);
   const rec = useRef(null);
   const [supported, setSupported] = useState(false);
   useEffect(() => { setSupported(Boolean(Recognition())); return () => rec.current?.abort(); }, []);
-  if (!supported) return null;
-  const toggle = () => {
-    if (listening) { rec.current?.stop(); return; }
-    stopSpeaking();
+  const start = () => {
     const R = Recognition();
+    if (!R || rec.current) return;
+    stopSpeaking();
     const r = new R();
     r.lang = hindi ? "hi-IN" : "en-IN";
     r.interimResults = false;
     r.onresult = (e) => { const said = e.results[0]?.[0]?.transcript?.trim(); if (said) onText(said); };
-    r.onerror = (e) => onError(e.error === "not-allowed" || e.error === "service-not-allowed" ? "Your browser has blocked the microphone. Click the icon left of the web address, set Microphone to Allow, and reload the page. You can also type your question." : e.error === "audio-capture" ? "I can't find a microphone on this device. Please check it is connected, or type your question." : e.error === "no-speech" ? "I didn't hear anything. Please try again." : "Voice isn't working right now. Please type your question.");
-    r.onend = () => setListening(false);
+    r.onerror = (e) => onError(e.error);
+    r.onend = () => { rec.current = null; setListening(false); };
     rec.current = r;
     setListening(true);
-    r.start();
+    try { r.start(); } catch { rec.current = null; setListening(false); }
+  };
+  control.current = { start, stop: () => rec.current?.abort() };
+  if (!supported) return null;
+  const toggle = () => {
+    if (listening) { rec.current?.stop(); onTap(false); return; }
+    onTap(true);
+    start();
   };
   return (
     <button type="button" onClick={toggle} disabled={disabled} aria-label={listening ? "Stop listening" : "Speak your question"} aria-pressed={listening} className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 disabled:opacity-40 ${listening ? "bg-rose-600 text-white animate-pulse" : "bg-stone-800 text-amber-300 hover:bg-stone-700"}`}>
@@ -411,6 +417,11 @@ function LiveChat() {
   const [soundOn, setSoundOn] = useState(true);
   const autoOpened = useRef(false);
   const touched = useRef(false); // the visitor already used the chat
+  // Voice conversation: starts when the visitor taps the mic, and then the mic reopens after each
+  // answer. It ends when they tap the mic again, close the chat or stay silent twice.
+  const mic = useRef(null);
+  const voiceChat = useRef(false);
+  const silences = useRef(0);
 
   useEffect(() => { setSoundOn(!soundOff()); }, []);
   const toggleSound = () => {
@@ -515,7 +526,7 @@ function LiveChat() {
   useEffect(() => {
     // An auto-opened chat doesn't take the keyboard focus from the page
     if (open) { setUnread(0); if (!autoOpened.current) setTimeout(() => inputRef.current?.focus(), 200); }
-    if (!open) { autoOpened.current = false; cancelPendingSound(); }
+    if (!open) { autoOpened.current = false; cancelPendingSound(); voiceChat.current = false; mic.current?.stop(); stopSpeaking(); }
   }, [open]);
 
   useEffect(() => {
@@ -538,7 +549,36 @@ function LiveChat() {
   };
 
   // ─── Send message ──────────────────────────────────────────────
-  const sendMessage = useCallback(async (text, { spoken = false } = {}) => {
+  const listenAgain = () => { if (voiceChat.current) mic.current?.start(); };
+  // Every answer is spoken (unless sounds are off), then Nova asks for the next thing and listens
+  const sayAnswer = async (answer) => {
+    if (soundOff()) { listenAgain(); return; }
+    const ask = hindi ? " और क्या जानना चाहेंगे?" : " What else would you like to know?";
+    const said = await speak(`${spokenReply(answer, hindi)}${voiceChat.current ? ask : ""}`, listenAgain);
+    if (said) return;
+    // no voice for this text on the device: say it in English, or at least point to the screen
+    const english = answer.machine ? spokenReply(answer, false) : "Here is what I found. Please see the answer on your screen.";
+    if (!(await speak(english, listenAgain))) listenAgain();
+  };
+
+  const onMicError = (code) => {
+    const say = (content) => setMsgs((prev) => [...prev, { role: "assistant", content, isNew: true }]);
+    if (code === "aborted") return;
+    if (code === "no-speech" && voiceChat.current) {
+      silences.current += 1;
+      if (silences.current < 2) { setTimeout(listenAgain, 300); return; }
+      voiceChat.current = false;
+      say(hindi ? "मैं सुनना बंद कर रही हूँ। बोलने के लिए माइक दबाइए।" : "I've stopped listening. Tap the mic when you want to talk.");
+      return;
+    }
+    voiceChat.current = false;
+    if (code === "not-allowed" || code === "service-not-allowed") say("Your browser has blocked the microphone. Click the icon left of the web address, set Microphone to Allow, and reload the page. You can also type your question.");
+    else if (code === "audio-capture") say("I can't find a microphone on this device. Please check it is connected, or type your question.");
+    else if (code === "no-speech") say("I didn't hear anything. Please try again.");
+    else say("Voice isn't working right now. Please type your question.");
+  };
+
+  const sendMessage = useCallback(async (text) => {
     const content = (text || input).trim();
     if (!content || loading) return;
     setInput("");
@@ -567,7 +607,7 @@ function LiveChat() {
 
       setMsgs(prev => [...prev, botMsg]);
       playSound("message");
-      if (spoken && !soundOff()) speak(spokenReply(answer, hindi));
+      sayAnswer(answer);
       if (!open) setUnread(n => n + 1);
     } catch (err) {
       console.error("AI error:", err);
@@ -777,8 +817,10 @@ function LiveChat() {
             <MicButton
               hindi={hindi}
               disabled={loading}
-              onText={(said) => sendMessage(said, { spoken: true })}
-              onError={(message) => setMsgs((prev) => [...prev, { role: "assistant", content: message, isNew: true }])}
+              control={mic}
+              onTap={(on) => { voiceChat.current = on; silences.current = 0; }}
+              onText={(said) => { silences.current = 0; sendMessage(said); }}
+              onError={onMicError}
             />
             <button
               onClick={() => sendMessage()}

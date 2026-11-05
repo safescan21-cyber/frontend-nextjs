@@ -153,8 +153,9 @@ export const findFacts = async (question, limit = 6) => {
   // ("Do you have a checkweigher?" gets the English machine answer, "video dikhao" the film list)
   const filmWords = new Set(['video', 'videos', 'hindi', 'dikhao', 'samjhao', 'show', 'machine']);
   const wantsFilm = q.some((w) => ['video', 'videos', 'hindi'].includes(w)) && q.some((w) => !filmWords.has(w));
+  const asksVideo = q.some((w) => ['video', 'videos', 'hindi'].includes(w));
   return idx.facts
-    .filter((f) => !f.film || wantsFilm)
+    .filter((f) => (!f.film || wantsFilm) && (!f.videoList || asksVideo))
     .map((f) => {
       let score = 0;
       let hits = 0; // how many of the question's words this fact contains

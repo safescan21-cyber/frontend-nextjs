@@ -86,8 +86,10 @@ export async function POST(request) {
   // A machine with a listed price the visitor asked about: the chat shows an instant quotation form
   // The machine the visitor named, if it is in the shop. With a listed price the chat offers the
   // instant quotation at once; without one the chat shows the expert's phone and WhatsApp.
-  const named = facts[0]?.product && facts[0].named >= 0.6 ? facts[0].product : null;
-  const machine = named && { id: named.id, name: named.name, url: facts[0].url, price: named.price };
+  // (from the latest message alone: the facts also cover the one before, for follow-up questions)
+  const top = (await findFacts(messages[messages.length - 1].content, 1).catch(() => []))[0];
+  const named = top?.product && top.named >= 0.6 ? top.product : null;
+  const machine = named && { id: named.id, name: named.name, url: top.url, price: named.price };
   const quote = quoteOffer(facts, asked) || (named?.price > 0 ? named : null);
 
   // Nothing good to answer with: put the question on the admin's list (the latest message only)
