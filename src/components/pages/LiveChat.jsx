@@ -21,17 +21,14 @@ const QUICK_REPLIES = [
   { icon: "📞", text: "Connect me to WhatsApp" },
 ];
 
-const INIT_MSG = {
-  role: "assistant",
-  content: "Hey there! 👋 I'm Nova, your Food Pharma Machinery assistant. Ask me about our equipment, or jump to WhatsApp to speak with a real expert.",
-  isNew: false,
-};
-
 // Nova's greeting, with the visitor's state when we can tell it (the words "looks like": it comes
 // from the internet address, which is too rough for a city, above all on mobile data)
 const greeting = (place, hindi) => (hindi
   ? `फूड फार्मा मशीनरी में आपका स्वागत है${place ? `, लगता है आप ${place} से हैं` : ''}! मैं नोवा हूँ। आप किस तरह की मशीन ढूँढ रहे हैं? लिखिए, या माइक दबाकर बोलिए।`
   : `Welcome to Food Pharma Machinery${place ? `! Looks like you're visiting from ${place}` : ''}. I'm Nova. Which type of machine are you looking for? Type it, or tap the mic and say it.`);
+
+// The first message: the plain welcome, until the visitor's area is known
+const INIT_MSG = { role: "assistant", content: greeting("", false), isNew: false, askLocation: true };
 
 // The city a visitor found with "Use my exact location", kept in their own browser so the
 // rough guess doesn't come back on the next page or visit
@@ -404,7 +401,7 @@ function LiveChat() {
   const [loading, setLoading] = useState(false);
   const [unread,  setUnread]  = useState(1);
   const [showWelcome, setShowWelcome] = useState(false);
-  const bottomRef = useRef(null);
+  const listRef = useRef(null);
   const inputRef  = useRef(null);
   const chatHistory = useRef([]);
   const welcomeTimeout = useRef(null);
@@ -435,7 +432,7 @@ function LiveChat() {
   // the world or an unknown state
   const buildGreeting = useCallback(async () => {
     const saved = savedPlace();
-    const area = saved ? null : await fetch(`${getBaseURL()}/api/geo`).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+    const area = saved ? null : await fetch(`${getBaseURL()}/api/geo`, { signal: AbortSignal.timeout(3000) }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
     const countrySite = LOCALE_CODES.some((c) => c !== "hi" && (pathname === `/${c}` || pathname.startsWith(`/${c}/`)));
     const region = countrySite ? "" : saved?.region || (area?.country === "IN" ? area.region : "");
     const language = hindiPage ? "hi" : regionLanguage(region);
@@ -530,7 +527,8 @@ function LiveChat() {
   }, [open]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const list = listRef.current;
+    if (list) list.scrollTo({ top: msgs.length > 1 || loading ? list.scrollHeight : 0, behavior: "smooth" });
   }, [msgs, loading]);
 
   // ─── AI reply (server side: app/api/chat/route.js keeps the key) ──
@@ -732,9 +730,9 @@ function LiveChat() {
       {/* ─── CHAT PANEL ────────────────────────────────────── */}
       {open && (
         <div className="chat-panel fixed bottom-[140px] lg:bottom-28 right-4 sm:right-6 z-50 flex flex-col rounded-3xl shadow-[0_32px_80px_rgba(0,0,0,0.6)] border border-white/10 overflow-hidden"
-          style={{ width: "min(380px, calc(100vw - 2rem))", maxHeight: "min(calc(100vh - 190px), 520px)", background: "linear-gradient(160deg,#141210 0%,#0e0c0a 100%)" }}>
+          style={{ width: "min(380px, calc(100vw - 2rem))", maxHeight: "min(calc(100vh - 190px), 640px)", background: "linear-gradient(160deg,#141210 0%,#0e0c0a 100%)" }}>
           {/* Header */}
-          <div className="relative px-4 py-3 lg:px-5 lg:py-4 flex items-center gap-3" style={{ background: "linear-gradient(135deg,#1c1a17 0%,#161310 100%)", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+          <div className="relative shrink-0 px-4 py-3 lg:px-5 lg:py-4 flex items-center gap-3" style={{ background: "linear-gradient(135deg,#1c1a17 0%,#161310 100%)", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden rounded-t-3xl pointer-events-none">
               <div className="absolute -top-6 -left-6 w-24 h-24 rounded-full bg-amber-500/10 blur-2xl" />
             </div>
@@ -769,15 +767,15 @@ function LiveChat() {
           </div>
 
           {/* WhatsApp strip */}
-          <div className="px-4 py-2.5" style={{ background: "rgba(37,211,102,0.07)", borderBottom: "1px solid rgba(37,211,102,0.15)" }}>
+          <div className="shrink-0 px-4 py-2.5" style={{ background: "rgba(37,211,102,0.07)", borderBottom: "1px solid rgba(37,211,102,0.15)" }}>
             <WhatsAppButton aiSummary={chatHistory.current.slice(-2).map(m => m.content).join(" | ")} />
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-5 space-y-3 min-h-[220px]">
+          <div ref={listRef} className="flex-1 min-h-0 overflow-y-auto">
+          <div className="px-4 py-5 space-y-3">
             {msgs.map((m, i) => <Bubble key={i} msg={m} isNew={m.isNew} hindi={hindi} onLocated={onLocated} />)}
             {loading && <TypingDots />}
-            <div ref={bottomRef} />
           </div>
 
           {/* Quick Replies */}
@@ -798,9 +796,10 @@ function LiveChat() {
               </div>
             </div>
           )}
+          </div>
 
           {/* Input */}
-          <div className="px-4 py-3 flex items-end gap-2.5" style={{ borderTop: "1px solid rgba(255,255,255,0.07)", background: "rgba(255,255,255,0.02)" }}>
+          <div className="shrink-0 px-4 py-3 flex items-end gap-2.5" style={{ borderTop: "1px solid rgba(255,255,255,0.07)", background: "rgba(255,255,255,0.02)" }}>
             <textarea
               ref={inputRef}
               rows={1}

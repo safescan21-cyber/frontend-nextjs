@@ -755,26 +755,21 @@ const Navbar = () => {
                   onClick={handleLinkClick}
                   aria-label={`Shopping cart, ${cartTotalQuantity} items`}
                   rel="nofollow"
-                  className={`flex items-center gap-1 2xl:gap-2 px-2 2xl:px-4 py-2 text-slate-300 hover:text-amber-400 hover:bg-slate-700/50 rounded-lg transition-all relative ${
+                  className={`flex items-center gap-1 px-2 py-2 text-slate-300 hover:text-amber-400 hover:bg-slate-700/50 rounded-lg transition-all relative ${
                     cartNotification ? 'animate-pulse-cart' : ''
                   } focus:outline-none focus:ring-2 focus:ring-amber-400/50`}
                 >
                   <ShoppingCart className="w-5 h-5" aria-hidden="true" />
                   {cartTotalQuantity > 0 ? (
                     <>
-                      <span className="font-medium text-sm hidden 2xl:inline">
-                        {cartTotalQuantity} {cartTotalQuantity === 1 ? 'item' : 'items'}
-                      </span>
                       <span className="absolute -top-1 -right-0 bg-green-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                         {cartTotalQuantity}
                       </span>
                     </>
-                  ) : (
-                    <span className="text-sm text-slate-400 hidden 2xl:inline">{t("Cart")}</span>
-                  )}
+                  ) : null}
                 </Link>
 
-                <div className="flex items-center space-x-1 2xl:space-x-3 ml-1 2xl:ml-4 pl-1 2xl:pl-4 border-l border-slate-600">
+                <div className="flex items-center space-x-1 2xl:space-x-3 ml-1 2xl:ml-2 pl-1 2xl:pl-2 border-l border-slate-600">
                   {user ? (
                     <div className="relative" ref={userDropRef}>
                       <button
