@@ -503,7 +503,7 @@ const Navbar = () => {
             <div className="flex justify-between items-center h-20 sm:h-24 md:h-28 xl:h-36 gap-2">
 
               {/* Logo - only the image, no text */}
-              <div className="shrink-0 group">
+              <div className="shrink-0 group flex items-center">
                 <Link
                   to="/"
                   onClick={handleLinkClick}
@@ -518,7 +518,7 @@ const Navbar = () => {
                     height="200"
                     fetchPriority="high"
                     decoding="async"
-                    className="h-12 min-[375px]:h-14 sm:h-16 md:h-[72px] w-auto xl:w-36 xl:h-36 2xl:w-52 2xl:h-52 object-contain transition-opacity duration-300 group-hover:opacity-90"
+                    className="h-12 min-[375px]:h-14 sm:h-16 md:h-[72px] w-auto xl:w-36 xl:h-auto 2xl:w-52 object-contain transition-opacity duration-300 group-hover:opacity-90"
                   />
                 </Link>
               </div>
