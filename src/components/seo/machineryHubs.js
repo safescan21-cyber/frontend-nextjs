@@ -28,7 +28,7 @@ export const PHARMA_HUB = {
     path: '/pharma-machinery',
     title: 'Pharmaceutical Machinery Manufacturer & Supplier, India',
     description:
-      'Pharma machine manufacturer in Haridwar, India: pharmaceutical manufacturing machinery for tablets, capsules, liquids and packaging.',
+      'Pharmaceutical manufacturing equipment suppliers in Haridwar, India: every pharmaceutical machine for tablets, capsules, liquids and packing.',
   },
   crumb: 'Pharma machinery',
   theme: 'blue',
