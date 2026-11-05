@@ -553,8 +553,10 @@ function LiveChat() {
   // Every answer is spoken (unless sounds are off), then Nova asks for the next thing and listens
   const sayAnswer = async (answer) => {
     if (soundOff()) { listenAgain(); return; }
-    const ask = hindi ? " और क्या जानना चाहेंगे?" : " What else would you like to know?";
-    const said = await speak(`${spokenReply(answer, hindi)}${voiceChat.current ? ask : ""}`, listenAgain);
+    const line = spokenReply(answer, hindi);
+    // (the follow-up in the language of the answer: most answers are English even in Hindi mode)
+    const ask = /[\u0900-\u097F]/.test(line) ? " और क्या जानना चाहेंगे?" : " What else would you like to know?";
+    const said = await speak(`${line}${voiceChat.current ? ask : ""}`, listenAgain);
     if (said) return;
     // no voice for this text on the device: say it in English, or at least point to the screen
     const english = answer.machine ? spokenReply(answer, false) : "Here is what I found. Please see the answer on your screen.";
